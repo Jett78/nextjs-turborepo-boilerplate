@@ -1,7 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export const DB_CONNECTION = 'DB_CONNECTION';
 
@@ -9,10 +13,14 @@ export const DB_CONNECTION = 'DB_CONNECTION';
   providers: [
     {
       provide: DB_CONNECTION,
-      useFactory: () => {
+      useFactory: async () => {
+        const logger = new Logger('Database');
         const pool = new Pool({
           connectionString: process.env.DATABASE_URL,
         });
+        const client = await pool.connect();
+        logger.log('Database connected successfully');
+        client.release();
         return drizzle(pool, { schema });
       },
     },
