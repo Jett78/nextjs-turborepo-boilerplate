@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nest start --watch",
+    "dev": "ts-node -r tsconfig-paths/register src/main.ts",
+    "dev:watch": "nest start --watch --preserveWatchOutput",
     "build": "nest build",
-    "start": "node dist/main",
-    "start:prod": "node dist/main",
+    "start": "node dist/main.js",
+    "start:prod": "node dist/main.js",
     "lint": "eslint \"{src,test}/**/*.ts\" --max-warnings 0",
     "check-types": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
@@ -31,6 +32,8 @@
     "@types/pg": "^8.10.9",
     "drizzle-kit": "^0.28.1",
     "eslint": "^9.39.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "5.9.2"
   }
 }
