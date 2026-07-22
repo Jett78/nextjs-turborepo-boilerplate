@@ -23,7 +23,7 @@ export async function getBlogs(params?: GetBlogsParams): Promise<Blog[]> {
     const url = query ? `${API_ROUTES.BLOG}?${query}` : API_ROUTES.BLOG;
 
     const response = await apiClient<BlogListResponse>(url, {
-      cache: "no-store",
+      next: { tags: ["blogs"] },
     });
 
     if (!response || !response.success || !response.data) return [];
@@ -38,7 +38,7 @@ export async function getBlogBySlug(slug: string): Promise<Blog | null> {
   try {
     const response = await apiClient<BlogResponse>(
       `${API_ROUTES.BLOG}/slug/${slug}`,
-      { cache: "no-store" }
+      { next: { tags: [`blog-${slug}`, "blogs"] } }
     );
 
     if (!response || !response.success || !response.data) return null;
@@ -53,7 +53,7 @@ export async function getBlogById(id: string): Promise<Blog | null> {
   try {
     const response = await apiClient<BlogResponse>(
       `${API_ROUTES.BLOG}/${id}`,
-      { cache: "no-store" }
+      { next: { tags: [`blog-${id}`] } }
     );
 
     if (!response || !response.success || !response.data) return null;
@@ -61,5 +61,20 @@ export async function getBlogById(id: string): Promise<Blog | null> {
   } catch (error) {
     console.error("Error fetching blog:", error);
     return null;
+  }
+}
+
+export async function getAllBlogSlugs(): Promise<string[]> {
+  try {
+    const response = await apiClient<BlogListResponse>(
+      `${API_ROUTES.BLOG}?take=1000&isActive=true`,
+      { next: { tags: ["blogs"] } }
+    );
+
+    if (!response || !response.success || !response.data) return [];
+    return response.data.data?.map((blog) => blog.slug) || [];
+  } catch (error) {
+    console.error("Error fetching blog slugs:", error);
+    return [];
   }
 }

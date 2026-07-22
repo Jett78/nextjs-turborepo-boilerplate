@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import FileUpload from "@/components/ui/file-upload";
 import { apiClient, TOKEN_TYPES } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
-import { revalidateBlogs } from "@/actions/revalidate-action";
+import { revalidateBlogs, revalidateBlog } from "@/actions/revalidate-action";
 import type { Blog } from "@/types/blog";
 import type { ApiError } from "@/types/base-entity";
 
@@ -100,8 +101,9 @@ export function BlogForm({ blog }: BlogFormProps) {
         tokenType: TOKEN_TYPES.USER,
       });
     },
-    onSuccess: async () => {
+    onSuccess: async (_, variables) => {
       await revalidateBlogs();
+      await revalidateBlog(variables.slug);
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       router.push("/dashboard/blogs");
       router.refresh();
@@ -161,11 +163,11 @@ export function BlogForm({ blog }: BlogFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="imageKey">Image Key</Label>
-        <Input
-          id="imageKey"
-          {...register("imageKey")}
-          placeholder="blogs/image.jpg"
+        <Label>Blog Image</Label>
+        <FileUpload
+          defaultImage={imageKey}
+          onSuccess={(url) => setValue("imageKey", url)}
+          returnType="url"
         />
       </div>
 
@@ -245,11 +247,22 @@ export function BlogForm({ blog }: BlogFormProps) {
 
           <div className="space-y-2">
             <Label>OG Image</Label>
-            <Input
-              value={imageKey}
-              disabled
-              className="bg-muted"
-            />
+            {imageKey ? (
+              <div className="relative h-32 rounded-md border">
+                <img
+                  src={imageKey}
+                  alt="OG Preview"
+                  className="h-full w-full rounded-md object-contain"
+                />
+              </div>
+            ) : (
+              <Input
+                value=""
+                disabled
+                className="bg-muted"
+                placeholder="No image uploaded"
+              />
+            )}
           </div>
         </div>
       </div>
