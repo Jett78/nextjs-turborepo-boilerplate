@@ -6,6 +6,7 @@ import { DbModule } from './db/db.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UploadModule } from './modules/upload/upload.module';
     BlogModule,
     AuthModule,
     UploadModule,
+    CompanyProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

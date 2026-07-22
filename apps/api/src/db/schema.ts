@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, timestamp, text, boolean, integer, uuid, index, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, timestamp, text, boolean, integer, uuid, index, pgEnum, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const userRoleEnum = pgEnum('user_role', ['super_admin', 'admin', 'manager', 'customer']);
@@ -30,22 +30,28 @@ export const users = pgTable('users', {
   roleIdx: index('users_role_idx').on(table.role),
 }));
 
+export interface SocialMediaItem {
+  platform: string;
+  url: string;
+  order: number;
+}
+
 export const companyProfiles = pgTable('company_profiles', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  slug: varchar('slug', { length: 255 }).notNull().unique(),
-  description: text('description'),
-  website: varchar('website', { length: 500 }),
-  email: varchar('email', { length: 255 }),
-  phone: varchar('phone', { length: 50 }),
+  id: uuid('id').defaultRandom().primaryKey(),
+  companyName: varchar('company_name', { length: 255 }).notNull(),
+  companyDescription: text('company_description'),
   address: text('address'),
-  logo: varchar('logo', { length: 500 }),
-  founded: integer('founded'),
-  industry: varchar('industry', { length: 100 }),
-  employeeCount: integer('employee_count'),
+  phoneNumber: varchar('phone_number', { length: 50 }),
+  email: varchar('email', { length: 255 }),
+  logoKey: varchar('logo_key', { length: 500 }),
+  footerLogoKey: varchar('footer_logo_key', { length: 500 }),
+  faviconKey: varchar('favicon_key', { length: 500 }),
+  whatsappNumber: varchar('whatsapp_number', { length: 50 }),
+  googleMap: text('google_map'),
+  socialMedia: jsonb('social_media').$type<SocialMediaItem[]>().default([]),
   isActive: boolean('is_active').default(true).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const blogs = pgTable('blogs', {
@@ -73,7 +79,8 @@ export const seoMetas = pgTable('seo_metas', {
   ogImageKey: varchar('og_image_key', { length: 500 }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-  blogId: uuid('blog_id').unique().references(() => blogs.id, { onDelete: 'cascade' }),
+  blogId: uuid('blog_id').references(() => blogs.id, { onDelete: 'cascade' }),
+  companyProfileId: uuid('company_profile_id').references(() => companyProfiles.id, { onDelete: 'cascade' }),
 });
 
 export const blogsRelations = relations(blogs, ({ one }) => ({
@@ -83,9 +90,20 @@ export const blogsRelations = relations(blogs, ({ one }) => ({
   }),
 }));
 
+export const companyProfilesRelations = relations(companyProfiles, ({ one }) => ({
+  seoMeta: one(seoMetas, {
+    fields: [companyProfiles.id],
+    references: [seoMetas.companyProfileId],
+  }),
+}));
+
 export const seoMetasRelations = relations(seoMetas, ({ one }) => ({
   blog: one(blogs, {
     fields: [seoMetas.blogId],
     references: [blogs.id],
+  }),
+  companyProfile: one(companyProfiles, {
+    fields: [seoMetas.companyProfileId],
+    references: [companyProfiles.id],
   }),
 }));

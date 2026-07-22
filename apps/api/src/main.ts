@@ -23,6 +23,7 @@ async function bootstrap() {
     .addTag('auth', 'Authentication endpoints')
     .addTag('blogs', 'Blog management')
     .addTag('upload', 'File upload to S3')
+    .addTag('company-profile', 'Company profile management')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
