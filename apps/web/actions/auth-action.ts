@@ -1,27 +1,13 @@
 "use server";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import type { LoginResponse, LoginResult } from "@/types/auth";
 
-interface LoginResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: {
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName?: string;
-      role: string;
-    };
-    token: string;
-  };
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export async function loginAction(
   email: string,
   password: string
-): Promise<{ success: boolean; token?: string; error?: string }> {
+): Promise<LoginResult> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",

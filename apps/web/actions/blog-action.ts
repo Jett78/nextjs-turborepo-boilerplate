@@ -3,13 +3,7 @@
 import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
 import type { Blog, BlogListResponse, BlogResponse } from "@/types/blog";
-
-interface GetBlogsParams {
-  skip?: number;
-  take?: number;
-  search?: string;
-  isActive?: boolean;
-}
+import type { GetBlogsParams } from "@/types/components";
 
 export async function getBlogs(params?: GetBlogsParams): Promise<Blog[]> {
   try {

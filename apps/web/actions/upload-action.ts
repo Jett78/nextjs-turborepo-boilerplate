@@ -1,28 +1,9 @@
 "use server";
 
 import { cookies } from "next/headers";
+import type { UploadResponse, UploadResult } from "@/types/upload";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-interface UploadResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: {
-    key: string;
-    url: string;
-    bucket: string;
-  };
-}
-
-interface UploadResult {
-  success: boolean;
-  data?: {
-    urls: { original: string };
-    keys: { original: string };
-  };
-  error?: string;
-}
 
 export async function uploadSingleImage(
   formData: FormData

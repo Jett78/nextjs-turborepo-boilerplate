@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight } from "lucide-react";
-import type { Blog } from "@/types/blog";
+import type { BlogCardProps } from "@/types/components";
 
 function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("en-US", {
@@ -14,11 +14,6 @@ function formatDate(date: Date): string {
 function getExcerpt(text: string, maxLength: number = 120): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength).trim() + "...";
-}
-
-interface BlogCardProps {
-  blog: Blog;
-  variant?: "default" | "featured";
 }
 
 export function BlogCard({ blog, variant = "default" }: BlogCardProps) {

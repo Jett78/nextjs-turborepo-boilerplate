@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { BlogForm } from "@/components/dashboard/blog-form";
 import Link from "next/link";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
 async function getBlog(id: string) {
-  const res = await fetch(`http://localhost:4000/blogs/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/blogs/${id}`, {
     cache: "no-store",
   });
   if (!res.ok) return null;

@@ -39,7 +39,7 @@ export function BlogList() {
     );
   }
 
-  const blogs = data?.data?.data || [];
+  const blogs = data || [];
 
   if (blogs.length === 0) {
     return (

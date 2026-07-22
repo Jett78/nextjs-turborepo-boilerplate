@@ -3,14 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { uploadSingleImage } from "@/actions/upload-action";
-
-interface FileUploadProps {
-  onSuccess?: (value: string) => void;
-  defaultImage?: string;
-  className?: string;
-  returnType?: "url" | "key";
-  accept?: string;
-}
+import type { FileUploadProps } from "@/types/components";
 
 const FIXED_FOLDER = "blogs";
 

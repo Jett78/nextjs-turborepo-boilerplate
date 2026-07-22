@@ -4,10 +4,7 @@ import { Navbar } from "@/components/sections/navbar";
 import { Footer } from "@/components/sections/footer";
 import { getBlogBySlug, getAllBlogSlugs } from "@/actions/blog-action";
 import type { Metadata } from "next";
-
-interface BlogPostPageProps {
-  params: Promise<{ slug: string }>;
-}
+import type { BlogPostPageProps } from "@/types/components";
 
 function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("en-US", {
