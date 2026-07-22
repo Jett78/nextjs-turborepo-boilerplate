@@ -22,6 +22,7 @@ async function bootstrap() {
     .addBearerAuth({ type: 'http', scheme: 'bearer' }, 'JWT-auth')
     .addTag('auth', 'Authentication endpoints')
     .addTag('blogs', 'Blog management')
+    .addTag('upload', 'File upload to S3')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
