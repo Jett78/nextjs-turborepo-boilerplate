@@ -1,35 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/ui/file-upload";
-import { apiClient, TOKEN_TYPES } from "@/lib/api-client";
+import { useCrud } from "@/hooks/useCRUD";
+import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateBlogs, revalidateBlog } from "@/actions/revalidate-action";
-import type { Blog } from "@/types/blog";
-import type { ApiError } from "@/types/base-entity";
+import type { BlogFormProps } from "@/types/components";
 
-interface BlogFormProps {
-  blog?: Blog;
-}
-
-interface BlogFormData {
-  title: string;
-  slug: string;
-  description: string;
-  imageKey: string;
-  isActive: boolean;
-  metaTitle: string;
-  metaDescription: string;
-  metaKeywords: string;
-}
-
-function slugify(text: string): string {
+function generateSlug(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")
@@ -39,116 +22,121 @@ function slugify(text: string): string {
 
 export function BlogForm({ blog }: BlogFormProps) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const isEditing = !!blog;
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<BlogFormData>({
-    defaultValues: {
-      title: blog?.title || "",
-      slug: blog?.slug || "",
-      description: blog?.description || "",
-      imageKey: blog?.imageKey || "",
-      isActive: blog?.isActive ?? true,
+  const { create, put } = useCrud<Record<string, any>>({
+    endpoint: API_ROUTES.BLOG,
+    queryKey: "blogs",
+    isAuthenticated: true,
+  });
+
+  const { values, errors, handleChange, setField } = useForm({
+    title: blog?.title || "",
+    description: blog?.description || "",
+    imageKey: blog?.imageKey || "",
+    seoMeta: {
       metaTitle: blog?.seoMeta?.metaTitle || "",
       metaDescription: blog?.seoMeta?.metaDescription || "",
       metaKeywords: blog?.seoMeta?.metaKeywords?.join(", ") || "",
+      ogTitle: blog?.seoMeta?.ogTitle || "",
+      ogDescription: blog?.seoMeta?.ogDescription || "",
+      ogImageKey: blog?.seoMeta?.ogImageKey || "",
+      metaRobots: blog?.seoMeta?.metaRobots || "index, follow",
+      canonicalUrl: blog?.seoMeta?.canonicalUrl || "",
     },
   });
 
-  const title = watch("title");
-  const description = watch("description");
-  const imageKey = watch("imageKey");
+  const isPending = isEditing ? put.isPending : create.isPending;
 
-  const mutation = useMutation({
-    mutationFn: (data: BlogFormData) => {
-      const payload = {
-        title: data.title,
-        slug: data.slug,
-        description: data.description,
-        imageKey: data.imageKey,
-        isActive: data.isActive,
-        seoMeta: {
-          metaTitle: data.metaTitle || data.title,
-          metaDescription: data.metaDescription || data.description,
-          metaKeywords: data.metaKeywords
-            ? data.metaKeywords.split(",").map((k) => k.trim()).filter(Boolean)
-            : [],
-          ogTitle: data.metaTitle || data.title,
-          ogDescription: data.metaDescription || data.description,
-          ogImageKey: data.imageKey,
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const slug = generateSlug(values.title);
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+    const metaKeywordsArray = values.seoMeta.metaKeywords
+      ? values.seoMeta.metaKeywords.split(",").map((keyword: string) => keyword.trim())
+      : [];
+
+    const payload = {
+      title: values.title,
+      slug,
+      description: values.description,
+      imageKey: values.imageKey,
+      seoMeta: {
+        metaTitle: values.seoMeta.metaTitle || values.title,
+        metaDescription: values.seoMeta.metaDescription || values.description,
+        metaKeywords: metaKeywordsArray,
+        ogTitle: values.seoMeta.ogTitle || values.seoMeta.metaTitle || values.title,
+        ogDescription: values.seoMeta.ogDescription || values.seoMeta.metaDescription || values.description,
+        ogImageKey: values.seoMeta.ogImageKey || values.imageKey,
+        metaRobots: "index, follow",
+        canonicalUrl: `${baseUrl}/blog/${slug}`,
+      },
+    };
+
+    if (isEditing) {
+      put.mutate(
+        { id: blog.id, data: payload },
+        {
+          onSuccess: async (res: any) => {
+            if (res.success) {
+              await revalidateBlogs();
+              await revalidateBlog(slug);
+              router.push("/dashboard/blogs");
+            }
+          },
+          onError: (error: any) => {
+            alert(error.message || "Failed to update blog");
+          },
+        }
+      );
+    } else {
+      create.mutate(payload, {
+        onSuccess: async (res: any) => {
+          if (res.success) {
+            await revalidateBlogs();
+            await revalidateBlog(slug);
+            router.push("/dashboard/blogs");
+          }
         },
-      };
-
-      if (isEditing) {
-        return apiClient(`${API_ROUTES.BLOG}/${blog.id}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-          isAuthenticated: true,
-          tokenType: TOKEN_TYPES.USER,
-        });
-      }
-
-      return apiClient(API_ROUTES.BLOG, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        isAuthenticated: true,
-        tokenType: TOKEN_TYPES.USER,
+        onError: (error: any) => {
+          alert(error.message || "Failed to create blog");
+        },
       });
-    },
-    onSuccess: async (_, variables) => {
-      await revalidateBlogs();
-      await revalidateBlog(variables.slug);
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      router.push("/dashboard/blogs");
-      router.refresh();
-    },
-    onError: (error: ApiError) => {
-      alert(error.message || "Failed to save blog");
-    },
-  });
-
-  const onSubmit = (data: BlogFormData) => {
-    mutation.mutate(data);
+    }
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setValue("title", value);
-    setValue("slug", slugify(value));
+    setField("title", value);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="title">Title *</Label>
           <Input
             id="title"
-            {...register("title", { required: "Title is required" })}
+            name="title"
+            value={values.title}
             onChange={handleTitleChange}
             placeholder="Blog post title"
           />
           {errors.title && (
-            <p className="text-sm text-destructive">{errors.title.message}</p>
+            <p className="text-sm text-destructive">{errors.title}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="slug">Slug *</Label>
+          <Label>Slug</Label>
           <Input
-            id="slug"
-            {...register("slug", { required: "Slug is required" })}
+            value={generateSlug(values.title)}
+            disabled
+            className="bg-muted"
             placeholder="blog-post-slug"
           />
-          {errors.slug && (
-            <p className="text-sm text-destructive">{errors.slug.message}</p>
-          )}
         </div>
       </div>
 
@@ -156,7 +144,9 @@ export function BlogForm({ blog }: BlogFormProps) {
         <Label htmlFor="description">Description</Label>
         <Textarea
           id="description"
-          {...register("description")}
+          name="description"
+          value={values.description}
+          onChange={handleChange}
           placeholder="Brief description of the blog post"
           rows={3}
         />
@@ -165,31 +155,23 @@ export function BlogForm({ blog }: BlogFormProps) {
       <div className="space-y-2">
         <Label>Blog Image</Label>
         <FileUpload
-          defaultImage={imageKey}
-          onSuccess={(url) => setValue("imageKey", url)}
+          defaultImage={values.imageKey}
+          onSuccess={(url) => setField("imageKey", url)}
           returnType="url"
         />
-      </div>
-
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="isActive"
-          {...register("isActive")}
-          className="h-4 w-4 rounded border-gray-300"
-        />
-        <Label htmlFor="isActive">Active</Label>
       </div>
 
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium mb-4">SEO Settings</h3>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="metaTitle">Meta Title</Label>
+            <Label htmlFor="seoMeta.metaTitle">Meta Title</Label>
             <Input
-              id="metaTitle"
-              {...register("metaTitle")}
-              placeholder={title || "SEO title (defaults to blog title)"}
+              id="seoMeta.metaTitle"
+              name="seoMeta.metaTitle"
+              value={values.seoMeta.metaTitle}
+              onChange={handleChange}
+              placeholder={values.title || "SEO title (defaults to blog title)"}
             />
             <p className="text-xs text-muted-foreground">
               Defaults to blog title if empty
@@ -197,11 +179,13 @@ export function BlogForm({ blog }: BlogFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="metaDescription">Meta Description</Label>
+            <Label htmlFor="seoMeta.metaDescription">Meta Description</Label>
             <Textarea
-              id="metaDescription"
-              {...register("metaDescription")}
-              placeholder={description || "SEO description (defaults to blog description)"}
+              id="seoMeta.metaDescription"
+              name="seoMeta.metaDescription"
+              value={values.seoMeta.metaDescription}
+              onChange={handleChange}
+              placeholder={values.description || "SEO description (defaults to blog description)"}
               rows={2}
             />
             <p className="text-xs text-muted-foreground">
@@ -210,10 +194,12 @@ export function BlogForm({ blog }: BlogFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="metaKeywords">Meta Keywords</Label>
+            <Label htmlFor="seoMeta.metaKeywords">Meta Keywords</Label>
             <Input
-              id="metaKeywords"
-              {...register("metaKeywords")}
+              id="seoMeta.metaKeywords"
+              name="seoMeta.metaKeywords"
+              value={values.seoMeta.metaKeywords}
+              onChange={handleChange}
               placeholder="keyword1, keyword2, keyword3"
             />
             <p className="text-xs text-muted-foreground">
@@ -223,53 +209,9 @@ export function BlogForm({ blog }: BlogFormProps) {
         </div>
       </div>
 
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-medium mb-4">Open Graph (Auto-filled)</h3>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>OG Title</Label>
-            <Input
-              value={title}
-              disabled
-              className="bg-muted"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>OG Description</Label>
-            <Textarea
-              value={description}
-              disabled
-              className="bg-muted"
-              rows={2}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>OG Image</Label>
-            {imageKey ? (
-              <div className="relative h-32 rounded-md border">
-                <img
-                  src={imageKey}
-                  alt="OG Preview"
-                  className="h-full w-full rounded-md object-contain"
-                />
-              </div>
-            ) : (
-              <Input
-                value=""
-                disabled
-                className="bg-muted"
-                placeholder="No image uploaded"
-              />
-            )}
-          </div>
-        </div>
-      </div>
-
       <div className="flex gap-4">
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending
+        <Button type="submit" disabled={isPending}>
+          {isPending
             ? "Saving..."
             : isEditing
               ? "Update Blog"

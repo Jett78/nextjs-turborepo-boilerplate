@@ -1,104 +1,91 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient, QueryKey } from "@tanstack/react-query";
-import { apiClient, TOKEN_TYPES } from "@/lib/api-client";
-import type { PaginatedResponse, CommonResponse } from "@/types/base-entity";
+import { apiClient } from "@/lib/api-client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { CrudOptions } from "@/types/hooks";
 
-interface UseCrudOptions {
-  endpoint: string;
-  queryKey: string;
-  isAuthenticated?: boolean;
-}
-
-interface ListParams {
-  skip?: number;
-  take?: number;
-  search?: string;
-  [key: string]: unknown;
-}
-
-export function useCrud<T extends { id: string }>({
+export function useCrud<T>({
   endpoint,
   queryKey,
-  isAuthenticated = false,
-}: UseCrudOptions) {
+  isAuthenticated,
+}: CrudOptions<T>) {
   const queryClient = useQueryClient();
-  const keys = {
-    all: [queryKey] as const,
-    lists: () => [...keys.all, "list"] as const,
-    list: (params?: ListParams) => [...keys.lists(), params ?? {}] as const,
-    details: () => [...keys.all, "detail"] as const,
-    detail: (id: string) => [...keys.details(), id] as const,
-  };
 
-  const getAll = (params?: ListParams) => {
-    const searchParams = new URLSearchParams();
-    if (params?.skip !== undefined) searchParams.set("skip", String(params.skip));
-    if (params?.take !== undefined) searchParams.set("take", String(params.take));
-    if (params?.search) searchParams.set("search", params.search);
-
-    const query = searchParams.toString();
-    const url = query ? `${endpoint}?${query}` : endpoint;
+  const getAll = (params?: Record<string, string | number | boolean>) => {
+    const queryString = params
+      ? "?" +
+        Object.entries(params)
+          .filter(([_, value]) => value !== undefined && value !== "")
+          .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+          .join("&")
+      : "";
 
     return useQuery({
-      queryKey: keys.list(params),
-      queryFn: () =>
-        apiClient<CommonResponse<PaginatedResponse<T>>>(url, {
-          isAuthenticated,
-          tokenType: isAuthenticated ? TOKEN_TYPES.USER : undefined,
-        }),
+      queryKey: [queryKey, params],
+      queryFn: () => apiClient<T[]>(`${endpoint}${queryString}`, { isAuthenticated }),
     });
   };
 
-  const getOne = (id: string) => {
-    return useQuery({
-      queryKey: keys.detail(id),
-      queryFn: () =>
-        apiClient<CommonResponse<T>>(`${endpoint}/${id}`, {
-          isAuthenticated,
-          tokenType: isAuthenticated ? TOKEN_TYPES.USER : undefined,
-        }),
+  const getOne = (id: string | number) =>
+    useQuery({
+      queryKey: [queryKey, id],
+      queryFn: () => apiClient<T>(`${endpoint}/${id}`),
+      enabled: !!id,
     });
-  };
 
   const create = useMutation({
-    mutationFn: (data: Partial<T>) =>
-      apiClient<CommonResponse<T>>(endpoint, {
+    mutationFn: (data: T) =>
+      apiClient(endpoint, {
         method: "POST",
         body: JSON.stringify(data),
-        isAuthenticated,
-        tokenType: isAuthenticated ? TOKEN_TYPES.USER : undefined,
+        isAuthenticated: isAuthenticated,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: keys.lists() });
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
     },
   });
 
   const update = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<T> }) =>
-      apiClient<CommonResponse<T>>(`${endpoint}/${id}`, {
+    mutationFn: ({ id, data }: { id: string | number; data: T }) =>
+      apiClient(`${endpoint}/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+        isAuthenticated: isAuthenticated,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
+    },
+  });
+
+  const put = useMutation({
+    mutationFn: ({ id, data }: { id: string | number; data: T }) =>
+      apiClient(`${endpoint}/${id}`, {
         method: "PUT",
         body: JSON.stringify(data),
-        isAuthenticated,
-        tokenType: isAuthenticated ? TOKEN_TYPES.USER : undefined,
+        isAuthenticated: isAuthenticated,
       }),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: keys.lists() });
-      queryClient.invalidateQueries({ queryKey: keys.detail(id) });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
     },
   });
 
   const remove = useMutation({
-    mutationFn: (id: string) =>
-      apiClient<CommonResponse<null>>(`${endpoint}/${id}`, {
+    mutationFn: (id: string | number) =>
+      apiClient(`${endpoint}/${id}`, {
         method: "DELETE",
-        isAuthenticated,
-        tokenType: isAuthenticated ? TOKEN_TYPES.USER : undefined,
+        isAuthenticated: isAuthenticated,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: keys.lists() });
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
     },
   });
 
-  return { getAll, getOne, create, update, remove, keys };
+  return {
+    getAll,
+    getOne,
+    create,
+    update,
+    remove,
+    put,
+  };
 }
