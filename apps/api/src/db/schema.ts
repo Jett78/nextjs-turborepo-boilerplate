@@ -1,13 +1,34 @@
-import { pgTable, serial, varchar, timestamp, text, boolean, integer, uuid, index } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, timestamp, text, boolean, integer, uuid, index, pgEnum } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
+export const userRoleEnum = pgEnum('user_role', ['super_admin', 'admin', 'manager', 'customer']);
+export const authProviderEnum = pgEnum('auth_provider', ['email', 'google', 'github']);
+
 export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
+  id: uuid('id').defaultRandom().primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+  phone: varchar('phone', { length: 20 }).unique(),
+  passwordHash: varchar('password_hash', { length: 255 }),
+  firstName: varchar('first_name', { length: 100 }).notNull(),
+  lastName: varchar('last_name', { length: 100 }),
+  imageKey: varchar('image_key', { length: 500 }),
+  role: userRoleEnum('role').default('super_admin').notNull(),
+  provider: authProviderEnum('provider').default('email').notNull(),
+  providerId: varchar('provider_id', { length: 255 }),
+  providerData: text('provider_data'),
+  isActive: boolean('is_active').default(true).notNull(),
+  isEmailVerified: boolean('is_email_verified').default(false).notNull(),
+  isPhoneVerified: boolean('is_phone_verified').default(false).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
+}, (table) => ({
+  emailIdx: index('users_email_idx').on(table.email),
+  phoneIdx: index('users_phone_idx').on(table.phone),
+  isActiveIdx: index('users_is_active_idx').on(table.isActive),
+  roleIdx: index('users_role_idx').on(table.role),
+}));
 
 export const companyProfiles = pgTable('company_profiles', {
   id: serial('id').primaryKey(),

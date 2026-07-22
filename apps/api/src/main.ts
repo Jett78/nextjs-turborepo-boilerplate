@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
@@ -6,11 +7,21 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
   const config = new DocumentBuilder()
     .setTitle('API Documentation')
     .setDescription('NestJS API with PostgreSQL and Drizzle ORM')
     .setVersion('1.0')
-    .addTag('health')
+    .addBearerAuth({ type: 'http', scheme: 'bearer' }, 'JWT-auth')
+    .addTag('auth', 'Authentication endpoints')
+    .addTag('blogs', 'Blog management')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
