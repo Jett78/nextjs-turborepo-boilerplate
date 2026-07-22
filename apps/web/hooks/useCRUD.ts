@@ -22,14 +22,20 @@ export function useCrud<T>({
 
     return useQuery({
       queryKey: [queryKey, params],
-      queryFn: () => apiClient<T[]>(`${endpoint}${queryString}`, { isAuthenticated }),
+      queryFn: async () => {
+        const response = await apiClient<any>(`${endpoint}${queryString}`, { isAuthenticated });
+        return response?.data?.data || response?.data || [];
+      },
     });
   };
 
   const getOne = (id: string | number) =>
     useQuery({
       queryKey: [queryKey, id],
-      queryFn: () => apiClient<T>(`${endpoint}/${id}`),
+      queryFn: async () => {
+        const response = await apiClient<any>(`${endpoint}/${id}`);
+        return response?.data || response;
+      },
       enabled: !!id,
     });
 

@@ -62,7 +62,7 @@ export function BlogList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {blogs.map((blog) => (
+          {blogs.map((blog: any) => (
             <TableRow key={blog.id}>
               <TableCell className="font-medium">{blog.title}</TableCell>
               <TableCell className="text-muted-foreground">

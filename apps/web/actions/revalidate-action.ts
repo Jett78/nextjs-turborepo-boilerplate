@@ -10,3 +10,7 @@ export async function revalidateBlog(slug: string) {
   revalidateTag("blogs", "updateTag");
   revalidateTag(`blog-${slug}`, "updateTag");
 }
+
+export async function revalidateCompanyProfile() {
+  revalidateTag("company-profile", "updateTag");
+}

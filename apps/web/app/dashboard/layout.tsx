@@ -21,6 +21,12 @@ export default function DashboardLayout({
               Blogs
             </Link>
             <Link
+              href="/dashboard/company-profile"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Company Profile
+            </Link>
+            <Link
               href="/"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
             >
