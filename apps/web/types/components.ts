@@ -29,3 +29,11 @@ export interface FileUploadProps {
 export interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
+
+export interface TestimonialFormProps {
+  testimonial?: import("./testimonial").Testimonial;
+}
+
+export interface DeleteTestimonialButtonProps {
+  id: string;
+}

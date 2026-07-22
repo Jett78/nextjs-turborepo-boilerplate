@@ -14,3 +14,7 @@ export async function revalidateBlog(slug: string) {
 export async function revalidateCompanyProfile() {
   revalidateTag("company-profile", "updateTag");
 }
+
+export async function revalidateTestimonials() {
+  revalidateTag("testimonials", "updateTag");
+}
