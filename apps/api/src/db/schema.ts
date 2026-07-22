@@ -107,3 +107,16 @@ export const seoMetasRelations = relations(seoMetas, ({ one }) => ({
     references: [companyProfiles.id],
   }),
 }));
+
+export const testimonials = pgTable('testimonials', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  message: text('message').notNull(),
+  avatar: varchar('avatar', { length: 500 }),
+  designation: varchar('designation', { length: 255 }),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  sortOrderIdx: index('testimonials_sort_order_idx').on(table.sortOrder),
+}));

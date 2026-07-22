@@ -7,6 +7,7 @@ import { BlogModule } from './modules/blog/blog.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
+import { TestimonialModule } from './modules/testimonial/testimonial.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CompanyProfileModule } from './modules/company-profile/company-profile.
     AuthModule,
     UploadModule,
     CompanyProfileModule,
+    TestimonialModule,
   ],
   controllers: [AppController],
   providers: [AppService],
