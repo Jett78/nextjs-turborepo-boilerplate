@@ -27,6 +27,12 @@ export default function DashboardLayout({
               Testimonials
             </Link>
             <Link
+              href="/dashboard/inquiries"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Inquiries
+            </Link>
+            <Link
               href="/dashboard/company-profile"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
             >

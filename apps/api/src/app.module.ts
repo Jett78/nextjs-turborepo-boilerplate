@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
 import { TestimonialModule } from './modules/testimonial/testimonial.module';
+import { InquiryModule } from './modules/inquiry/inquiry.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TestimonialModule } from './modules/testimonial/testimonial.module';
     UploadModule,
     CompanyProfileModule,
     TestimonialModule,
+    InquiryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -5,4 +5,5 @@ export const API_ROUTES = {
   BLOG: `${API_BASE_URL}/blogs`,
   COMPANY_PROFILE: `${API_BASE_URL}/company-profile`,
   TESTIMONIAL: `${API_BASE_URL}/testimonials`,
+  INQUIRY: `${API_BASE_URL}/inquiries`,
 } as const;
