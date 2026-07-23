@@ -8,6 +8,13 @@
       "when": 1784623848192,
       "tag": "0000_eminent_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753334400000,
+      "tag": "0001_add_company_colors",
+      "breakpoints": true
     }
   ]
 }

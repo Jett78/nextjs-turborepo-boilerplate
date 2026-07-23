@@ -87,6 +87,12 @@ export class CompanyProfileEntity {
   @ApiProperty()
   googleMap: string | null;
 
+  @ApiProperty({ required: false })
+  primaryColor: string | null;
+
+  @ApiProperty({ required: false })
+  secondaryColor: string | null;
+
   @ApiProperty({ type: [SocialMediaEntity] })
   socialMedia: SocialMediaEntity[] | null;
 

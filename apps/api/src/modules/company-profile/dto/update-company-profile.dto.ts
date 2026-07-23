@@ -121,6 +121,18 @@ export class UpdateCompanyProfileDto {
   @IsString()
   googleMap?: string;
 
+  @ApiPropertyOptional({ example: '221.2 83.2% 53.3%', description: 'HSL color value (e.g., "221.2 83.2% 53.3%")' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  primaryColor?: string;
+
+  @ApiPropertyOptional({ example: '210 40% 96.1%', description: 'HSL color value (e.g., "210 40% 96.1%")' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  secondaryColor?: string;
+
   @ApiPropertyOptional({ type: [SocialMediaDto] })
   @IsOptional()
   @IsArray()

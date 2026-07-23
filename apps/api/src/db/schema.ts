@@ -48,6 +48,8 @@ export const companyProfiles = pgTable('company_profiles', {
   faviconKey: varchar('favicon_key', { length: 500 }),
   whatsappNumber: varchar('whatsapp_number', { length: 50 }),
   googleMap: text('google_map'),
+  primaryColor: varchar('primary_color', { length: 50 }),
+  secondaryColor: varchar('secondary_color', { length: 50 }),
   socialMedia: jsonb('social_media').$type<SocialMediaItem[]>().default([]),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

@@ -33,6 +33,8 @@ export interface CompanyProfile {
   faviconKey?: string;
   whatsappNumber?: string;
   googleMap?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
   socialMedia?: SocialMedia[];
   isActive: boolean;
   createdAt: Date;

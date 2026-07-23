@@ -11,6 +11,7 @@ import { useForm } from "@/hooks/useForm";
 import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateCompanyProfile } from "@/actions/revalidate-action";
+import { HslColorPicker } from "@/components/ui/hsl-color-picker";
 import type { CompanyProfile } from "@/types/company-profile";
 
 interface CompanyProfileFormProps {
@@ -32,6 +33,8 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
     faviconKey: profile?.faviconKey || "",
     whatsappNumber: profile?.whatsappNumber || "",
     googleMap: profile?.googleMap || "",
+    primaryColor: profile?.primaryColor || "221.2 83.2% 53.3%",
+    secondaryColor: profile?.secondaryColor || "210 40% 96.1%",
     socialMedia: profile?.socialMedia || [],
     seoMeta: {
       metaTitle: profile?.seoMeta?.metaTitle || "",
@@ -198,6 +201,25 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
               returnType="url"
             />
           </div>
+        </div>
+      </div>
+
+      <div className="border-t pt-6 space-y-6">
+        <h3 className="text-lg font-medium">Brand Colors</h3>
+        <p className="text-sm text-muted-foreground">
+          Set your brand colors in HSL format. These will be used for your site&apos;s theme.
+        </p>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <HslColorPicker
+            label="Primary Color"
+            value={values.primaryColor}
+            onChange={(hsl) => setField("primaryColor", hsl)}
+          />
+          <HslColorPicker
+            label="Secondary Color"
+            value={values.secondaryColor}
+            onChange={(hsl) => setField("secondaryColor", hsl)}
+          />
         </div>
       </div>
 

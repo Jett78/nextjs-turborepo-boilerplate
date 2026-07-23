@@ -62,6 +62,8 @@ async function seed() {
           faviconKey: 'string',
           whatsappNumber: '+977-9800000000',
           googleMap: '<iframe>...</iframe>',
+          primaryColor: '221.2 83.2% 53.3%',
+          secondaryColor: '210 40% 96.1%',
           socialMedia: [
             {
               platform: 'Facebook',
