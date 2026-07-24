@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { BlogForm } from "@/components/dashboard/blog-form";
-import Link from "next/link";
+import BreadCrumbs from "@/components/ui/bread-crumbs";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -24,14 +23,9 @@ export default async function EditBlogPage({
   if (!blog) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Blog Not Found</h1>
-            <p className="text-muted-foreground">The blog you're looking for doesn't exist.</p>
-          </div>
-          <Link href="/dashboard/blogs">
-            <Button variant="outline">Back to Blogs</Button>
-          </Link>
+        <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
+          <h1 className="text-2xl font-bold tracking-tight">Blog Not Found</h1>
+          <BreadCrumbs path="blogs" page="Edit" />
         </div>
       </div>
     );
@@ -39,14 +33,9 @@ export default async function EditBlogPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Edit Blog</h1>
-          <p className="text-muted-foreground">Update blog post</p>
-        </div>
-        <Link href="/dashboard/blogs">
-          <Button variant="outline">Back to Blogs</Button>
-        </Link>
+      <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
+        <h1 className="text-2xl font-bold tracking-tight">Edit Blog</h1>
+        <BreadCrumbs path="blogs" page="Edit" />
       </div>
       <BlogForm blog={blog} />
     </div>

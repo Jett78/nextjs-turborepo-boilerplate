@@ -1,11 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/ui/file-upload";
+import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
@@ -77,45 +75,49 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name *</Label>
-          <Input
-            id="name"
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Basic Info */}
+      <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">Testimonial Information</h3>
+          <p className="text-xs text-slate-500 mt-1">Customer testimonial details.</p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            label="Name *"
             name="name"
             value={values.name}
             onChange={handleChange}
             placeholder="Customer name"
           />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="designation">Designation</Label>
-          <Input
-            id="designation"
+          <FormField
+            label="Designation"
             name="designation"
             value={values.designation}
             onChange={handleChange}
             placeholder="CEO, Company Name"
           />
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="message">Message *</Label>
-        <Textarea
-          id="message"
+        <FormField
+          label="Message *"
           name="message"
+          textarea
+          rows={4}
           value={values.message}
           onChange={handleChange}
           placeholder="Testimonial message"
-          rows={4}
         />
       </div>
 
-      <div className="space-y-2">
-        <Label>Avatar</Label>
+      {/* Avatar */}
+      <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">Avatar</h3>
+          <p className="text-xs text-slate-500 mt-1">Upload customer photo.</p>
+        </div>
+
         <FileUpload
           defaultImage={values.avatar}
           onSuccess={(url) => setField("avatar", url)}
@@ -123,26 +125,28 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
         />
       </div>
 
+      {/* Sort Order (Edit only) */}
       {isEditing && (
-        <div className="space-y-2">
-          <Label htmlFor="sortOrder">Sort Order</Label>
-          <Input
-            id="sortOrder"
+        <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">Sort Order</h3>
+            <p className="text-xs text-slate-500 mt-1">Control display order.</p>
+          </div>
+
+          <FormField
+            label="Sort Order"
             name="sortOrder"
             type="number"
             value={values.sortOrder}
             onChange={handleChange}
             placeholder="Auto-calculated"
-            min="0"
           />
-          <p className="text-xs text-muted-foreground">
-            Leave empty to keep current order. Changing this will swap with existing item.
-          </p>
         </div>
       )}
 
+      {/* Actions */}
       <div className="flex gap-4">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" disabled={isPending} className="bg-primary hover:bg-primary/90">
           {isPending
             ? "Saving..."
             : isEditing

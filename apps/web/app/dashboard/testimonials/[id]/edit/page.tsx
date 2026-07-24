@@ -1,9 +1,8 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { TestimonialForm } from "@/components/dashboard/testimonial-form";
 import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
 import type { Testimonial } from "@/types/testimonial";
+import BreadCrumbs from "@/components/ui/bread-crumbs";
 
 export default async function EditTestimonialPage({
   params,
@@ -21,14 +20,9 @@ export default async function EditTestimonialPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Edit Testimonial</h1>
-          <p className="text-muted-foreground">Update testimonial details</p>
-        </div>
-        <Link href="/dashboard/testimonials">
-          <Button variant="outline">Back to Testimonials</Button>
-        </Link>
+      <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
+        <h1 className="text-2xl font-bold tracking-tight">Edit Testimonial</h1>
+        <BreadCrumbs path="testimonials" page="Edit" />
       </div>
       <TestimonialForm testimonial={testimonial} />
     </div>

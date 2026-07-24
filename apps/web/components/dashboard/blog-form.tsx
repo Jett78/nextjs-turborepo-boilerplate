@@ -1,15 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/ui/file-upload";
+import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateBlogs, revalidateBlog } from "@/actions/revalidate-action";
+import { TiptapEditor } from "@/components/ui/tiptap-editor";
 import type { BlogFormProps } from "@/types/components";
 
 function generateSlug(text: string): string {
@@ -107,53 +106,49 @@ export function BlogForm({ blog }: BlogFormProps) {
     }
   };
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setField("title", value);
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="title">Title *</Label>
-          <Input
-            id="title"
-            name="title"
-            value={values.title}
-            onChange={handleTitleChange}
-            placeholder="Blog post title"
-          />
-          {errors.title && (
-            <p className="text-sm text-destructive">{errors.title}</p>
-          )}
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Basic Info */}
+      <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">Blog Information</h3>
+          <p className="text-xs text-slate-500 mt-1">Basic blog post details.</p>
         </div>
 
-        <div className="space-y-2">
-          <Label>Slug</Label>
-          <Input
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            label="Title *"
+            name="title"
+            value={values.title}
+            onChange={(e) => setField("title", e.target.value)}
+            placeholder="Blog post title"
+            errors={errors.title}
+          />
+          <FormField
+            label="Slug"
             value={generateSlug(values.title)}
             disabled
-            className="bg-muted"
             placeholder="blog-post-slug"
           />
         </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-slate-700">Description</label>
+          <TiptapEditor
+            content={values.description}
+            onChange={(content) => setField("description", content)}
+            placeholder="Brief description of the blog post"
+          />
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          value={values.description}
-          onChange={handleChange}
-          placeholder="Brief description of the blog post"
-          rows={3}
-        />
-      </div>
+      {/* Image */}
+      <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">Blog Image</h3>
+          <p className="text-xs text-slate-500 mt-1">Upload a featured image.</p>
+        </div>
 
-      <div className="space-y-2">
-        <Label>Blog Image</Label>
         <FileUpload
           defaultImage={values.imageKey}
           onSuccess={(url) => setField("imageKey", url)}
@@ -161,56 +156,44 @@ export function BlogForm({ blog }: BlogFormProps) {
         />
       </div>
 
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-medium mb-4">SEO Settings</h3>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="seoMeta.metaTitle">Meta Title</Label>
-            <Input
-              id="seoMeta.metaTitle"
-              name="seoMeta.metaTitle"
-              value={values.seoMeta.metaTitle}
-              onChange={handleChange}
-              placeholder={values.title || "SEO title (defaults to blog title)"}
-            />
-            <p className="text-xs text-muted-foreground">
-              Defaults to blog title if empty
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="seoMeta.metaDescription">Meta Description</Label>
-            <Textarea
-              id="seoMeta.metaDescription"
-              name="seoMeta.metaDescription"
-              value={values.seoMeta.metaDescription}
-              onChange={handleChange}
-              placeholder={values.description || "SEO description (defaults to blog description)"}
-              rows={2}
-            />
-            <p className="text-xs text-muted-foreground">
-              Defaults to blog description if empty
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="seoMeta.metaKeywords">Meta Keywords</Label>
-            <Input
-              id="seoMeta.metaKeywords"
-              name="seoMeta.metaKeywords"
-              value={values.seoMeta.metaKeywords}
-              onChange={handleChange}
-              placeholder="keyword1, keyword2, keyword3"
-            />
-            <p className="text-xs text-muted-foreground">
-              Comma-separated keywords
-            </p>
-          </div>
+      {/* SEO */}
+      <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">SEO Settings</h3>
+          <p className="text-xs text-slate-500 mt-1">Optimize for search engines.</p>
         </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            label="Meta Title"
+            name="seoMeta.metaTitle"
+            value={values.seoMeta.metaTitle}
+            onChange={handleChange}
+            placeholder={values.title || "SEO title"}
+          />
+          <FormField
+            label="Meta Keywords"
+            name="seoMeta.metaKeywords"
+            value={values.seoMeta.metaKeywords}
+            onChange={handleChange}
+            placeholder="keyword1, keyword2, keyword3"
+          />
+        </div>
+
+        <FormField
+          label="Meta Description"
+          name="seoMeta.metaDescription"
+          textarea
+          rows={2}
+          value={values.seoMeta.metaDescription}
+          onChange={handleChange}
+          placeholder={values.description || "SEO description"}
+        />
       </div>
 
+      {/* Actions */}
       <div className="flex gap-4">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" disabled={isPending} className="bg-primary hover:bg-primary/90">
           {isPending
             ? "Saving..."
             : isEditing

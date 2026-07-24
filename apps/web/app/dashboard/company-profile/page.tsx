@@ -1,6 +1,6 @@
 import { CompanyProfileForm } from "@/components/dashboard/company-profile-form";
 import { getCompanyProfile } from "@/actions/company-profile-action";
-
+import DashboardHeading from "@/components/dashboard/dashboard-heading";
 
 export const metadata = {
   title: "Company Profile | Dashboard",
@@ -11,12 +11,10 @@ export default async function CompanyProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Company Profile</h1>
-        <p className="text-muted-foreground">
-          Manage your company information and SEO settings
-        </p>
-      </div>
+      <DashboardHeading
+        title="Company Profile"
+        description="Manage your company information, branding, and SEO settings"
+      />
       <CompanyProfileForm profile={profile} />
     </div>
   );

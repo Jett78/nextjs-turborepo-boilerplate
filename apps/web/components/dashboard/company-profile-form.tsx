@@ -2,16 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/ui/file-upload";
+import FormField from "@/components/forms/form-field";
 import { useForm } from "@/hooks/useForm";
 import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateCompanyProfile } from "@/actions/revalidate-action";
 import { HslColorPicker } from "@/components/ui/hsl-color-picker";
+import { Building2, Palette, Globe, MapPin, Phone, Mail, MessageCircle, Save, Search, Image as ImageIcon } from "lucide-react";
 import type { CompanyProfile } from "@/types/company-profile";
 
 interface CompanyProfileFormProps {
@@ -86,198 +85,255 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium">Company Information</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="companyName">Company Name *</Label>
-            <Input
-              id="companyName"
-              name="companyName"
-              value={values.companyName}
-              onChange={handleChange}
-              placeholder="Company name"
-            />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Left Column - Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Company Information */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primarymain/10 rounded-xl">
+                  <Building2 className="h-5 w-5 text-primarymain" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Company Information</h3>
+                  <p className="text-xs text-slate-500">Basic company details</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <FormField
+                  label="Company Name"
+                  name="companyName"
+                  value={values.companyName}
+                  onChange={handleChange}
+                  placeholder="Enter company name"
+                />
+                <FormField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  placeholder="info@company.com"
+                />
+                <FormField
+                  label="Phone Number"
+                  name="phoneNumber"
+                  value={values.phoneNumber}
+                  onChange={handleChange}
+                  placeholder="+977-9800000000"
+                />
+                <FormField
+                  label="WhatsApp Number"
+                  name="whatsappNumber"
+                  value={values.whatsappNumber}
+                  onChange={handleChange}
+                  placeholder="+977-9800000000"
+                />
+              </div>
+
+              <FormField
+                label="Address"
+                name="address"
+                value={values.address}
+                onChange={handleChange}
+                placeholder="Kathmandu, Nepal"
+              />
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700">Company Description</label>
+                <textarea
+                  name="companyDescription"
+                  value={values.companyDescription}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Tell us about your company..."
+                  className="flex min-h-[100px] w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primarymain/20 focus-visible:border-primarymain/50 disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-none"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700">Google Map Embed</label>
+                <textarea
+                  name="googleMap"
+                  value={values.googleMap}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="<iframe>...</iframe>"
+                  className="flex min-h-[80px] w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primarymain/20 focus-visible:border-primarymain/50 disabled:cursor-not-allowed disabled:opacity-50 transition-all font-mono text-xs"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={values.email}
-              onChange={handleChange}
-              placeholder="info@company.com"
-            />
-          </div>
+          {/* SEO Settings */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primarymain/10 rounded-xl">
+                  <Search className="h-5 w-5 text-primarymain" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">SEO Settings</h3>
+                  <p className="text-xs text-slate-500">Optimize for search engines</p>
+                </div>
+              </div>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phoneNumber">Phone Number</Label>
-            <Input
-              id="phoneNumber"
-              name="phoneNumber"
-              value={values.phoneNumber}
-              onChange={handleChange}
-              placeholder="+977-9800000000"
-            />
-          </div>
+            <div className="p-6 space-y-5">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <FormField
+                  label="Meta Title"
+                  name="seoMeta.metaTitle"
+                  value={values.seoMeta.metaTitle}
+                  onChange={handleChange}
+                  placeholder={values.companyName || "SEO title"}
+                />
+                <FormField
+                  label="Meta Keywords"
+                  name="seoMeta.metaKeywords"
+                  value={values.seoMeta.metaKeywords}
+                  onChange={handleChange}
+                  placeholder="keyword1, keyword2, keyword3"
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="whatsappNumber">WhatsApp Number</Label>
-            <Input
-              id="whatsappNumber"
-              name="whatsappNumber"
-              value={values.whatsappNumber}
-              onChange={handleChange}
-              placeholder="+977-9800000000"
-            />
+              <FormField
+                label="Meta Description"
+                name="seoMeta.metaDescription"
+                textarea
+                rows={3}
+                value={values.seoMeta.metaDescription}
+                onChange={handleChange}
+                placeholder="SEO description"
+              />
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <FormField
+                  label="Canonical URL"
+                  name="seoMeta.canonicalUrl"
+                  value={values.seoMeta.canonicalUrl}
+                  onChange={handleChange}
+                  placeholder="https://example.com"
+                />
+                <FormField
+                  label="Meta Robots"
+                  name="seoMeta.metaRobots"
+                  value={values.seoMeta.metaRobots}
+                  onChange={handleChange}
+                  placeholder="index, follow"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="address">Address</Label>
-          <Input
-            id="address"
-            name="address"
-            value={values.address}
-            onChange={handleChange}
-            placeholder="Kathmandu, Nepal"
-          />
-        </div>
+        {/* Right Column - Sidebar */}
+        <div className="space-y-6">
+          {/* Logos & Favicon */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primarymain/10 rounded-xl">
+                  <ImageIcon className="h-5 w-5 text-primarymain" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Logos</h3>
+                  <p className="text-xs text-slate-500">Brand assets</p>
+                </div>
+              </div>
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="companyDescription">Company Description</Label>
-          <Textarea
-            id="companyDescription"
-            name="companyDescription"
-            value={values.companyDescription}
-            onChange={handleChange}
-            placeholder="About your company"
-            rows={3}
-          />
-        </div>
+            <div className="p-6 space-y-5">
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-slate-700">Main Logo</label>
+                <FileUpload
+                  defaultImage={values.logoKey}
+                  onSuccess={(url) => setField("logoKey", url)}
+                  returnType="url"
+                />
+              </div>
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-slate-700">Footer Logo</label>
+                <FileUpload
+                  defaultImage={values.footerLogoKey}
+                  onSuccess={(url) => setField("footerLogoKey", url)}
+                  returnType="url"
+                />
+              </div>
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-slate-700">Favicon</label>
+                <FileUpload
+                  defaultImage={values.faviconKey}
+                  onSuccess={(url) => setField("faviconKey", url)}
+                  returnType="url"
+                />
+              </div>
+            </div>
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="googleMap">Google Map Embed</Label>
-          <Textarea
-            id="googleMap"
-            name="googleMap"
-            value={values.googleMap}
-            onChange={handleChange}
-            placeholder="<iframe>...</iframe>"
-            rows={3}
-          />
+          {/* Brand Colors */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primarymain/10 rounded-xl">
+                  <Palette className="h-5 w-5 text-primarymain" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Brand Colors</h3>
+                  <p className="text-xs text-slate-500">Set your colors</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <HslColorPicker
+                label="Primary Color"
+                value={values.primaryColor}
+                onChange={(hsl) => setField("primaryColor", hsl)}
+              />
+              <HslColorPicker
+                label="Secondary Color"
+                value={values.secondaryColor}
+                onChange={(hsl) => setField("secondaryColor", hsl)}
+              />
+
+              <div className="p-4 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200">
+                <p className="text-xs font-bold text-slate-700 mb-3">Preview</p>
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <div
+                      className="h-12 rounded-lg shadow-inner border border-white"
+                      style={{ backgroundColor: `hsl(${values.primaryColor})` }}
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1.5 text-center font-medium">Primary</p>
+                  </div>
+                  <div className="flex-1">
+                    <div
+                      className="h-12 rounded-lg shadow-inner border border-white"
+                      style={{ backgroundColor: `hsl(${values.secondaryColor})` }}
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1.5 text-center font-medium">Secondary</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="border-t pt-6 space-y-6">
-        <h3 className="text-lg font-medium">Logos & Favicon</h3>
-        <div className="grid gap-6 sm:grid-cols-3">
-          <div className="space-y-2">
-            <Label>Logo</Label>
-            <FileUpload
-              defaultImage={values.logoKey}
-              onSuccess={(url) => setField("logoKey", url)}
-              returnType="url"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Footer Logo</Label>
-            <FileUpload
-              defaultImage={values.footerLogoKey}
-              onSuccess={(url) => setField("footerLogoKey", url)}
-              returnType="url"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Favicon</Label>
-            <FileUpload
-              defaultImage={values.faviconKey}
-              onSuccess={(url) => setField("faviconKey", url)}
-              returnType="url"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t pt-6 space-y-6">
-        <h3 className="text-lg font-medium">Brand Colors</h3>
-        <p className="text-sm text-muted-foreground">
-          Set your brand colors in HSL format. These will be used for your site&apos;s theme.
-        </p>
-        <div className="grid gap-6 sm:grid-cols-2">
-          <HslColorPicker
-            label="Primary Color"
-            value={values.primaryColor}
-            onChange={(hsl) => setField("primaryColor", hsl)}
-          />
-          <HslColorPicker
-            label="Secondary Color"
-            value={values.secondaryColor}
-            onChange={(hsl) => setField("secondaryColor", hsl)}
-          />
-        </div>
-      </div>
-
-      <div className="border-t pt-6 space-y-6">
-        <h3 className="text-lg font-medium">SEO Settings</h3>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="seoMeta.metaTitle">Meta Title</Label>
-            <Input
-              id="seoMeta.metaTitle"
-              name="seoMeta.metaTitle"
-              value={values.seoMeta.metaTitle}
-              onChange={handleChange}
-              placeholder={values.companyName || "SEO title"}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="seoMeta.metaDescription">Meta Description</Label>
-            <Textarea
-              id="seoMeta.metaDescription"
-              name="seoMeta.metaDescription"
-              value={values.seoMeta.metaDescription}
-              onChange={handleChange}
-              placeholder="SEO description"
-              rows={2}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="seoMeta.metaKeywords">Meta Keywords</Label>
-            <Input
-              id="seoMeta.metaKeywords"
-              name="seoMeta.metaKeywords"
-              value={values.seoMeta.metaKeywords}
-              onChange={handleChange}
-              placeholder="keyword1, keyword2, keyword3"
-            />
-            <p className="text-xs text-muted-foreground">
-              Comma-separated keywords
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="seoMeta.canonicalUrl">Canonical URL</Label>
-            <Input
-              id="seoMeta.canonicalUrl"
-              name="seoMeta.canonicalUrl"
-              value={values.seoMeta.canonicalUrl}
-              onChange={handleChange}
-              placeholder="https://example.com"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-4">
-        <Button type="submit" disabled={isPending}>
+      {/* Submit */}
+      <div className="flex justify-end pt-2">
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="bg-primarymain hover:bg-secondarymain text-white flex items-center gap-2 px-8 py-3 rounded-xl font-semibold shadow-lg shadow-primarymain/25 hover:shadow-xl hover:shadow-secondarymain/25 transition-all hover:-translate-y-0.5"
+        >
+          <Save className="h-4 w-4" />
           {isPending ? "Saving..." : "Save Changes"}
         </Button>
       </div>
