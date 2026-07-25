@@ -10,7 +10,7 @@ import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateCompanyProfile } from "@/actions/revalidate-action";
 import { HslColorPicker } from "@/components/ui/hsl-color-picker";
-import { Building2, Palette, Globe, MapPin, Phone, Mail, MessageCircle, Save, Search, Image as ImageIcon } from "lucide-react";
+import { Building2, Palette, Save, Image as ImageIcon } from "lucide-react";
 import type { CompanyProfile } from "@/types/company-profile";
 
 interface CompanyProfileFormProps {
@@ -35,41 +35,16 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
     primaryColor: profile?.primaryColor || "221.2 83.2% 53.3%",
     secondaryColor: profile?.secondaryColor || "210 40% 96.1%",
     socialMedia: profile?.socialMedia || [],
-    seoMeta: {
-      metaTitle: profile?.seoMeta?.metaTitle || "",
-      metaDescription: profile?.seoMeta?.metaDescription || "",
-      metaKeywords: profile?.seoMeta?.metaKeywords?.join(", ") || "",
-      canonicalUrl: profile?.seoMeta?.canonicalUrl || "",
-      metaRobots: profile?.seoMeta?.metaRobots || "index, follow",
-      ogTitle: profile?.seoMeta?.ogTitle || "",
-      ogDescription: profile?.seoMeta?.ogDescription || "",
-      ogImageKey: profile?.seoMeta?.ogImageKey || "",
-    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPending(true);
 
-    const metaKeywordsArray = values.seoMeta.metaKeywords
-      ? values.seoMeta.metaKeywords.split(",").map((k: string) => k.trim())
-      : [];
-
-    const payload = {
-      ...values,
-      seoMeta: {
-        ...values.seoMeta,
-        metaKeywords: metaKeywordsArray,
-        ogTitle: values.seoMeta.ogTitle || values.seoMeta.metaTitle || values.companyName,
-        ogDescription: values.seoMeta.ogDescription || values.seoMeta.metaDescription,
-        ogImageKey: values.seoMeta.ogImageKey || values.logoKey,
-      },
-    };
-
     try {
       const res = await apiClient<any>(API_ROUTES.COMPANY_PROFILE, {
         method: "PUT",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(values),
         isAuthenticated: true,
       });
 
@@ -86,9 +61,9 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Left Column - Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Company Information */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
             <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
@@ -165,67 +140,6 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
                   rows={3}
                   placeholder="<iframe>...</iframe>"
                   className="flex min-h-[80px] w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primarymain/20 focus-visible:border-primarymain/50 disabled:cursor-not-allowed disabled:opacity-50 transition-all font-mono text-xs"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* SEO Settings */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primarymain/10 rounded-xl">
-                  <Search className="h-5 w-5 text-primarymain" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">SEO Settings</h3>
-                  <p className="text-xs text-slate-500">Optimize for search engines</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <FormField
-                  label="Meta Title"
-                  name="seoMeta.metaTitle"
-                  value={values.seoMeta.metaTitle}
-                  onChange={handleChange}
-                  placeholder={values.companyName || "SEO title"}
-                />
-                <FormField
-                  label="Meta Keywords"
-                  name="seoMeta.metaKeywords"
-                  value={values.seoMeta.metaKeywords}
-                  onChange={handleChange}
-                  placeholder="keyword1, keyword2, keyword3"
-                />
-              </div>
-
-              <FormField
-                label="Meta Description"
-                name="seoMeta.metaDescription"
-                textarea
-                rows={3}
-                value={values.seoMeta.metaDescription}
-                onChange={handleChange}
-                placeholder="SEO description"
-              />
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <FormField
-                  label="Canonical URL"
-                  name="seoMeta.canonicalUrl"
-                  value={values.seoMeta.canonicalUrl}
-                  onChange={handleChange}
-                  placeholder="https://example.com"
-                />
-                <FormField
-                  label="Meta Robots"
-                  name="seoMeta.metaRobots"
-                  value={values.seoMeta.metaRobots}
-                  onChange={handleChange}
-                  placeholder="index, follow"
                 />
               </div>
             </div>

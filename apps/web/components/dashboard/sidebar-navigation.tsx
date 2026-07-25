@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ChevronDown,
   ExternalLink,
+  Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,11 @@ const navigation: NavItem[] = [
         name: "Company Profile",
         href: "/dashboard/company-profile",
         icon: Building2,
+      },
+      {
+        name: "SEO & Analytics",
+        href: "/dashboard/seo",
+        icon: Search,
       },
     ],
   },

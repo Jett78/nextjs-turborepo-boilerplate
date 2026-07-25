@@ -13,7 +13,7 @@ export default async function CompanyProfilePage() {
     <div className="space-y-6">
       <DashboardHeading
         title="Company Profile"
-        description="Manage your company information, branding, and SEO settings"
+        description="Manage your company information and branding"
       />
       <CompanyProfileForm profile={profile} />
     </div>
