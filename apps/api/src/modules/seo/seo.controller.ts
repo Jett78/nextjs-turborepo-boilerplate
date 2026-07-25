@@ -23,24 +23,9 @@ export class SeoController {
   constructor(private readonly seoService: SeoService) {}
 
   @AllowAnonymous()
-  @Get('public')
-  @ApiOperation({ summary: 'Get public SEO settings for frontend rendering' })
-  @ApiResponse({ status: 200, description: 'Public SEO settings' })
-  async findPublic() {
-    const seo = await this.seoService.findPublic();
-    return {
-      success: true,
-      statusCode: 200,
-      message: 'Public SEO settings fetched successfully',
-      data: seo,
-    };
-  }
-
   @Get()
-  @Roles(['super_admin'])
-  @ApiOperation({ summary: 'Get full SEO settings' })
+  @ApiOperation({ summary: 'Get SEO settings' })
   @ApiResponse({ status: 200, description: 'SEO settings fetched successfully', type: GlobalSeoEntity })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findOne() {
     const seo = await this.seoService.findOne();
     return {

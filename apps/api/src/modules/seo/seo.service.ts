@@ -24,26 +24,6 @@ export class SeoService {
     return seo || null;
   }
 
-  async findPublic() {
-    const [seo] = await this.db
-      .select()
-      .from(schema.globalSeo)
-      .limit(1);
-
-    if (!seo) return null;
-
-    return {
-      metaTitle: seo.metaTitle,
-      metaDescription: seo.metaDescription,
-      metaKeywords: seo.metaKeywords,
-      ogTitle: seo.ogTitle,
-      ogDescription: seo.ogDescription,
-      ogImageKey: seo.ogImageKey,
-      gtmContainerId: seo.gtmContainerId,
-      googleSearchConsoleVerification: seo.googleSearchConsoleVerification,
-    };
-  }
-
   async upsert(dto: UpdateGlobalSeoDto) {
     const [existing] = await this.db
       .select()
