@@ -2,13 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { loginAction } from "@/actions/auth-action";
+import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-const TOKEN_COOKIE_NAME = "admin_token";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,25 +20,28 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const result = await loginAction(email, password);
+      const { error } = await signIn.email({
+        email,
+        password,
+      });
 
-      if (result.success && result.token) {
-        Cookies.set(TOKEN_COOKIE_NAME, result.token, {
-          expires: 7,
-          path: "/",
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-        });
-
-        router.push("/dashboard");
+      if (error) {
+        setError(error.message || "Login failed");
       } else {
-        setError(result.error || "Login failed");
+        router.push("/dashboard");
       }
     } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleLogin = async () => {
+    await signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
   };
 
   return (
@@ -89,6 +89,25 @@ export default function LoginPage() {
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Sign In"}
+          </Button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Or</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+          >
+            Sign in with Google
           </Button>
         </form>
       </div>

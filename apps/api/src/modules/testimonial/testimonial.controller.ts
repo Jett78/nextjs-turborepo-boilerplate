@@ -10,25 +10,20 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
-  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
 import { TestimonialService } from './testimonial.service';
 import { CreateTestimonialDto } from './dto/create-testimonial.dto';
 import { UpdateTestimonialDto } from './dto/update-testimonial.dto';
 import { TestimonialEntity } from './entities/testimonial.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('testimonials')
 @Controller('testimonials')
@@ -36,9 +31,7 @@ export class TestimonialController {
   constructor(private readonly testimonialService: TestimonialService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @ApiOperation({ summary: 'Create a new testimonial' })
   @ApiResponse({ status: 201, description: 'Testimonial created successfully', type: TestimonialEntity })
   async create(@Body() dto: CreateTestimonialDto) {
@@ -51,7 +44,7 @@ export class TestimonialController {
     };
   }
 
-  @Public()
+  @AllowAnonymous()
   @Get()
   @ApiOperation({ summary: 'Get all testimonials' })
   async findAll(
@@ -72,7 +65,7 @@ export class TestimonialController {
     };
   }
 
-  @Public()
+  @AllowAnonymous()
   @Get(':id')
   @ApiOperation({ summary: 'Get a testimonial by ID' })
   @ApiParam({ name: 'id', description: 'Testimonial UUID' })
@@ -87,9 +80,7 @@ export class TestimonialController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @ApiOperation({ summary: 'Update a testimonial' })
   @ApiParam({ name: 'id', description: 'Testimonial UUID' })
   async update(
@@ -106,9 +97,7 @@ export class TestimonialController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a testimonial' })
   @ApiParam({ name: 'id', description: 'Testimonial UUID' })

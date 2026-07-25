@@ -10,7 +10,6 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,19 +18,15 @@ import {
   ApiParam,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { GetBlogsQueryDto } from './dto/get-blogs-query.dto';
 import { BlogEntity } from './entities/blog.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('blogs')
 @Controller('blogs')
@@ -39,9 +34,7 @@ export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @ApiOperation({ summary: 'Create a new blog' })
   @ApiResponse({ status: 201, description: 'Blog created successfully', type: BlogEntity })
   async create(@Body() createBlogDto: CreateBlogDto) {
@@ -54,7 +47,7 @@ export class BlogController {
     };
   }
 
-  @Public()
+  @AllowAnonymous()
   @Get()
   @ApiOperation({ summary: 'Get all blogs with pagination' })
   async findAll(@Query() query: GetBlogsQueryDto) {
@@ -73,7 +66,7 @@ export class BlogController {
     };
   }
 
-  @Public()
+  @AllowAnonymous()
   @Get(':id')
   @ApiOperation({ summary: 'Get a blog by ID' })
   @ApiParam({ name: 'id', description: 'Blog UUID' })
@@ -87,7 +80,7 @@ export class BlogController {
     };
   }
 
-  @Public()
+  @AllowAnonymous()
   @Get('slug/:slug')
   @ApiOperation({ summary: 'Get a blog by slug' })
   @ApiParam({ name: 'slug', description: 'Blog slug' })
@@ -102,9 +95,7 @@ export class BlogController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @ApiOperation({ summary: 'Update a blog' })
   @ApiParam({ name: 'id', description: 'Blog UUID' })
   async update(
@@ -121,9 +112,7 @@ export class BlogController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a blog' })
   @ApiParam({ name: 'id', description: 'Blog UUID' })

@@ -9,32 +9,27 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
-  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
   ApiQuery,
 } from '@nestjs/swagger';
+import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
 import { InquiryService } from './inquiry.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
 import { InquiryEntity } from './entities/inquiry.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('inquiries')
 @Controller('inquiries')
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
 
-  @Public()
+  @AllowAnonymous()
   @Post()
   @ApiOperation({ summary: 'Submit an inquiry' })
   @ApiResponse({ status: 201, description: 'Inquiry submitted successfully', type: InquiryEntity })
@@ -49,9 +44,7 @@ export class InquiryController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @ApiOperation({ summary: 'Get all inquiries' })
   @ApiQuery({ name: 'skip', required: false, example: 0, description: 'Number of records to skip' })
   @ApiQuery({ name: 'take', required: false, example: 10, description: 'Number of records to take' })
@@ -81,9 +74,7 @@ export class InquiryController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @ApiOperation({ summary: 'Get an inquiry by ID' })
   @ApiParam({ name: 'id', description: 'Inquiry UUID' })
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -97,9 +88,7 @@ export class InquiryController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
-  @ApiBearerAuth('JWT-auth')
+  @Roles(['super_admin'])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete an inquiry' })
   @ApiParam({ name: 'id', description: 'Inquiry UUID' })

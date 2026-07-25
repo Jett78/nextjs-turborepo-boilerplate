@@ -10,11 +10,13 @@ export async function uploadSingleImage(
 ): Promise<UploadResult> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("admin_token")?.value;
+    const sessionToken =
+      cookieStore.get("better-auth.session_token")?.value ||
+      cookieStore.get("__Secure-better-auth.session_token")?.value;
 
     const headers: Record<string, string> = {};
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
+    if (sessionToken) {
+      headers["Cookie"] = `better-auth.session_token=${sessionToken}`;
     }
 
     const response = await fetch(`${API_BASE_URL}/upload`, {

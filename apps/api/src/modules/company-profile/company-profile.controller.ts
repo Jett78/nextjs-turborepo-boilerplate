@@ -5,29 +5,24 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
 import { CompanyProfileService } from './company-profile.service';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
 import { CompanyProfileEntity } from './entities/company-profile.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('company-profile')
 @Controller('company-profile')
 export class CompanyProfileController {
   constructor(private readonly companyProfileService: CompanyProfileService) {}
 
-  @Public()
+  @AllowAnonymous()
   @Get()
   @ApiOperation({ summary: 'Get company profile' })
   @ApiResponse({ status: 200, description: 'Company profile fetched successfully', type: CompanyProfileEntity })
@@ -42,10 +37,8 @@ export class CompanyProfileController {
   }
 
   @Put()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin')
+  @Roles(['super_admin'])
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update company profile' })
   @ApiResponse({ status: 200, description: 'Company profile updated successfully', type: CompanyProfileEntity })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })

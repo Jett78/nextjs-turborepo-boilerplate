@@ -1,10 +1,11 @@
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import * as bcrypt from 'bcryptjs';
 import * as schema from './schema';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { eq } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
+import { hashPassword } from 'better-auth/crypto';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
@@ -13,32 +14,45 @@ async function seed() {
   const db = drizzle(pool, { schema });
 
   try {
-    // Seed admin user
+    // Seed super admin user in Better Auth user table
     const existingAdmin = await db
       .select()
-      .from(schema.users)
-      .where(eq(schema.users.email, 'admin@page.com'))
+      .from(schema.user)
+      .where(eq(schema.user.email, 'admin@page.com'))
       .limit(1);
 
     if (existingAdmin.length === 0) {
-      const passwordHash = await bcrypt.hash('Admin@123', 10);
+      const userId = randomUUID();
+      const passwordHash = await hashPassword('Admin@123');
 
-      await db
-        .insert(schema.users)
-        .values({
-          email: 'admin@page.com',
-          passwordHash,
-          firstName: 'Super',
-          lastName: 'Admin',
-          role: 'super_admin',
-          isActive: true,
-          isEmailVerified: true,
-        });
+      await db.insert(schema.user).values({
+        id: userId,
+        name: 'Super Admin',
+        email: 'admin@page.com',
+        emailVerified: true,
+        role: 'super_admin',
+      });
+
+      await db.insert(schema.account).values({
+        id: randomUUID(),
+        accountId: userId,
+        providerId: 'credential',
+        userId,
+        password: passwordHash,
+      });
 
       console.log('Super admin created successfully!');
       console.log('Email: admin@page.com');
       console.log('Password: Admin@123');
     } else {
+      // Ensure existing admin has super_admin role
+      if (existingAdmin[0].role !== 'super_admin') {
+        await db
+          .update(schema.user)
+          .set({ role: 'super_admin' })
+          .where(eq(schema.user.email, 'admin@page.com'));
+        console.log('Updated existing admin to super_admin role.');
+      }
       console.log('Super admin already exists, skipping.');
     }
 
