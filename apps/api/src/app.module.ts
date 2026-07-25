@@ -9,6 +9,7 @@ import { UploadModule } from './modules/upload/upload.module';
 import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
 import { TestimonialModule } from './modules/testimonial/testimonial.module';
 import { InquiryModule } from './modules/inquiry/inquiry.module';
+import { SeoModule } from './modules/seo/seo.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { InquiryModule } from './modules/inquiry/inquiry.module';
     CompanyProfileModule,
     TestimonialModule,
     InquiryModule,
+    SeoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -21,20 +21,7 @@ export class CompanyProfileService {
       .from(schema.companyProfiles)
       .limit(1);
 
-    if (!profile) {
-      return null;
-    }
-
-    const [seoMeta] = await this.db
-      .select()
-      .from(schema.seoMetas)
-      .where(eq(schema.seoMetas.companyProfileId, profile.id))
-      .limit(1);
-
-    return {
-      ...profile,
-      seoMeta: seoMeta || null,
-    };
+    return profile || null;
   }
 
   async update(dto: UpdateCompanyProfileDto) {
@@ -47,7 +34,7 @@ export class CompanyProfileService {
       throw new NotFoundException('Company profile not found');
     }
 
-    const { seoMeta, socialMedia, ...profileData } = dto;
+    const { socialMedia, ...profileData } = dto;
 
     await this.db
       .update(schema.companyProfiles)
@@ -57,31 +44,6 @@ export class CompanyProfileService {
         updatedAt: new Date(),
       })
       .where(eq(schema.companyProfiles.id, existing.id));
-
-    if (seoMeta) {
-      const [existingSeoMeta] = await this.db
-        .select()
-        .from(schema.seoMetas)
-        .where(eq(schema.seoMetas.companyProfileId, existing.id))
-        .limit(1);
-
-      if (existingSeoMeta) {
-        await this.db
-          .update(schema.seoMetas)
-          .set({
-            ...seoMeta,
-            updatedAt: new Date(),
-          })
-          .where(eq(schema.seoMetas.companyProfileId, existing.id));
-      } else {
-        await this.db
-          .insert(schema.seoMetas)
-          .values({
-            ...seoMeta,
-            companyProfileId: existing.id,
-          });
-      }
-    }
 
     return this.findOne();
   }

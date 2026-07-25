@@ -16,53 +16,6 @@ export class SocialMediaDto {
   order?: number;
 }
 
-export class CompanyProfileSeoMetaDto {
-  @ApiPropertyOptional({ example: 'My Awesome Page Title' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  metaTitle?: string;
-
-  @ApiPropertyOptional({ example: 'This is a description of my awesome page.' })
-  @IsOptional()
-  @IsString()
-  metaDescription?: string;
-
-  @ApiPropertyOptional({ example: ['keyword1', 'keyword2'] })
-  @IsOptional()
-  @IsString({ each: true })
-  metaKeywords?: string[];
-
-  @ApiPropertyOptional({ example: 'https://example.com/canonical-url' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(500)
-  canonicalUrl?: string;
-
-  @ApiPropertyOptional({ example: 'index, follow', default: 'index, follow' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  metaRobots?: string;
-
-  @ApiPropertyOptional({ example: 'OG Title' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  ogTitle?: string;
-
-  @ApiPropertyOptional({ example: 'OG Description' })
-  @IsOptional()
-  @IsString()
-  ogDescription?: string;
-
-  @ApiPropertyOptional({ example: 'media/seo/og-image.jpg' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(500)
-  ogImageKey?: string;
-}
-
 export class UpdateCompanyProfileDto {
   @ApiPropertyOptional({ example: 'Law Sagar' })
   @IsOptional()
@@ -144,10 +97,4 @@ export class UpdateCompanyProfileDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
-
-  @ApiPropertyOptional({ type: CompanyProfileSeoMetaDto })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => CompanyProfileSeoMetaDto)
-  seoMeta?: CompanyProfileSeoMetaDto;
 }

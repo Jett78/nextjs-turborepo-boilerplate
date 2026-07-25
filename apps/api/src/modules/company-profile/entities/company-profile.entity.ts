@@ -1,47 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CompanyProfileSeoMetaEntity {
-  @ApiProperty()
-  id: string;
-
-  @ApiProperty()
-  metaTitle?: string;
-
-  @ApiProperty()
-  metaDescription?: string;
-
-  @ApiProperty()
-  metaKeywords?: string[];
-
-  @ApiProperty()
-  canonicalUrl?: string;
-
-  @ApiProperty()
-  metaRobots?: string;
-
-  @ApiProperty()
-  ogTitle?: string;
-
-  @ApiProperty()
-  ogDescription?: string;
-
-  @ApiProperty()
-  ogImageKey?: string;
-
-  @ApiProperty()
-  createdAt: Date;
-
-  @ApiProperty()
-  updatedAt: Date;
-
-  @ApiProperty()
-  companyProfileId?: string;
-
-  constructor(partial: Partial<CompanyProfileSeoMetaEntity>) {
-    Object.assign(this, partial);
-  }
-}
-
 export class SocialMediaEntity {
   @ApiProperty()
   platform: string;
@@ -104,9 +62,6 @@ export class CompanyProfileEntity {
 
   @ApiProperty()
   updatedAt: Date;
-
-  @ApiProperty({ type: CompanyProfileSeoMetaEntity })
-  seoMeta: CompanyProfileSeoMetaEntity | null;
 
   constructor(partial: Partial<CompanyProfileEntity>) {
     Object.assign(this, partial);

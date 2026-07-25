@@ -92,23 +92,29 @@ export const blogsRelations = relations(blogs, ({ one }) => ({
   }),
 }));
 
-export const companyProfilesRelations = relations(companyProfiles, ({ one }) => ({
-  seoMeta: one(seoMetas, {
-    fields: [companyProfiles.id],
-    references: [seoMetas.companyProfileId],
-  }),
-}));
+export const companyProfilesRelations = relations(companyProfiles, ({ one }) => ({}));
 
 export const seoMetasRelations = relations(seoMetas, ({ one }) => ({
   blog: one(blogs, {
     fields: [seoMetas.blogId],
     references: [blogs.id],
   }),
-  companyProfile: one(companyProfiles, {
-    fields: [seoMetas.companyProfileId],
-    references: [companyProfiles.id],
-  }),
 }));
+
+// Global SEO settings (site-wide meta, GTM, Search Console)
+export const globalSeo = pgTable('global_seo', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  metaTitle: varchar('meta_title', { length: 255 }),
+  metaDescription: text('meta_description'),
+  metaKeywords: text('meta_keywords').array(),
+  ogTitle: varchar('og_title', { length: 255 }),
+  ogDescription: text('og_description'),
+  ogImageKey: varchar('og_image_key', { length: 500 }),
+  gtmContainerId: varchar('gtm_container_id', { length: 100 }),
+  googleSearchConsoleVerification: varchar('google_search_console_verification', { length: 255 }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
 
 export const testimonials = pgTable('testimonials', {
   id: uuid('id').defaultRandom().primaryKey(),
