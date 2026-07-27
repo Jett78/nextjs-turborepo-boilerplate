@@ -56,15 +56,14 @@ export class PageSeoController {
     };
   }
 
-  @Post(':path')
+  @Post()
   @Roles(['super_admin'])
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create page SEO' })
-  @ApiParam({ name: 'path', example: '/about' })
   @ApiResponse({ status: 201, description: 'Page SEO created successfully', type: PageSeoEntity })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async create(@Param('path') path: string, @Body() dto: CreatePageSeoDto) {
-    const page = await this.pageSeoService.upsert(path, dto);
+  async create(@Body() dto: CreatePageSeoDto) {
+    const page = await this.pageSeoService.upsert(dto.pagePath!, dto);
     return {
       success: true,
       statusCode: 201,
