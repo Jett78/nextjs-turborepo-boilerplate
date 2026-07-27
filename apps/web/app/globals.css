@@ -97,3 +97,100 @@
     transform: rotate(0.5turn);
   }
 }
+
+
+
+.prose li {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  color: #111111be;
+}
+
+.prose {
+  font-size: 0.875rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+}
+
+
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.3em;
+  margin-bottom: 0.4em;
+  letter-spacing: -0.01em;
+  color: #111827;
+}
+
+.prose h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-top: 1.1em;
+  margin-bottom: 0.3em;
+  letter-spacing: -0.01em;
+  color: #1f2937;
+}
+
+.prose h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.1em;
+  margin-bottom: 0.3em;
+  color: #374151;
+}
+
+.prose h5 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.3em;
+  color: #4b5563;
+}
+
+.prose h6 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 0.8em;
+  margin-bottom: 0.3em;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 640px) {
+  .prose h2 {
+    font-size: 1.125rem;
+  }
+
+  .prose h3 {
+    font-size: 1rem;
+  }
+
+  .prose h4 {
+    font-size: 0.875rem;
+  }
+
+  .prose h5 {
+    font-size: 0.813rem;
+  }
+
+  .prose h6 {
+    font-size: 0.65rem;
+  }
+}
+
+
+/* Custom text selection */
+::selection {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: inherit;
+}

@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { getBlogBySlug, getAllBlogSlugs } from "@/actions/blog-action";
+import BackButton from "@/components/buttons/back-button";
+import SocialShare from "@/components/buttons/social-share-button";
 import type { Metadata } from "next";
 import type { BlogPostPageProps } from "@/types/components";
+import Image from "next/image";
 
 function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("en-US", {
@@ -65,43 +68,51 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const imageUrl = blog.imageKey || blog.seoMeta?.ogImageKey;
 
   return (
-    <div className="min-h-screen bg-background pt-16">
-      <article className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Badge variant="secondary">{formatDate(blog.createdAt)}</Badge>
-            {blog.seoMeta?.metaKeywords?.map((keyword) => (
-              <Badge key={keyword} variant="outline">
-                {keyword}
-              </Badge>
-            ))}
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+    <article className="mx-4 my-28 max-w-5xl space-y-4 md:my-32 md:space-y-8 xl:mx-auto">
+      <BackButton />
+
+      <header className="space-y-6 border-b border-zinc-200 pb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-2xl font-extrabold text-zinc-900 md:text-3xl">
             {blog.title}
           </h1>
-          {blog.description && (
-            <p className="mt-4 text-xl text-muted-foreground">
-              {blog.description}
-            </p>
-          )}
+
+          <SocialShare slug={blog.slug} title={blog.title} />
         </div>
 
-        {imageUrl && (
-          <div className="mb-10 overflow-hidden rounded-2xl">
-            <img
-              src={imageUrl}
-              alt={blog.title}
-              className="w-full object-cover"
-            />
-          </div>
-        )}
-
-        <div className="prose prose-lg prose-zinc dark:prose-invert max-w-none">
-          <p className="text-muted-foreground leading-relaxed">
-            {blog.description || "No content available."}
-          </p>
+        <div className="flex items-center gap-4 text-sm text-zinc-500">
+          <span>{formatDate(blog.createdAt)}</span>
         </div>
-      </article>
-    </div>
+      </header>
+
+      {imageUrl && (
+        <figure className="relative my-10 overflow-hidden rounded-2xl shadow-lg">
+          <Image
+            src={imageUrl}
+            alt={blog.title}
+            className="h-[20em] w-full object-cover md:h-[26em]"
+            height={1000}
+            width={1000}
+          />
+        </figure>
+      )}
+
+      {/* Content */}
+      <div className="prose prose-lg max-w-none">
+        <div
+          className="space-y-6 text-sm leading-[1.9]  font-medium text-lighttext sm:text-base"
+          dangerouslySetInnerHTML={{ __html: blog.description || "No content available." }}
+        />
+      </div>
+
+      {/* Footer */}
+      <footer className="mt-16 flex items-center justify-between border-t border-zinc-200 pt-8">
+        <p className="text-sm text-zinc-500">
+          Written by <span className="font-medium text-zinc-700">Admin</span>
+        </p>
+
+        <SocialShare slug={blog.slug} title={blog.title} />
+      </footer>
+    </article>
   );
 }
