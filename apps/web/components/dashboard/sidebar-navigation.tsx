@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ExternalLink,
   Search,
+  FileCode,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,11 @@ const navigation: NavItem[] = [
         name: "SEO & Analytics",
         href: "/dashboard/seo",
         icon: Search,
+      },
+      {
+        name: "Page SEO",
+        href: "/dashboard/page-seo",
+        icon: FileCode,
       },
     ],
   },

@@ -2,18 +2,21 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "#features", label: "Features" },
-  { href: "#blog", label: "Blog" },
-  { href: "#about", label: "About" },
-  { href: "#contact", label: "Contact" },
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
+  { href: "/services", label: "Services" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Navbar() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
 
@@ -24,6 +27,11 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   return (
     <header
@@ -47,18 +55,30 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="relative px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground rounded-lg hover:bg-muted"
+              className={cn(
+                "relative px-4 py-2 text-sm font-medium transition-colors rounded-lg",
+                isActive(link.href)
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
             >
               {link.label}
+              {isActive(link.href) && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-6 rounded-full bg-primary" />
+              )}
             </Link>
           ))}
         </div>
 
         <div className="hidden md:flex md:items-center md:gap-3">
-          <Button variant="ghost" size="sm">
-            Sign in
-          </Button>
-          <Button size="sm">Get Started</Button>
+          <Link href="/login">
+            <Button variant="ghost" size="sm">
+              Sign in
+            </Button>
+          </Link>
+          <Link href="/login">
+            <Button size="sm">Get Started</Button>
+          </Link>
         </div>
 
         <button
@@ -77,17 +97,26 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className={cn(
+                  "block rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
+                  isActive(link.href)
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
             <div className="mt-4 flex flex-col gap-2">
-              <Button variant="outline" className="w-full">
-                Sign in
-              </Button>
-              <Button className="w-full">Get Started</Button>
+              <Link href="/login" onClick={() => setIsOpen(false)}>
+                <Button variant="outline" className="w-full">
+                  Sign in
+                </Button>
+              </Link>
+              <Link href="/login" onClick={() => setIsOpen(false)}>
+                <Button className="w-full">Get Started</Button>
+              </Link>
             </div>
           </div>
         </div>

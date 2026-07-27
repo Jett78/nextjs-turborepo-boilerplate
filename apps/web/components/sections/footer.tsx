@@ -3,27 +3,27 @@ import Link from "next/link";
 
 const footerLinks = {
   Product: [
-    { label: "Features", href: "#features" },
-    { label: "Pricing", href: "#" },
-    { label: "Changelog", href: "#" },
-    { label: "Documentation", href: "#" },
+    { label: "Features", href: "/" },
+    { label: "Pricing", href: "/" },
+    { label: "Changelog", href: "/blog" },
+    { label: "Documentation", href: "/" },
   ],
   Company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#blog" },
-    { label: "Careers", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "About", href: "/about" },
+    { label: "Blog", href: "/blog" },
+    { label: "Careers", href: "/about" },
+    { label: "Contact", href: "/contact" },
   ],
   Resources: [
-    { label: "Community", href: "#" },
-    { label: "Help Center", href: "#" },
-    { label: "Partners", href: "#" },
-    { label: "Status", href: "#" },
+    { label: "Community", href: "/" },
+    { label: "Help Center", href: "/contact" },
+    { label: "Partners", href: "/about" },
+    { label: "Status", href: "/" },
   ],
   Legal: [
-    { label: "Privacy", href: "#" },
-    { label: "Terms", href: "#" },
-    { label: "Security", href: "#" },
+    { label: "Privacy", href: "/" },
+    { label: "Terms", href: "/" },
+    { label: "Security", href: "/" },
   ],
 };
 
