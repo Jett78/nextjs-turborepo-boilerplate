@@ -10,6 +10,7 @@ import { CompanyProfileModule } from './modules/company-profile/company-profile.
 import { TestimonialModule } from './modules/testimonial/testimonial.module';
 import { InquiryModule } from './modules/inquiry/inquiry.module';
 import { SeoModule } from './modules/seo/seo.module';
+import { PageSeoModule } from './modules/page-seo/page-seo.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SeoModule } from './modules/seo/seo.module';
     TestimonialModule,
     InquiryModule,
     SeoModule,
+    PageSeoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

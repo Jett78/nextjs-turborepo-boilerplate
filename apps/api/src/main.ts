@@ -84,6 +84,8 @@ This API uses **Better Auth** for authentication with session-based cookies.
     .addTag('company-profile', 'Company profile management')
     .addTag('testimonials', 'Testimonial management')
     .addTag('inquiries', 'Inquiry management')
+    .addTag('seo', 'Global SEO settings (meta tags, GTM, Search Console)')
+    .addTag('page-seo', 'Per-page SEO settings')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

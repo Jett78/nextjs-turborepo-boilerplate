@@ -116,6 +116,22 @@ export const globalSeo = pgTable('global_seo', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+// Per-page SEO settings
+export const pageSeo = pgTable('page_seo', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  pagePath: varchar('page_path', { length: 500 }).notNull().unique(),
+  pageTitle: varchar('page_title', { length: 255 }),
+  metaTitle: varchar('meta_title', { length: 255 }),
+  metaDescription: text('meta_description'),
+  ogTitle: varchar('og_title', { length: 255 }),
+  ogDescription: text('og_description'),
+  ogImageKey: varchar('og_image_key', { length: 500 }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  pagePathIdx: index('page_seo_page_path_idx').on(table.pagePath),
+}));
+
 export const testimonials = pgTable('testimonials', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
