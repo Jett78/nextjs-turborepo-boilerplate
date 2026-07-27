@@ -37,3 +37,7 @@ export interface TestimonialFormProps {
 export interface DeleteTestimonialButtonProps {
   id: string;
 }
+
+export interface PageSeoFormProps {
+  pageSeo?: import("./page-seo").PageSeo;
+}

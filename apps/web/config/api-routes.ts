@@ -7,4 +7,5 @@ export const API_ROUTES = {
   TESTIMONIAL: `${API_BASE_URL}/testimonials`,
   INQUIRY: `${API_BASE_URL}/inquiries`,
   SEO: `${API_BASE_URL}/seo`,
+  PAGE_SEO: `${API_BASE_URL}/page-seo`,
 } as const;
