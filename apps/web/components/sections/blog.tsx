@@ -4,6 +4,8 @@ import { getBlogs } from "@/actions/blog-action";
 import type { Blog as BlogType } from "@/types/blog";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import PageHeader from "@/components/ui/page-header";
+import PrimaryButton from "../ui/primary-button";
 
 export async function Blog() {
   const posts = await getBlogs({ take: 3, isActive: true });
@@ -13,39 +15,29 @@ export async function Blog() {
   }
 
   return (
-    <section id="blog" className="py-20 sm:py-28">
+    <section id="blog" className="py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <Badge variant="secondary" className="mb-4">
-            Blog
-          </Badge>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Latest insights
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Deep dives into engineering, design, and the future of building
-            products.
-          </p>
-        </div>
+        <PageHeader
+          title="Latest insights"
+          subtitle="Blog"
+          desc="Stay up to date with the latest news, articles, and resources from our team."
+        />
 
-        <div className="mx-auto mt-12 grid max-w-5xl gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post: BlogType, index: number) => (
+        <div className="mx-auto mt-16 grid max-w-5xl gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.slice(0,3).map((post: BlogType) => (
             <BlogCard
               key={post.id}
               blog={post}
-              variant={index === 0 ? "featured" : "default"}
             />
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            View all posts
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+        <div className="mt-14 text-center">
+            <PrimaryButton
+                text="View All"
+                path="/blog"
+                variant="secondary"
+              />
         </div>
       </div>
     </section>

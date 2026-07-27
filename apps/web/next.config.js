@@ -8,6 +8,16 @@ const nextConfig = {
       },
     ];
   },
+   images: {
+    remotePatterns: [
+      
+      {
+        protocol: "https",
+        hostname: "lawsagar.s3.ap-south-1.amazonaws.com",
+        port: "",
+      }
+    ],
+  }
 };
 
 export default nextConfig;

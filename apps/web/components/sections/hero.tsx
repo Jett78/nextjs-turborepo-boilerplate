@@ -1,65 +1,117 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
+"use client";
+
+import * as React from "react";
+import { motion, type Variants } from "framer-motion";
+import { ArrowRight, Sparkles, Star } from "lucide-react";
+import PrimaryButton from "@/components/ui/primary-button";
+
+const container: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-24 lg:pb-32">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 h-[400px] w-[400px] rounded-full bg-primary/5 blur-3xl" />
-      </div>
+    <section className="relative min-h-screen overflow-hidden bg-linear-to-br from-gray-50 via-white to-gray-100">
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
+        <div className="mx-auto max-w-4xl">
+          {/* Left content */}
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="text-center"
+          >
+            {/* Badge */}
+            <motion.div variants={item}>
+              <span className="mb-8 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm backdrop-blur-sm">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10">
+                  <Sparkles className="h-3 w-3 text-primary" />
+                </span>
+                Introducing Turborepo v3
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </motion.div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-6 inline-flex items-center rounded-full border bg-muted/50 px-4 py-1.5 text-sm font-medium text-muted-foreground backdrop-blur-sm">
-            <span className="mr-2 inline-flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Now in public beta
-          </div>
+            {/* Headline */}
+            <motion.h1
+              variants={item}
+              className="text-3xl font-extrabold tracking-tight leading-[1.2] text-gray-800 sm:text-3xl lg:text-4xl xl:text-5xl"
+            >
+              Build your <span className="text-primarymain">Nextjs</span> App
+              <br />
+              faster than ever
+            </motion.h1>
 
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Build something{" "}
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              extraordinary
-            </span>
-          </h1>
+            {/* Description */}
+            <motion.p
+              variants={item}
+              className="mx-auto mt-6 max-w-2xl leading-relaxed text-gray-600"
+            >
+              A production-grade Next.js boilerplate with TypeScript, Tailwind
+              CSS, and Turborepo. Everything you need to ship a full-stack app
+              in minutes.
+            </motion.p>
 
-          <p className="mt-6 text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            The modern platform that helps teams ship faster. From idea to
-            production in minutes, not months. Designed for developers who value
-            simplicity and speed.
-          </p>
+            {/* CTA buttons */}
+            <motion.div
+              variants={item}
+              className="mt-10 flex items-center  justify-center"
+            >
+              <PrimaryButton
+                text="Get Started Free"
+                path="/dashboard"
+                variant="secondary"
+              />
+            
+            </motion.div>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button size="xl" className="group">
-              Start Building
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-            <Button variant="outline" size="xl" className="group">
-              <Play className="mr-2 h-4 w-4" />
-              Watch Demo
-            </Button>
-          </div>
-
-          <div className="mt-16 grid grid-cols-3 gap-8 border-t pt-10">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-foreground">10k+</div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                Active developers
+            {/* Trust indicators */}
+            <motion.div variants={item} className="mt-10">
+              <div className="flex items-center justify-center gap-4">
+                {/* Avatars */}
+                <div className="flex -space-x-2">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className="h-8 w-8 rounded-full border-2 border-white"
+                      style={{
+                        background: `hsl(${i * 60}, 70%, 60%)`,
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="h-8 w-px bg-gray-200" />
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star
+                      key={i}
+                      className="h-4 w-4 fill-amber-400 text-amber-400"
+                    />
+                  ))}
+                </div>
+                <span className="text-sm font-medium text-gray-600">
+                  4.9/5 from 500+ reviews
+                </span>
               </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-foreground">99.9%</div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                Uptime SLA
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-foreground">50ms</div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                Avg response
-              </div>
-            </div>
-          </div>
+              <p className="mt-3 text-sm text-gray-500">
+                Trusted by 5,000+ developers worldwide. Full type safety out of
+                the box.
+              </p>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </section>
