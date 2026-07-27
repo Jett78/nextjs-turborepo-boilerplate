@@ -1,3 +1,4 @@
+import PageBanner from "@/components/page-banner";
 import { getPageSeoForMetadata } from "@/actions/page-seo-action";
 import { Scale, Shield, Users, Award, ArrowRight, CheckCircle2, BookOpen, Gavel } from "lucide-react";
 import type { Metadata } from "next";
@@ -50,33 +51,11 @@ const team = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-32 pb-20 sm:pt-40 sm:pb-24 overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 right-1/4 h-[500px] w-[500px] rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute bottom-0 left-1/4 h-[400px] w-[400px] rounded-full bg-primary/5 blur-3xl" />
-        </div>
-
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/70 backdrop-blur-sm">
-              <Scale className="h-4 w-4" />
-              About Law Sagar
-            </div>
-
-            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Trusted Legal Partners Since{" "}
-              <span className="text-primary">2009</span>
-            </h1>
-
-            <p className="mt-6 text-lg leading-relaxed text-white/70 sm:text-xl">
-              Law Sagar is a premier law firm dedicated to providing exceptional legal services
-              with integrity, professionalism, and a deep commitment to justice. We combine
-              decades of experience with modern legal strategies to deliver results.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageBanner
+        img="https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        title="About Us"
+        path="about"
+      />
 
       {/* Stats */}
       <section className="border-y bg-muted/30">
