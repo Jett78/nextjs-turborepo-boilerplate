@@ -44,6 +44,12 @@ export class CreatePageSeoDto {
 }
 
 export class UpdatePageSeoDto {
+  @ApiPropertyOptional({ example: '/about' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  pagePath?: string;
+
   @ApiPropertyOptional({ example: 'About Us' })
   @IsOptional()
   @IsString()

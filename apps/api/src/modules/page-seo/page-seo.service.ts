@@ -63,17 +63,24 @@ export class PageSeoService {
     const ogTitle = dto.metaTitle || existing.ogTitle;
     const ogDescription = dto.metaDescription || existing.ogDescription;
 
+    const newPath = dto.pagePath && dto.pagePath !== pagePath ? dto.pagePath : undefined;
+
     await this.db
       .update(schema.pageSeo)
       .set({
-        ...dto,
+        ...(newPath && { pagePath: newPath }),
+        pageTitle: dto.pageTitle,
+        metaTitle: dto.metaTitle,
+        metaDescription: dto.metaDescription,
         ogTitle,
         ogDescription,
+        ogImageKey: dto.ogImageKey,
         updatedAt: new Date(),
       })
       .where(eq(schema.pageSeo.id, existing.id));
 
-    return this.findByPath(pagePath);
+    const finalPath = newPath || pagePath;
+    return this.findByPath(finalPath);
   }
 
   async upsert(pagePath: string, dto: CreatePageSeoDto) {
