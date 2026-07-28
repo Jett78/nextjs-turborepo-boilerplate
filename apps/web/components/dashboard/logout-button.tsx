@@ -9,6 +9,9 @@ export function LogoutButton() {
 
   const handleLogout = async () => {
     await signOut();
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
     router.push("/login");
   };
 

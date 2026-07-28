@@ -175,6 +175,8 @@ export const user = pgTable('user', {
   emailVerified: boolean('email_verified').default(false).notNull(),
   image: text('image'),
   role: varchar('role', { length: 50 }).default('customer').notNull(),
+  phone: varchar('phone', { length: 20 }),
+  address: text('address'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

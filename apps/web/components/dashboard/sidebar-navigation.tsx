@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard,
@@ -15,8 +15,11 @@ import {
   ExternalLink,
   Search,
   FileCode,
+  Users,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { signOut } from "@/lib/auth-client";
 
 interface NavItem {
   name: string;
@@ -33,9 +36,11 @@ const navigation: NavItem[] = [
     children: [
       { name: "Blogs", href: "/dashboard/blogs", icon: FileText },
       { name: "Testimonials", href: "/dashboard/testimonials", icon: Star },
+      { name: "FAQs", href: "/dashboard/faqs", icon: HelpCircle },
     ],
   },
   { name: "Inquiries", href: "/dashboard/inquiries", icon: MessageSquare },
+  { name: "Users", href: "/dashboard/users", icon: Users },
   {
     name: "Settings",
     icon: Building2,
@@ -61,6 +66,7 @@ const navigation: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const isPathActive = (path?: string) => {
@@ -72,6 +78,21 @@ export function Sidebar() {
   const isAnyChildActive = (children?: { href: string }[]) => {
     if (!children) return false;
     return children.some((child) => isPathActive(child.href));
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    
+    // Clear all cookies
+    const cookies = document.cookie.split(";");
+    for (const cookie of cookies) {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+    }
+    
+    router.push("/login");
   };
 
   return (
@@ -198,7 +219,10 @@ export function Sidebar() {
             View Site
           </span>
         </Link>
-        <button className="flex items-center gap-3 px-3 py-2 w-full text-sm font-medium rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors overflow-hidden">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2 w-full text-sm font-medium rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors overflow-hidden"
+        >
           <LogOut className="size-5 shrink-0" />
           <span className="truncate opacity-100 transition-opacity duration-300">
             Logout
