@@ -2,13 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
+import { showSuccess, showError } from "@/lib/toast-helper";
 import type { PageSeoFormProps } from "@/types/components";
 import { ArrowLeft, FileText, Globe, Image as ImageIcon } from "lucide-react";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
 
 export function PageSeoForm({ pageSeo }: PageSeoFormProps) {
   const router = useRouter();
@@ -54,14 +57,22 @@ export function PageSeoForm({ pageSeo }: PageSeoFormProps) {
         { id: pageSeo.pagePath, data: payload },
         {
           onSuccess: () => {
+            showSuccess("Page SEO updated successfully");
             router.push("/dashboard/page-seo");
+          },
+          onError: (error: any) => {
+            showError(error.message || "Failed to update page SEO");
           },
         }
       );
     } else {
       create.mutate(payload as any, {
         onSuccess: () => {
+          showSuccess("Page SEO created successfully");
           router.push("/dashboard/page-seo");
+        },
+        onError: (error: any) => {
+          showError(error.message || "Failed to create page SEO");
         },
       });
     }
@@ -69,6 +80,7 @@ export function PageSeoForm({ pageSeo }: PageSeoFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {isPending && <SubmittingLoader status={isEditing ? "Updating page SEO" : "Creating page SEO"} />}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
           <div className="flex items-center gap-3">
@@ -184,13 +196,11 @@ export function PageSeoForm({ pageSeo }: PageSeoFormProps) {
       </div>
 
       <div className="flex items-center gap-4">
-        <Button
+        <PrimaryButton
           type="submit"
+          text={isEditing ? "Update Page SEO" : "Create Page SEO"}
           disabled={isPending}
-          className="bg-primarymain hover:bg-secondarymain text-white flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-primarymain/25 hover:shadow-xl transition-all"
-        >
-          {isPending ? "Saving..." : isEditing ? "Update Page SEO" : "Create Page SEO"}
-        </Button>
+        />
         <Button
           type="button"
           variant="outline"

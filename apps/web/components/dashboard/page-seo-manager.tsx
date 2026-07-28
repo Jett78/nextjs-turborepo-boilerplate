@@ -36,14 +36,7 @@ export function PageSeoManager({ pages: initialPages }: PageSeoManagerProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <Link href="/dashboard/page-seo/new">
-          <Button className="bg-primarymain hover:bg-secondarymain text-white flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-primarymain/25 hover:shadow-xl transition-all">
-            <Plus className="h-4 w-4" />
-            Add Page SEO
-          </Button>
-        </Link>
-      </div>
+ 
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6">

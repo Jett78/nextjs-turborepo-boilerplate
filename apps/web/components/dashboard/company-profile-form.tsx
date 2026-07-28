@@ -2,15 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useForm } from "@/hooks/useForm";
 import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateCompanyProfile } from "@/actions/revalidate-action";
+import { showSuccess, showError } from "@/lib/toast-helper";
 import { HslColorPicker } from "@/components/ui/hsl-color-picker";
-import { Building2, Palette, Save, Image as ImageIcon } from "lucide-react";
+import { Building2, Palette, Image as ImageIcon } from "lucide-react";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { CompanyProfile } from "@/types/company-profile";
 
 interface CompanyProfileFormProps {
@@ -51,9 +53,10 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
       if (res.success) {
         await revalidateCompanyProfile();
         router.refresh();
+        showSuccess("Company profile updated successfully");
       }
     } catch (error: any) {
-      alert(error.message || "Failed to update company profile");
+      showError(error.message || "Failed to update company profile");
     } finally {
       setIsPending(false);
     }
@@ -61,9 +64,10 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {isPending && <SubmittingLoader status="Saving company profile" />}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Left Column - Main Content */}
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
           {/* Company Information */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
             <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
@@ -141,6 +145,20 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
                   placeholder="<iframe>...</iframe>"
                   className="flex min-h-[80px] w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primarymain/20 focus-visible:border-primarymain/50 disabled:cursor-not-allowed disabled:opacity-50 transition-all font-mono text-xs"
                 />
+                {values.googleMap && (
+                  <div className="mt-3 rounded-xl overflow-hidden border border-slate-200">
+                    <iframe
+                      src={
+                        values.googleMap.includes("src=")
+                          ? values.googleMap.match(/src="([^"]+)"/)?.[1]
+                          : values.googleMap
+                      }
+                      loading="lazy"
+                      className="w-full h-[300px] border-0"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -242,14 +260,11 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
 
       {/* Submit */}
       <div className="flex justify-end pt-2">
-        <Button
+        <PrimaryButton
           type="submit"
+          text="Save Changes"
           disabled={isPending}
-          className="bg-primarymain hover:bg-secondarymain text-white flex items-center gap-2 px-8 py-3 rounded-xl font-semibold shadow-lg shadow-primarymain/25 hover:shadow-xl hover:shadow-secondarymain/25 transition-all hover:-translate-y-0.5"
-        >
-          <Save className="h-4 w-4" />
-          {isPending ? "Saving..." : "Save Changes"}
-        </Button>
+        />
       </div>
     </form>
   );

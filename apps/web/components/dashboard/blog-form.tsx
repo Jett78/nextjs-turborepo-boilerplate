@@ -2,13 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateBlogs, revalidateBlog } from "@/actions/revalidate-action";
+import { showSuccess, showError } from "@/lib/toast-helper";
 import { TiptapEditor } from "@/components/ui/tiptap-editor";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { BlogFormProps } from "@/types/components";
 
 function generateSlug(text: string): string {
@@ -82,11 +85,12 @@ export function BlogForm({ blog }: BlogFormProps) {
             if (res.success) {
               await revalidateBlogs();
               await revalidateBlog(slug);
+              showSuccess("Blog updated successfully");
               router.push("/dashboard/blogs");
             }
           },
           onError: (error: any) => {
-            alert(error.message || "Failed to update blog");
+            showError(error.message || "Failed to update blog");
           },
         }
       );
@@ -96,11 +100,12 @@ export function BlogForm({ blog }: BlogFormProps) {
           if (res.success) {
             await revalidateBlogs();
             await revalidateBlog(slug);
+            showSuccess("Blog created successfully");
             router.push("/dashboard/blogs");
           }
         },
         onError: (error: any) => {
-          alert(error.message || "Failed to create blog");
+          showError(error.message || "Failed to create blog");
         },
       });
     }
@@ -108,6 +113,7 @@ export function BlogForm({ blog }: BlogFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {isPending && <SubmittingLoader status={isEditing ? "Updating blog" : "Creating blog"} />}
       {/* Basic Info */}
       <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
         <div>
@@ -193,13 +199,11 @@ export function BlogForm({ blog }: BlogFormProps) {
 
       {/* Actions */}
       <div className="flex gap-4">
-        <Button type="submit" disabled={isPending} className="bg-primary hover:bg-primary/90">
-          {isPending
-            ? "Saving..."
-            : isEditing
-              ? "Update Blog"
-              : "Create Blog"}
-        </Button>
+        <PrimaryButton
+          type="submit"
+          text={isEditing ? "Update Blog" : "Create Blog"}
+          disabled={isPending}
+        />
         <Button
           type="button"
           variant="outline"

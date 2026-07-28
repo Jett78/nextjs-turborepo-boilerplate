@@ -2,12 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateTestimonials } from "@/actions/revalidate-action";
+import { showSuccess, showError } from "@/lib/toast-helper";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { TestimonialFormProps } from "@/types/components";
 
 export function TestimonialForm({ testimonial }: TestimonialFormProps) {
@@ -51,11 +54,12 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
           onSuccess: async (res: any) => {
             if (res.success) {
               await revalidateTestimonials();
+              showSuccess("Testimonial updated successfully");
               router.push("/dashboard/testimonials");
             }
           },
           onError: (error: any) => {
-            alert(error.message || "Failed to update testimonial");
+            showError(error.message || "Failed to update testimonial");
           },
         }
       );
@@ -64,11 +68,12 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
         onSuccess: async (res: any) => {
           if (res.success) {
             await revalidateTestimonials();
+            showSuccess("Testimonial created successfully");
             router.push("/dashboard/testimonials");
           }
         },
         onError: (error: any) => {
-          alert(error.message || "Failed to create testimonial");
+          showError(error.message || "Failed to create testimonial");
         },
       });
     }
@@ -76,6 +81,7 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {isPending && <SubmittingLoader status={isEditing ? "Updating testimonial" : "Creating testimonial"} />}
       {/* Basic Info */}
       <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
         <div>
@@ -146,13 +152,11 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
 
       {/* Actions */}
       <div className="flex gap-4">
-        <Button type="submit" disabled={isPending} className="bg-primary hover:bg-primary/90">
-          {isPending
-            ? "Saving..."
-            : isEditing
-              ? "Update Testimonial"
-              : "Create Testimonial"}
-        </Button>
+        <PrimaryButton
+          type="submit"
+          text={isEditing ? "Update Testimonial" : "Create Testimonial"}
+          disabled={isPending}
+        />
         <Button
           type="button"
           variant="outline"

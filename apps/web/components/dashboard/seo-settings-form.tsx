@@ -2,13 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useForm } from "@/hooks/useForm";
 import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
-import { Search, Tag, BarChart3, Image as ImageIcon, Save } from "lucide-react";
+import { showSuccess, showError } from "@/lib/toast-helper";
+import { Search, Tag, BarChart3, Image as ImageIcon } from "lucide-react";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { GlobalSeo } from "@/types/seo";
 
 interface SeoSettingsFormProps {
@@ -50,9 +52,10 @@ export function SeoSettingsForm({ seo }: SeoSettingsFormProps) {
 
       if (res.success) {
         router.refresh();
+        showSuccess("SEO settings updated successfully");
       }
     } catch (error: any) {
-      alert(error.message || "Failed to update SEO settings");
+      showError(error.message || "Failed to update SEO settings");
     } finally {
       setIsPending(false);
     }
@@ -60,6 +63,7 @@ export function SeoSettingsForm({ seo }: SeoSettingsFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {isPending && <SubmittingLoader status="Saving SEO settings" />}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Left Column - Meta Tags */}
         <div className="space-y-6">
@@ -199,14 +203,11 @@ export function SeoSettingsForm({ seo }: SeoSettingsFormProps) {
 
       {/* Submit */}
       <div className="flex justify-end pt-2">
-        <Button
+        <PrimaryButton
           type="submit"
+          text="Save Changes"
           disabled={isPending}
-          className="bg-primarymain hover:bg-secondarymain text-white flex items-center gap-2 px-8 py-3 rounded-xl font-semibold shadow-lg shadow-primarymain/25 hover:shadow-xl hover:shadow-secondarymain/25 transition-all hover:-translate-y-0.5"
-        >
-          <Save className="h-4 w-4" />
-          {isPending ? "Saving..." : "Save Changes"}
-        </Button>
+        />
       </div>
     </form>
   );
