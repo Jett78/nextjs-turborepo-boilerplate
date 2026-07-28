@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +29,26 @@ export default function LoginPage() {
       if (error) {
         setError(error.message || "Login failed");
       } else {
-        router.push("/dashboard");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/auth/profile`,
+          { credentials: "include" }
+        );
+        const data = await response.json();
+        const role = data?.data?.role || "user";
+        const emailVerified = data?.data?.emailVerified;
+
+        document.cookie = `user_role=${role}; path=/; max-age=${60 * 60 * 24 * 7}`;
+
+        if (role === "admin" || role === "super_admin") {
+          setError("Admin users please use the admin login page.");
+          await signIn.signOut();
+        } else if (!emailVerified) {
+          // Email not verified, sign out and redirect to verify-email
+          await signIn.signOut();
+          router.push(`/verify-email?email=${encodeURIComponent(email)}&name=${encodeURIComponent(data?.data?.name || "")}`);
+        } else {
+          router.push("/profile/user");
+        }
       }
     } catch {
       setError("An error occurred. Please try again.");
@@ -40,7 +60,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     await signIn.social({
       provider: "google",
-      callbackURL: "/dashboard",
+      callbackURL: "/auth/callback",
     });
   };
 
@@ -48,13 +68,16 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold tracking-tight">Admin Login</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to access the dashboard
+            Sign in to access your account
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border p-6 shadow-sm">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-lg border p-6 shadow-sm"
+        >
           {error && (
             <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
               {error}
@@ -66,7 +89,7 @@ export default function LoginPage() {
             <Input
               id="email"
               type="email"
-              placeholder="admin@example.com"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -96,7 +119,9 @@ export default function LoginPage() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or</span>
+              <span className="bg-background px-2 text-muted-foreground">
+                Or
+              </span>
             </div>
           </div>
 
@@ -110,6 +135,19 @@ export default function LoginPage() {
             Sign in with Google
           </Button>
         </form>
+
+        <p className="text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="text-primary hover:underline">
+            Sign up
+          </Link>
+        </p>
+
+        <p className="text-center text-sm text-muted-foreground">
+          <a href="/admin" className="text-slate-500 hover:text-slate-700">
+            Admin Login →
+          </a>
+        </p>
       </div>
     </div>
   );
