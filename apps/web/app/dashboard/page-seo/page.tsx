@@ -14,6 +14,7 @@ export default async function PageSeoPage() {
       <DashboardHeading
         title="Page SEO"
         description="Manage meta tags for individual pages"
+        path="/dashboard/page-seo"
       />
       <PageSeoManager pages={pages} />
     </div>
