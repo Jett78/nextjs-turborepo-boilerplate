@@ -1,7 +1,6 @@
-import PageBanner from "@/components/page-banner";
-import { Badge } from "@/components/ui/badge";
-import { BlogCard } from "@/components/blog-card";
+import { BookOpen } from "lucide-react";
 import { getBlogs } from "@/actions/blog-action";
+import BlogList from "@/components/sections/blog-list";
 
 export const metadata = {
   title: "Blog | Page",
@@ -13,25 +12,27 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <PageBanner
-        img="https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        title="Blog"
-        path="blog"
-      />
+      {/* Hero Header */}
+      <section className="relative overflow-hidden bg-gray-950 py-20 sm:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.15),transparent)]" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white/80 ring-1 ring-inset ring-white/10">
+              <BookOpen className="h-3.5 w-3.5" />
+              Blog
+            </span>
+            <h1 className="mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+              Ideas, insights,
+              <span className="block text-slate-400">and inspiration.</span>
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-slate-400">
+              Thoughts on development, design, and building products that matter.
+            </p>
+          </div>
+        </div>
+      </section>
 
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        {posts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No blog posts yet.</p>
-          </div>
-        ) : (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
-              <BlogCard key={post.id} blog={post} />
-            ))}
-          </div>
-        )}
-      </div>
+      <BlogList posts={posts} />
     </div>
   );
 }
