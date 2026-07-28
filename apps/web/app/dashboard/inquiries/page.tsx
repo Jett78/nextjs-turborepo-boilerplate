@@ -3,16 +3,19 @@
 import { useState, useEffect } from "react";
 import DashboardHeading from "@/components/dashboard/dashboard-heading";
 import DataTable, { Column } from "@/components/dashboard/data-table";
-import { Search, Mail, Phone } from "lucide-react";
+import { Search, Mail, Phone, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useCrud } from "@/hooks/useCRUD";
 import { API_ROUTES } from "@/config/api-routes";
 import { DeleteInquiryButton } from "@/components/dashboard/delete-inquiry-button";
+import InquiryModal from "./inquiry-modal";
 import type { Inquiry } from "@/types/inquiry";
 
 export default function InquiriesPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -93,6 +96,15 @@ export default function InquiriesPage() {
       className: "text-right",
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSelectedInquiry(row)}
+            className="h-8 px-3"
+          >
+            <Eye className="size-3.5 mr-1" />
+            View
+          </Button>
           <DeleteInquiryButton id={row.id} />
         </div>
       ),
@@ -130,6 +142,11 @@ export default function InquiriesPage() {
         data={filteredInquiries}
         isLoading={isLoading}
         className="shadow-2xl shadow-slate-200/40"
+      />
+
+      <InquiryModal
+        inquiry={selectedInquiry}
+        onClose={() => setSelectedInquiry(null)}
       />
     </div>
   );
