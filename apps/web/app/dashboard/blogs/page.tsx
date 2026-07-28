@@ -103,13 +103,14 @@ export default function BlogsPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <DashboardHeading
           title="Blogs"
           description="Manage your blog posts and pages."
           path="blogs"
         />
-        <div className="relative w-full sm:w-80 shrink-0">
+      
+
+        <div className="relative w-full shrink-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
           <Input
             placeholder="Search by title or slug..."
@@ -118,7 +119,6 @@ export default function BlogsPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-      </div>
 
       <DataTable
         columns={columns}

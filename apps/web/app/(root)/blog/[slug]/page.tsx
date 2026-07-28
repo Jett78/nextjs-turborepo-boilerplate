@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 import { getBlogBySlug, getAllBlogSlugs } from "@/actions/blog-action";
 import BackButton from "@/components/buttons/back-button";
 import SocialShare from "@/components/buttons/social-share-button";
 import type { Metadata } from "next";
 import type { BlogPostPageProps } from "@/types/components";
 import Image from "next/image";
+import { Calendar, Clock } from "lucide-react";
 
 function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("en-US", {
@@ -13,6 +13,13 @@ function formatDate(date: Date): string {
     day: "numeric",
     year: "numeric",
   });
+}
+
+function readTime(html: string): string {
+  const text = html.replace(/<[^>]*>/g, "");
+  const words = text.split(/\s+/).length;
+  const mins = Math.max(1, Math.ceil(words / 200));
+  return `${mins} min read`;
 }
 
 export async function generateStaticParams() {
@@ -68,51 +75,71 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const imageUrl = blog.imageKey || blog.seoMeta?.ogImageKey;
 
   return (
-    <article className="mx-4 my-28 max-w-5xl space-y-4 md:my-32 md:space-y-8 xl:mx-auto">
-      <BackButton />
+    <article className="min-h-screen bg-background">
+      {/* Hero */}
+      <div className="relative bg-gray-950 pt-32 pb-16 sm:pt-40 sm:pb-20">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.12),transparent)]" />
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative">
+          <BackButton />
 
-      <header className="space-y-6 border-b border-zinc-200 pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-extrabold text-zinc-900 md:text-3xl">
+          <div className="mt-8 flex items-center gap-3 text-sm text-slate-400">
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5" />
+              {formatDate(blog.createdAt)}
+            </span>
+            <span className="h-1 w-1 rounded-full bg-slate-600" />
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              {readTime(blog.description || "")}
+            </span>
+          </div>
+
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
             {blog.title}
           </h1>
 
-          <SocialShare slug={blog.slug} title={blog.title} />
+          <div className="mt-6">
+            <SocialShare slug={blog.slug} title={blog.title} />
+          </div>
         </div>
+      </div>
 
-        <div className="flex items-center gap-4 text-sm text-zinc-500">
-          <span>{formatDate(blog.createdAt)}</span>
-        </div>
-      </header>
-
+      {/* Image */}
       {imageUrl && (
-        <figure className="relative my-10 overflow-hidden rounded-2xl shadow-lg">
-          <Image
-            src={imageUrl}
-            alt={blog.title}
-            className="h-[20em] w-full object-cover md:h-[26em]"
-            height={1000}
-            width={1000}
-          />
-        </figure>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+          <figure className="overflow-hidden rounded-2xl shadow-2xl ring-1 ring-gray-900/5">
+            <Image
+              src={imageUrl}
+              alt={blog.title}
+              className="h-64 w-full object-cover sm:h-80 md:h-[28rem]"
+              width={1200}
+              height={600}
+              priority
+            />
+          </figure>
+        </div>
       )}
 
       {/* Content */}
-      <div className="prose prose-lg max-w-none">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div
-          className="space-y-6 text-sm leading-[1.9]  font-medium text-lighttext sm:text-base"
-          dangerouslySetInnerHTML={{ __html: blog.description || "No content available." }}
+          className="prose prose-lg prose-gray prose-headings:font-bold prose-headings:tracking-tight prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl"
+          dangerouslySetInnerHTML={{
+            __html: blog.description || "<p>No content available.</p>",
+          }}
         />
       </div>
 
       {/* Footer */}
-      <footer className="mt-16 flex items-center justify-between border-t border-zinc-200 pt-8">
-        <p className="text-sm text-zinc-500">
-          Written by <span className="font-medium text-zinc-700">Admin</span>
-        </p>
-
-        <SocialShare slug={blog.slug} title={blog.title} />
-      </footer>
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
+        <div className="flex items-center justify-between rounded-2xl bg-gray-50 px-8 py-6 ring-1 ring-gray-900/5">
+          <div>
+            <p className="text-sm text-gray-400">Written by</p>
+            <p className="mt-0.5 text-sm font-semibold text-gray-900">Admin</p>
+          </div>
+          <SocialShare slug={blog.slug} title={blog.title} />
+        </div>
+      </div>
     </article>
   );
 }
