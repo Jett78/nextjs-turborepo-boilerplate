@@ -4,6 +4,7 @@ import { GoogleTagManager } from "@next/third-parties/google";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { getPublicSeoSettings } from "@/actions/seo-action";
+import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -47,6 +48,7 @@ export default async function RootLayout({
         <QueryProvider>
           <ThemeProvider>{children}</ThemeProvider>
         </QueryProvider>
+        <Toaster />
       </body>
     </html>
   );
