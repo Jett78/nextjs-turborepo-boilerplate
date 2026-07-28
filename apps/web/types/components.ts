@@ -41,3 +41,11 @@ export interface DeleteTestimonialButtonProps {
 export interface PageSeoFormProps {
   pageSeo?: import("./page-seo").PageSeo;
 }
+
+export interface FaqFormProps {
+  faq?: import("./faq").Faq;
+}
+
+export interface DeleteFaqButtonProps {
+  id: string;
+}

@@ -145,6 +145,18 @@ export const testimonials = pgTable('testimonials', {
   sortOrderIdx: index('testimonials_sort_order_idx').on(table.sortOrder),
 }));
 
+export const faqs = pgTable('faqs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  question: varchar('question', { length: 500 }).notNull(),
+  answer: text('answer').notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  sortOrderIdx: index('faqs_sort_order_idx').on(table.sortOrder),
+}));
+
 export const messages = pgTable('messages', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),

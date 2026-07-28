@@ -11,6 +11,7 @@ import { TestimonialModule } from './modules/testimonial/testimonial.module';
 import { InquiryModule } from './modules/inquiry/inquiry.module';
 import { SeoModule } from './modules/seo/seo.module';
 import { PageSeoModule } from './modules/page-seo/page-seo.module';
+import { FaqModule } from './modules/faq/faq.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PageSeoModule } from './modules/page-seo/page-seo.module';
     InquiryModule,
     SeoModule,
     PageSeoModule,
+    FaqModule,
   ],
   controllers: [AppController],
   providers: [AppService],
