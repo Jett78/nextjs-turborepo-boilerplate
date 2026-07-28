@@ -17,13 +17,13 @@ export class SocialMediaDto {
 }
 
 export class UpdateCompanyProfileDto {
-  @ApiPropertyOptional({ example: 'Law Sagar' })
+  @ApiPropertyOptional({ example: 'nextjs boilerplate' })
   @IsOptional()
   @IsString()
   @MaxLength(255)
   companyName?: string;
 
-  @ApiPropertyOptional({ example: 'Law Sagar is your trusted legal partner.' })
+  @ApiPropertyOptional({ example: 'nextjs boilerplate is your template.' })
   @IsOptional()
   @IsString()
   companyDescription?: string;

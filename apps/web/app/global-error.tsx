@@ -71,10 +71,10 @@ export default function GlobalError({
           <p className="text-sm text-gray-400">
             If the problem persists, please contact{" "}
             <a
-              href="mailto:support@lawsagar.com"
+              href="mailto:support@nextjs.com"
               className="text-primarymain font-bold hover:underline"
             >
-              support@lawsagar.com
+              support@nextjs.com
             </a>
           </p>
         </div>

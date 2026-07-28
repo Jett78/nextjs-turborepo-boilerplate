@@ -21,7 +21,7 @@ interface ContactInfoProps {
 
 const ContactInfo = ({ companyInfo }: ContactInfoProps) => {
   const phoneNumber = companyInfo?.phoneNumber || "+977-9800000000";
-  const email = companyInfo?.email || "info@lawsagar.com";
+  const email = companyInfo?.email || "info@nextjs.com";
   const address = companyInfo?.address || "Kathmandu, Nepal";
   const whatsappNumber = companyInfo?.whatsappNumber || "+977-9800000000";
 
