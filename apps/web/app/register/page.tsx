@@ -222,15 +222,7 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
-          >
-            Sign in
-          </Link>
-        </p>
+      
       </div>
     </div>
   );

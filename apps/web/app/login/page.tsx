@@ -208,14 +208,7 @@ export default function LoginPage() {
           </Link>
         </p>
 
-        <p className="text-center text-sm text-gray-500">
-          <Link
-            href="/admin"
-            className="hover:text-gray-700 transition-colors"
-          >
-            Admin Login
-          </Link>
-        </p>
+      
       </div>
     </div>
   );

@@ -1,19 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Shield, Loader2 } from "lucide-react";
+import { Shield, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import PrimaryButton from "@/components/ui/primary-button";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,18 +19,13 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      const { error: signInError } = await signIn.email({
-        email,
-        password,
-      });
+      const { error: signInError } = await signIn.email({ email, password });
 
       if (signInError) {
         setError(signInError.message || "Login failed");
-        setIsLoading(false);
         return;
       }
 
-      // Wait a bit for session to be established
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const response = await fetch(
@@ -49,22 +42,22 @@ export default function AdminLoginPage() {
       } else {
         setError("Access denied. Admin credentials required.");
         await signIn.signOut();
-        setIsLoading(false);
       }
     } catch {
       setError("An error occurred. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-900 px-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
+      <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
-            <Shield className="size-8 text-primary" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/10">
+            <Shield className="h-6 w-6 text-indigo-400" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-white">
             Admin Login
           </h1>
           <p className="mt-2 text-sm text-slate-400">
@@ -72,65 +65,74 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-lg border border-slate-700 bg-slate-800 p-6 shadow-sm"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl bg-slate-900 p-8 shadow-sm ring-1 ring-slate-800">
           {error && (
-            <div className="rounded-md bg-rose-500/15 p-3 text-sm text-rose-400 border border-rose-500/20">
+            <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400 text-center">
               {error}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-slate-300">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="admin@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={isLoading}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-            />
+            <label className="text-sm font-semibold text-slate-300 block">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <input
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+                className="w-full rounded-xl border border-slate-700 bg-slate-800/50 pl-10 pr-4 py-3.5 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:bg-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-slate-300">
+            <label className="text-sm font-semibold text-slate-300 block">
               Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-            />
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                className="w-full rounded-xl border border-slate-700 bg-slate-800/50 pl-10 pr-12 py-3.5 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:bg-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 size-4 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              "Sign In"
-            )}
-          </Button>
+          <PrimaryButton
+            text={isLoading ? "Signing in..." : "Sign In"}
+            type="submit"
+            disabled={isLoading}
+            className="w-full !py-3.5"
+          />
         </form>
 
-        <p className="text-center text-sm text-slate-400">
-          <a href="/login" className="text-primary hover:underline">
-            ← Back to user login
-          </a>
-        </p>
+        <div className="text-center">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-300 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to user login
+          </Link>
+        </div>
       </div>
     </div>
   );
