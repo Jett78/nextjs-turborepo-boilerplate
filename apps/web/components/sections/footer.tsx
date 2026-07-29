@@ -24,7 +24,7 @@ export async function Footer() {
   const company = await getCompanyProfile();
 
   return (
-    <footer className="border-t border-border bg-muted/20">
+    <footer className="bg-slate-900 text-slate-300">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Brand Column */}
@@ -39,14 +39,14 @@ export async function Footer() {
                   className="object-contain"
                 />
               ) : (
-                <span className="text-2xl font-bold text-foreground">
+                <span className="text-2xl font-bold text-white">
                   {company?.companyName || "Your Brand"}
                 </span>
               )}
             </Link>
 
             {company?.companyDescription && (
-              <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+              <p className="max-w-md text-sm leading-relaxed text-slate-400">
                 {company.companyDescription}
               </p>
             )}
@@ -54,9 +54,9 @@ export async function Footer() {
             {/* Contact Info */}
             <div className="space-y-3">
               {company?.address && (
-                <div className="flex items-start gap-3 text-sm text-muted-foreground">
+                <div className="flex items-start gap-3 text-sm text-slate-400">
                   <svg
-                    className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                    className="mt-0.5 h-4 w-4 shrink-0 text-slate-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -78,9 +78,9 @@ export async function Footer() {
                 </div>
               )}
               {company?.phoneNumber && (
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-3 text-sm text-slate-400">
                   <svg
-                    className="h-4 w-4 shrink-0 text-muted-foreground"
+                    className="h-4 w-4 shrink-0 text-slate-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -94,16 +94,16 @@ export async function Footer() {
                   </svg>
                   <a
                     href={`tel:${company.phoneNumber}`}
-                    className="hover:text-foreground transition-colors"
+                    className="hover:text-white transition-colors"
                   >
                     {company.phoneNumber}
                   </a>
                 </div>
               )}
               {company?.email && (
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-3 text-sm text-slate-400">
                   <svg
-                    className="h-4 w-4 shrink-0 text-muted-foreground"
+                    className="h-4 w-4 shrink-0 text-slate-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -117,7 +117,7 @@ export async function Footer() {
                   </svg>
                   <a
                     href={`mailto:${company.email}`}
-                    className="hover:text-foreground transition-colors"
+                    className="hover:text-white transition-colors"
                   >
                     {company.email}
                   </a>
@@ -137,7 +137,7 @@ export async function Footer() {
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
                       aria-label={social.platform}
                     >
                       <svg
@@ -157,9 +157,7 @@ export async function Footer() {
           {/* Links Grid */}
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             <div>
-              <h3 className="text-sm font-semibold text-foreground">
-                Quick Links
-              </h3>
+              <h3 className="text-sm font-semibold text-white">Quick Links</h3>
               <ul className="mt-4 space-y-3">
                 {[
                   { label: "Home", href: "/" },
@@ -170,7 +168,7 @@ export async function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-sm text-slate-400 transition-colors hover:text-white"
                     >
                       {link.label}
                     </Link>
@@ -180,12 +178,12 @@ export async function Footer() {
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold text-foreground">Legal</h3>
+              <h3 className="text-sm font-semibold text-white">Legal</h3>
               <ul className="mt-4 space-y-3">
                 <li>
                   <Link
                     href="/privacy"
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-sm text-slate-400 transition-colors hover:text-white"
                   >
                     Privacy Policy
                   </Link>
@@ -193,7 +191,7 @@ export async function Footer() {
                 <li>
                   <Link
                     href="/terms"
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-sm text-slate-400 transition-colors hover:text-white"
                   >
                     Terms of Service
                   </Link>
@@ -202,12 +200,12 @@ export async function Footer() {
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold text-foreground">Support</h3>
+              <h3 className="text-sm font-semibold text-white">Support</h3>
               <ul className="mt-4 space-y-3">
                 <li>
                   <Link
                     href="/contact"
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-sm text-slate-400 transition-colors hover:text-white"
                   >
                     Help Center
                   </Link>
@@ -215,7 +213,7 @@ export async function Footer() {
                 <li>
                   <Link
                     href="/contact"
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-sm text-slate-400 transition-colors hover:text-white"
                   >
                     Get in Touch
                   </Link>
@@ -226,19 +224,19 @@ export async function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 border-t border-border pt-8">
+        <div className="mt-12 border-t border-slate-800 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-slate-500">
               &copy; {new Date().getFullYear()}{" "}
               {company?.companyName || "Your Brand"}. All rights reserved.
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-slate-500">
               Designed & Developed by{" "}
               <a
                 href="https://nepaltechinnov.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-foreground hover:underline"
+                className="font-medium text-white hover:underline"
               >
                 Nepal Tech
               </a>
