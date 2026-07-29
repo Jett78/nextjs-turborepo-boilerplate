@@ -93,6 +93,34 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url, token }, request) => {
+      try {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
+        await transporter.sendMail({
+          from: process.env.MAIL_FROM,
+          to: user.email,
+          subject: 'Reset your password',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #333;">Reset Your Password</h2>
+              <p style="color: #666; line-height: 1.6;">
+                Hi ${user.name},<br><br>
+                We received a request to reset your password. Click the button below to set a new password.
+              </p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Reset Password</a>
+              </div>
+              <p style="color: #999; font-size: 12px;">This link will expire in 1 hour.</p>
+              <p style="color: #999; font-size: 12px;">If you didn't request a password reset, please ignore this email.</p>
+            </div>
+          `,
+        });
+        console.log('[AUTH] Password reset email sent to:', user.email);
+      } catch (err) {
+        console.error('[AUTH] Failed to send password reset email:', err);
+      }
+    },
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url, token }, request) => {

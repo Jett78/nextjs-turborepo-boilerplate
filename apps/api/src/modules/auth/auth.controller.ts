@@ -4,9 +4,10 @@ import { Session, Public } from '@thallesp/nestjs-better-auth';
 import type { UserSession } from '@thallesp/nestjs-better-auth';
 import { DB_CONNECTION } from '../../db/db.module';
 import { user as userTable, session as sessionTable, account as accountTable } from '../../db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, and } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { verifyOTP, sendOTP } from '../../lib/auth';
+import { hashPassword } from '../../lib/password';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -34,11 +35,27 @@ export class AuthController {
       .where(eq(userTable.id, session.user.id))
       .limit(1);
 
+    // Check if user has a credential account with password
+    const credentialAccount = await this.db
+      .select()
+      .from(accountTable)
+      .where(
+        and(
+          eq(accountTable.userId, session.user.id),
+          eq(accountTable.providerId, 'credential')
+        )
+      )
+      .limit(1);
+
+    const hasPassword = credentialAccount.length > 0 && !!credentialAccount[0].password;
+
+    const profileData = user[0] ? { ...user[0], hasPassword } : null;
+
     return {
       success: true,
       statusCode: 200,
       message: 'Profile fetched successfully',
-      data: user[0] || null,
+      data: profileData,
     };
   }
 
@@ -278,5 +295,73 @@ export class AuthController {
     } catch {
       throw new HttpException('Failed to send OTP', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @Post('set-password')
+  @ApiOperation({
+    summary: 'Set password for Google users',
+    description: 'Allows Google OAuth users to set a password for email/password login.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        password: { type: 'string', example: 'newPassword123', minLength: 8 },
+      },
+      required: ['password'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Password set successfully' })
+  @ApiResponse({ status: 400, description: 'Password too short' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  async setPassword(
+    @Session() session: UserSession,
+    @Body('password') password: string,
+  ) {
+    if (!session?.user) {
+      throw new HttpException('Not authenticated', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!password || password.length < 8) {
+      throw new HttpException('Password must be at least 8 characters', HttpStatus.BAD_REQUEST);
+    }
+
+    // Check if user already has a credential account
+    const existingAccount = await this.db
+      .select()
+      .from(accountTable)
+      .where(
+        and(
+          eq(accountTable.userId, session.user.id),
+          eq(accountTable.providerId, 'credential')
+        )
+      )
+      .limit(1);
+
+    const hashedPassword = await hashPassword(password);
+
+    if (existingAccount.length > 0) {
+      // Update existing credential account
+      await this.db
+        .update(accountTable)
+        .set({ password: hashedPassword })
+        .where(eq(accountTable.id, existingAccount[0].id));
+    } else {
+      // Create new credential account
+      const id = crypto.randomUUID();
+      await this.db.insert(accountTable).values({
+        id,
+        accountId: session.user.id,
+        providerId: 'credential',
+        userId: session.user.id,
+        password: hashedPassword,
+      });
+    }
+
+    return {
+      success: true,
+      statusCode: 200,
+      message: 'Password set successfully',
+    };
   }
 }
