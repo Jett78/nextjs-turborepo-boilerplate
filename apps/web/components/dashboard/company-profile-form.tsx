@@ -15,6 +15,15 @@ import { Building2, Palette, Image as ImageIcon } from "lucide-react";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { CompanyProfile } from "@/types/company-profile";
 
+function toCssHsl(hsl: string): string {
+  if (hsl.includes("/")) {
+    const [colorPart, alphaPart] = hsl.split("/").map((s) => s.trim());
+    const alpha = parseFloat(alphaPart.replace("%", "")) / 100;
+    return `hsla(${colorPart}, ${alpha})`;
+  }
+  return `hsl(${hsl})`;
+}
+
 interface CompanyProfileFormProps {
   profile: CompanyProfile | null;
 }
@@ -240,14 +249,14 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
                   <div className="flex-1">
                     <div
                       className="h-12 rounded-lg shadow-inner border border-white"
-                      style={{ backgroundColor: `hsl(${values.primaryColor})` }}
+                      style={{ backgroundColor: toCssHsl(values.primaryColor) }}
                     />
                     <p className="text-[10px] text-slate-500 mt-1.5 text-center font-medium">Primary</p>
                   </div>
                   <div className="flex-1">
                     <div
                       className="h-12 rounded-lg shadow-inner border border-white"
-                      style={{ backgroundColor: `hsl(${values.secondaryColor})` }}
+                      style={{ backgroundColor: toCssHsl(values.secondaryColor) }}
                     />
                     <p className="text-[10px] text-slate-500 mt-1.5 text-center font-medium">Secondary</p>
                   </div>

@@ -10,28 +10,37 @@ interface HslColorPickerProps {
   label?: string;
 }
 
-function parseHsl(hsl?: string): { h: number; s: number; l: number } {
-  if (!hsl) return { h: 221, s: 83, l: 53 };
-  const parts = hsl.replace(/%/g, "").split(" ");
+function parseHsl(hsl?: string): { h: number; s: number; l: number; a: number } {
+  if (!hsl) return { h: 221, s: 83, l: 53, a: 100 };
+  const normalized = hsl.includes("/") ? hsl.replace("/", " ") : hsl;
+  const parts = normalized.replace(/%/g, "").split(" ").filter(Boolean);
   return {
     h: parseFloat(parts[0]) || 0,
     s: parseFloat(parts[1]) || 0,
     l: parseFloat(parts[2]) || 0,
+    a: parts[3] !== undefined ? parseFloat(parts[3]) : 100,
   };
 }
 
-function hslToHex(h: number, s: number, l: number): string {
+function hslToHex(h: number, s: number, l: number, a: number = 100): string {
   s /= 100;
   l /= 100;
-  const a = s * Math.min(l, 1 - l);
+  const chroma = s * Math.min(l, 1 - l);
   const f = (n: number) => {
     const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    const color = l - chroma * Math.max(Math.min(k - 3, 9 - k, 1), -1);
     return Math.round(255 * color)
       .toString(16)
       .padStart(2, "0");
   };
-  return `#${f(0)}${f(8)}${f(4)}`;
+  const hex = `#${f(0)}${f(8)}${f(4)}`;
+  if (a < 100) {
+    const alphaHex = Math.round((a / 100) * 255)
+      .toString(16)
+      .padStart(2, "0");
+    return hex + alphaHex;
+  }
+  return hex;
 }
 
 function hexToHsl(hex: string): { h: number; s: number; l: number } {
@@ -77,14 +86,19 @@ function hexToHsl(hex: string): { h: number; s: number; l: number } {
 
 export function HslColorPicker({ value, onChange, label }: HslColorPickerProps) {
   const parsed = parseHsl(value);
-  const [hexInput, setHexInput] = useState(() => hslToHex(parsed.h, parsed.s, parsed.l));
+  const [hexInput, setHexInput] = useState(() => hslToHex(parsed.h, parsed.s, parsed.l, parsed.a));
 
   const handleSliderChange = useCallback(
-    (channel: "h" | "s" | "l", val: number) => {
+    (channel: "h" | "s" | "l" | "a", val: number) => {
       const current = parseHsl(value);
       current[channel] = val;
-      const hsl = `${current.h} ${current.s}% ${current.l}%`;
-      const hex = hslToHex(current.h, current.s, current.l);
+      let hsl: string;
+      if (current.a < 100) {
+        hsl = `${current.h} ${current.s}% ${current.l}% / ${current.a}%`;
+      } else {
+        hsl = `${current.h} ${current.s}% ${current.l}%`;
+      }
+      const hex = hslToHex(current.h, current.s, current.l, current.a);
       setHexInput(hex);
       onChange(hsl);
     },
@@ -93,12 +107,22 @@ export function HslColorPicker({ value, onChange, label }: HslColorPickerProps) 
 
   const handleHexChange = (hex: string) => {
     setHexInput(hex);
-    if (/^#?[0-9a-fA-F]{6}$/.test(hex)) {
-      const hsl = hexToHsl(hex);
-      onChange(`${hsl.h} ${hsl.s}% ${hsl.l}%`);
+    if (/^#?[0-9a-fA-F]{6,8}$/.test(hex)) {
+      const normalizedHex = hex.startsWith("#") ? hex : `#${hex}`;
+      const hsl = hexToHsl(normalizedHex);
+      if (normalizedHex.length === 9) {
+        const alphaHex = normalizedHex.substring(7, 9);
+        const alpha = Math.round((parseInt(alphaHex, 16) / 255) * 100);
+        onChange(`${hsl.h} ${hsl.s}% ${hsl.l}% / ${alpha}%`);
+      } else {
+        onChange(`${hsl.h} ${hsl.s}% ${hsl.l}%`);
+      }
     }
   };
 
+  const previewStyle = parsed.a < 100
+    ? { backgroundColor: `hsla(${parsed.h}, ${parsed.s}%, ${parsed.l}%, ${parsed.a / 100})` }
+    : { backgroundColor: `hsl(${parsed.h}, ${parsed.s}%, ${parsed.l}%)` };
 
   return (
     <div className="space-y-3">
@@ -106,7 +130,7 @@ export function HslColorPicker({ value, onChange, label }: HslColorPickerProps) 
       <div className="flex items-center gap-3">
         <div
           className="h-10 w-10 rounded-md border shrink-0"
-          style={{ backgroundColor: `hsl(${parsed.h}, ${parsed.s}%, ${parsed.l}%)` }}
+          style={previewStyle}
         />
         <Input
           value={hexInput}
@@ -116,6 +140,7 @@ export function HslColorPicker({ value, onChange, label }: HslColorPickerProps) 
         />
         <span className="text-xs text-muted-foreground whitespace-nowrap">
           {Math.round(parsed.h)}° {parsed.s}% {parsed.l}%
+          {parsed.a < 100 && ` / ${parsed.a}%`}
         </span>
       </div>
       <div className="space-y-2">
@@ -170,6 +195,22 @@ export function HslColorPicker({ value, onChange, label }: HslColorPickerProps) 
                 hsl(${parsed.h},${parsed.s}%,0%), 
                 hsl(${parsed.h},${parsed.s}%,50%), 
                 hsl(${parsed.h},${parsed.s}%,100%))`,
+            }}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Label className="w-8 text-xs">A</Label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={parsed.a}
+            onChange={(e) => handleSliderChange("a", Number(e.target.value))}
+            className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
+            style={{
+              background: `linear-gradient(to right, 
+                hsla(${parsed.h},${parsed.s}%,${parsed.l}%,0), 
+                hsla(${parsed.h},${parsed.s}%,${parsed.l}%,1))`,
             }}
           />
         </div>
