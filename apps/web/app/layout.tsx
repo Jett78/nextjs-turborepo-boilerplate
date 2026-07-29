@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Geist } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { getPublicSeoSettings } from "@/actions/seo-action";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -39,7 +42,7 @@ export default async function RootLayout({
   const seo = await getPublicSeoSettings();
 
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className={cn("scroll-smooth", "font-sans", geist.variable)}>
       <body className={`${montserrat.variable} ${montserrat.className} antialiased`}>
         {seo?.gtmContainerId && (
           <GoogleTagManager gtmId={seo.gtmContainerId} />

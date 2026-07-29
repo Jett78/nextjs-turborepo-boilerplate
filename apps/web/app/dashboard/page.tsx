@@ -4,12 +4,11 @@ import {
   Users,
   FileText,
   MessageSquare,
-  TrendingUp,
   Star,
   Download,
 } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/stats-card";
-import { ActivityTable } from "@/components/dashboard/activity-table";
+import { QuickActions } from "@/components/dashboard/quick-actions";
 import { AnalyticsChart } from "@/components/dashboard/analytics-chart";
 
 export default function DashboardPage() {
@@ -36,7 +35,7 @@ export default function DashboardPage() {
         </div>
 
         <div>
-          <ActivityTable />
+          <QuickActions />
         </div>
       </div>
     </div>
