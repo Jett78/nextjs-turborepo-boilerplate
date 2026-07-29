@@ -1,11 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { User, Mail, Phone, MapPin, Save, Camera, Loader2 } from "lucide-react";
+import { useState } from "react";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  CheckCircle,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import PrimaryButton from "@/components/ui/primary-button";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
+import AvatarUpload from "@/components/ui/avatar-upload";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCrud } from "@/hooks/useCRUD";
+import { API_ROUTES } from "@/config/api-routes";
+import { apiClient } from "@/lib/api-client";
+import { showSuccess, showError } from "@/lib/toast-helper";
 
 interface UserProfile {
   id: string;
@@ -21,211 +35,270 @@ interface UserProfile {
 }
 
 export default function UserProfilePage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const queryClient = useQueryClient();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/auth/profile`,
-          { credentials: "include" }
-        );
-        const data = await response.json();
-        if (data.success && data.data) {
-          setProfile(data.data);
-          setName(data.data.name || "");
-          setEmail(data.data.email || "");
-          setPhone(data.data.phone || "");
-          setAddress(data.data.address || "");
-        }
-      } catch {
-        setError("Failed to load profile");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { getAll } = useCrud<UserProfile>({
+    endpoint: `${API_ROUTES.AUTH}/profile`,
+    queryKey: "user-profile",
+  });
 
-    fetchProfile();
-  }, []);
+  const { data: profile, isLoading } = getAll();
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    setError("");
-    setSuccess("");
+  const profileData = profile as UserProfile | undefined;
 
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/auth/profile`,
+  if (profileData && !initialized) {
+    setName(profileData.name || "");
+    setPhone(profileData.phone || "");
+    setAddress(profileData.address || "");
+    setImageUrl(profileData.image || null);
+    setInitialized(true);
+  }
+
+  const mutation = useMutation({
+    mutationFn: (data: { name: string; phone: string; address: string; image: string | null }) =>
+      apiClient<{ success: boolean; data: UserProfile }>(
+        `${API_ROUTES.AUTH}/profile`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ name, phone, address }),
+          body: JSON.stringify(data),
+          isAuthenticated: true,
         }
-      );
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+      showSuccess("Profile updated successfully!");
+    },
+    onError: () => {
+      showError("Failed to update profile");
+    },
+  });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setProfile(data.data);
-        setSuccess("Profile updated successfully!");
-      } else {
-        setError(data.message || "Failed to update profile");
-      }
-    } catch {
-      setError("Failed to update profile");
-    } finally {
-      setIsSaving(false);
-    }
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate({ name, phone, address, image: imageUrl });
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="size-8 text-primary animate-spin" />
+        <div className="size-8 border-4 border-primarymain border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  if (error && !profile) {
+  if (!profileData) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-destructive">{error}</p>
+        <p className="text-red-500">Failed to load profile</p>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6 animate-in fade-in duration-500 max-w-2xl">
-      <div>
-        <h1 className="text-lg font-bold text-slate-900">Profile</h1>
-        <p className="text-slate-500 mt-1 text-xs">
-          Manage your personal information.
-        </p>
-      </div>
+  const initials = profileData.name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
-      {/* Profile Picture */}
-      <div className="bg-white rounded-md border border-slate-200 shadow-xs p-6">
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden">
-              {profile?.image ? (
-                <img
-                  src={profile.image}
-                  alt={profile.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="size-10 text-slate-400" />
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {mutation.isPending && <SubmittingLoader status="Saving profile" />}
+      {/* Profile Header Card */}
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        {/* Cover Background */}
+        <div className="h-32 bg-linear-to-r from-primarymain/20 via-primarymain/10 to-slate-100" />
+
+        {/* Profile Info */}
+        <div className="relative px-6 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12">
+            {/* Avatar */}
+            <AvatarUpload
+              currentImage={imageUrl}
+              initials={initials}
+              onImageUploaded={(url) => setImageUrl(url)}
+              size="md"
+            />
+
+            {/* Name & Role */}
+            <div className="flex-1 sm:pb-1">
+              <h1 className="text-xl font-bold text-slate-900">
+                {profileData.name}
+              </h1>
+              <p className="text-sm text-slate-500">{profileData.email}</p>
+            </div>
+
+            {/* Role Badge */}
+            <div className="flex items-center gap-2 sm:pb-1">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primarymain/10 text-primarymain capitalize">
+                <Shield className="size-3.5" />
+                {profileData.role?.replace("_", " ")}
+              </span>
+              {profileData.emailVerified && (
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600">
+                  <CheckCircle className="size-3.5" />
+                  Verified
+                </span>
               )}
             </div>
-            <button className="absolute bottom-0 right-0 p-1.5 bg-primary rounded-full text-white hover:bg-primary/90 transition-colors">
-              <Camera className="size-3.5" />
-            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Info Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-4 ">
+          <div className="p-3 bg-blue-50 rounded-xl">
+            <Mail className="size-5 text-blue-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-900">{profile?.name}</p>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {profile?.email}
+            <p className="text-xs text-slate-500">Email</p>
+            <p className="text-sm font-medium text-slate-900 truncate max-w-[180px]">
+              {profileData.email}
             </p>
-            <p className="text-xs text-slate-400 mt-0.5 capitalize">
-              Role: {profile?.role?.replace("_", " ")}
+          </div>
+        </div>
+        <div className="flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-4 ">
+          <div className="p-3 bg-purple-50 rounded-xl">
+            <Phone className="size-5 text-purple-600" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">Phone</p>
+            <p className="text-sm font-medium text-slate-900">
+              {profileData.phone || "Not set"}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-4 ">
+          <div className="p-3 bg-amber-50 rounded-xl">
+            <Calendar className="size-5 text-amber-600" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">Joined</p>
+            <p className="text-sm font-medium text-slate-900">
+              {new Date(profileData.createdAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Personal Information */}
-      <form onSubmit={handleSave} className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
-        {error && (
-          <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-600">
-            {success}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="pl-10"
-                disabled={isSaving}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                className="pl-10"
-                disabled
-              />
-            </div>
-            <p className="text-xs text-slate-400">Email cannot be changed</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-              <Input
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+977-9841234567"
-                className="pl-10"
-                disabled={isSaving}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="address">Address</Label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 size-4 text-slate-400" />
-              <Textarea
-                id="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Enter your address"
-                className="pl-10 min-h-[80px]"
-                disabled={isSaving}
-              />
-            </div>
-          </div>
+      {/* Edit Form */}
+      <div className="bg-white rounded-2xl border border-slate-200  overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-100 bg-linear-to-r from-slate-50/80 to-transparent">
+          <h2 className="text-sm font-bold text-slate-900">
+            Personal Information
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Update your personal details
+          </p>
         </div>
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSaving}>
-            <Save className="size-4 mr-2" />
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      </form>
+        <form onSubmit={handleSave} className="p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-xs font-semibold text-slate-700">
+                Full Name
+              </Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your full name"
+                  className="pl-10 h-11 rounded-xl"
+                  disabled={mutation.isPending}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-xs font-semibold text-slate-700">
+                Email Address
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={profileData.email}
+                  className="pl-10 h-11 rounded-xl bg-slate-50"
+                  disabled
+                />
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Contact support to change your email
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-xs font-semibold text-slate-700">
+                Phone Number
+              </Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                <Input
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+977-9841234567"
+                  className="pl-10 h-11 rounded-xl"
+                  disabled={mutation.isPending}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-700">
+                Role
+              </Label>
+              <div className="relative">
+                <Shield className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                <Input
+                  value={profileData.role?.replace("_", " ") || "customer"}
+                  className="pl-10 h-11 rounded-xl bg-slate-50 capitalize"
+                  disabled
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="address" className="text-xs font-semibold text-slate-700">
+                Address
+              </Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                <Input
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Enter your full address"
+                  className="pl-10 h-11 rounded-xl"
+                  disabled={mutation.isPending}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end pt-2">
+            <PrimaryButton
+              type="submit"
+              text={mutation.isPending ? "Saving..." : "Save Changes"}
+              disabled={mutation.isPending}
+              className="rounded-xl"
+            />
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

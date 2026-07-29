@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Mail, Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Bell, Mail, CheckCircle } from "lucide-react";
+import PrimaryButton from "@/components/ui/primary-button";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
+import { showSuccess } from "@/lib/toast-helper";
 
 export default function AccountSettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -14,65 +15,102 @@ export default function AccountSettingsPage() {
     e.preventDefault();
     setIsSaving(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    showSuccess("Settings saved successfully!");
     setIsSaving(false);
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 max-w-2xl">
-      <div>
-        <h1 className="text-lg font-bold text-slate-900">Account Settings</h1>
-        <p className="text-slate-500 mt-1 text-xs">
-          Manage your notification preferences.
-        </p>
+    <div className="space-y-6 animate-in fade-in duration-500">
+      {isSaving && <SubmittingLoader status="Saving settings" />}
+
+      {/* Notification Info Card */}
+      <div className="flex items-start gap-4 bg-white rounded-2xl border border-slate-200 p-6 ">
+        <div className="p-3 bg-blue-50 rounded-xl">
+          <Bell className="size-5 text-blue-600" />
+        </div>
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">
+            Notification Preferences
+          </h3>
+          <p className="text-xs text-slate-500 mt-1">
+            Choose how you want to be notified about account activity and
+            updates.
+          </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSave} className="bg-white rounded-md border border-slate-200 shadow-xs p-6 space-y-6">
-        <h3 className="font-bold text-slate-900 flex items-center gap-2">
-          <Bell className="size-4" />
-          Notifications
-        </h3>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <p className="text-sm font-medium text-slate-900">Email Notifications</p>
-              <p className="text-xs text-slate-500">Receive email updates about your account activity.</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={emailNotifications}
-                onChange={(e) => setEmailNotifications(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
-
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <p className="text-sm font-medium text-slate-900">Marketing Emails</p>
-              <p className="text-xs text-slate-500">Receive emails about new features and updates.</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={marketingEmails}
-                onChange={(e) => setMarketingEmails(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
+      {/* Notification Settings */}
+      <div className="bg-white rounded-2xl border border-slate-200  overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-100 bg-linear-to-r from-slate-50/80 to-transparent">
+          <h2 className="text-sm font-bold text-slate-900">Email Notifications</h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Manage your email notification settings
+          </p>
         </div>
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSaving}>
-            <Save className="size-4 mr-2" />
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      </form>
+        <form onSubmit={handleSave} className="p-6 space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 bg-blue-50 rounded-lg">
+                  <Mail className="size-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-900">
+                    Email Notifications
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Receive email updates about your account activity.
+                  </p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={emailNotifications}
+                  onChange={(e) => setEmailNotifications(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primarymain" />
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 bg-purple-50 rounded-lg">
+                  <CheckCircle className="size-4 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-900">
+                    Marketing Emails
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Receive emails about new features and updates.
+                  </p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={marketingEmails}
+                  onChange={(e) => setMarketingEmails(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primarymain" />
+              </label>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end pt-2">
+            <PrimaryButton
+              type="submit"
+              text={isSaving ? "Saving..." : "Save Changes"}
+              disabled={isSaving}
+              className="rounded-xl"
+            />
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

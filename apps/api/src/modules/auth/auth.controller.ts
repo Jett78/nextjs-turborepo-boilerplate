@@ -54,6 +54,7 @@ export class AuthController {
         name: { type: 'string', example: 'John Doe' },
         phone: { type: 'string', example: '+977-9841234567' },
         address: { type: 'string', example: 'Kathmandu, Nepal' },
+        image: { type: 'string', example: 'https://s3.amazonaws.com/bucket/image.jpg' },
       },
     },
   })
@@ -64,6 +65,7 @@ export class AuthController {
     @Body('name') name?: string,
     @Body('phone') phone?: string,
     @Body('address') address?: string,
+    @Body('image') image?: string,
   ) {
     if (!session?.user) {
       throw new HttpException('Not authenticated', HttpStatus.UNAUTHORIZED);
@@ -73,6 +75,7 @@ export class AuthController {
     if (name !== undefined) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone;
     if (address !== undefined) updateData.address = address;
+    if (image !== undefined) updateData.image = image;
 
     if (Object.keys(updateData).length === 0) {
       throw new HttpException('No fields to update', HttpStatus.BAD_REQUEST);

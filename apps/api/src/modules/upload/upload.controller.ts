@@ -31,7 +31,6 @@ export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   @Post()
-  @Roles(['super_admin'])
   @UseInterceptors(
     FileInterceptor('file', {
       limits: {
