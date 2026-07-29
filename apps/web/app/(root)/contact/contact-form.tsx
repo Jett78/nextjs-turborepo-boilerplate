@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { createInquiry } from "@/actions/inquiry-action";
 import PrimaryButton from "@/components/ui/primary-button";
-import { CheckCircle, XCircle } from "lucide-react";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
+import Swal from "sweetalert2";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +14,6 @@ const ContactForm = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,14 +22,25 @@ const ContactForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setStatus(null);
 
     try {
       await createInquiry(formData);
-      setStatus({ type: "success", message: "Thank you! Your inquiry has been submitted." });
       setFormData({ name: "", email: "", phone: "", message: "" });
+      Swal.fire({
+        icon: "success",
+        title: "Message Sent!",
+        text: "Thank you! Your inquiry has been submitted successfully.",
+        confirmButtonColor: "#4f46e5",
+        confirmButtonText: "OK",
+      });
     } catch {
-      setStatus({ type: "error", message: "Something went wrong. Please try again." });
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong. Please try again.",
+        confirmButtonColor: "#4f46e5",
+        confirmButtonText: "OK",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -37,22 +48,7 @@ const ContactForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {status && (
-        <div
-          className={`flex items-center gap-2 p-4 rounded-xl text-sm ${
-            status.type === "success"
-              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-              : "bg-red-50 text-red-700 border border-red-200"
-          }`}
-        >
-          {status.type === "success" ? (
-            <CheckCircle className="h-5 w-5 flex-shrink-0" />
-          ) : (
-            <XCircle className="h-5 w-5 flex-shrink-0" />
-          )}
-          {status.message}
-        </div>
-      )}
+      {isSubmitting && <SubmittingLoader status="Sending message" />}
 
       <div className="grid sm:grid-cols-2 gap-5">
         <div className="space-y-2">
