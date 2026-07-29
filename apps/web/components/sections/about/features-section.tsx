@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Layers, Lock, Database, Zap, Code2, Globe } from "lucide-react";
+import PageHeader from "@/components/ui/page-header";
 
 const features = [
   {
@@ -57,21 +58,12 @@ export default function FeaturesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="mx-auto max-w-2xl text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-indigo-600 ring-1 ring-inset ring-indigo-500/20">
-            <Zap className="h-3.5 w-3.5" />
-            Features
-          </span>
-          <h2 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            Everything you need.
-            <br />
-            <span className="text-gray-400">Nothing you don&apos;t.</span>
-          </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
-            Batteries-included without the bloat. Every tool is chosen for a reason,
-            and every default is intentional.
-          </p>
+          <PageHeader
+            subtitle="Features"
+            title="Everything you need. Nothing you don't."
+            desc="Batteries-included without the bloat. Every tool is chosen for a reason, and every default is intentional."
+          />
         </motion.div>
 
         <div className="mx-auto mt-16 max-w-5xl">

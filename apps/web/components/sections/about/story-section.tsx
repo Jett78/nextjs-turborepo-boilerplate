@@ -19,9 +19,9 @@ export default function StorySection() {
               Our Story
             </span>
 
-            <h2 className="mt-8 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            <h2 className="mt-8 text-4xl font-extrabold  text-gray-900 sm:text-5xl">
               We build tools
-              <span className="block text-indigo-600">developers love.</span>
+              <span className="block text-primarymain">Developers love.</span>
             </h2>
 
             <div className="mt-8 space-y-5 text-base leading-relaxed text-gray-600">

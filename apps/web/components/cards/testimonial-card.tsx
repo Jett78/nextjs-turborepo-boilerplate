@@ -39,7 +39,7 @@ const TestimonialCard = ({
   return (
     <div
       className={cn(
-        "group  relative overflow-hidden rounded-2xl border bg-white p-6 border transition-all duration-300",
+        "group  relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6  transition-all duration-300",
         className
       )}
     >

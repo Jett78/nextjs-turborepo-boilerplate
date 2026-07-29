@@ -115,7 +115,7 @@ export function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group rounded-2xl border bg-background p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 hover:border-border/80"
+              className="group rounded-2xl border border-slate-200 bg-background p-5 transition-all duration-300 hover:shadow-md  hover:border-border/80"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${feature.bg} ${feature.color} transition-transform duration-300 group-hover:scale-110`}>
@@ -125,7 +125,7 @@ export function Features() {
                   {feature.title}
                 </h3>
               </div>
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <p className="text-sm leading-relaxed text-lighttext font-medium">
                 {feature.description}
               </p>
             </div>

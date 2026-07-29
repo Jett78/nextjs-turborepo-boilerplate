@@ -46,9 +46,9 @@ export default function WhyChooseSection() {
               <Sparkles className="h-3.5 w-3.5" />
               Why Us
             </span>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              Built by developers,
-              <span className="block text-gray-400">for developers.</span>
+            <h2 className="mt-6 text-2xl font-extrabold  text-gray-900 sm:text-4xl">
+              Built by Developers,
+              <span className="block text-primarymain">For Developers.</span>
             </h2>
             <p className="mt-6 text-base leading-7 text-gray-600">
               We&apos;ve been where you are — staring at a blank project, configuring

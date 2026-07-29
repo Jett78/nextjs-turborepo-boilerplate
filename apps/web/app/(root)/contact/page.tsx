@@ -20,12 +20,12 @@ const ContactPage = async () => {
   }
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white pt-24">
+    <div className="bg-linear-to-b from-gray-50 to-white pt-24">
       <section className="mx-auto max-w-7xl px-4 py-16 md:py-24 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Contact Form */}
           <div className="lg:col-span-3">
-            <div className="bg-white border-primary/40 rounded-2xl p-4 md:p-6 shadow-sm border">
+            <div className="bg-white border-slate-200 rounded-2xl p-4 md:p-6  border">
               <h3 className="text-xl font-bold text-gray-900 mb-8">
                 Send us a Message
               </h3>
