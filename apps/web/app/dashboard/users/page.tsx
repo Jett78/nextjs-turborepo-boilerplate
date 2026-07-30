@@ -9,6 +9,7 @@ import { useCrud } from "@/hooks/useCRUD";
 import { API_ROUTES } from "@/config/api-routes";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import type { User } from "@/types/user";
+import Image from "next/image";
 
 const getRoleBadge = (role: string) => {
   const roleStyles: Record<string, string> = {
@@ -31,6 +32,16 @@ export default function UsersPage() {
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
+
+  // Fetch current user to prevent self-deletion
+  const { getAll: getCurrentUser } = useCrud<User>({
+    endpoint: `${API_ROUTES.AUTH}/profile`,
+    queryKey: "current-user",
+    isAuthenticated: true,
+  });
+
+  const { data: currentUserData } = getCurrentUser();
+  const currentUser = currentUserData as User | undefined;
 
   const { getAll } = useCrud<User>({
     endpoint: API_ROUTES.USER,
@@ -58,9 +69,11 @@ export default function UsersPage() {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden shrink-0">
             {row.image ? (
-              <img
+              <Image
                 src={row.image}
                 alt={row.name}
+                height={500}
+                width={500}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -128,12 +141,14 @@ export default function UsersPage() {
       className: "text-right",
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
-          <DeleteButton
-            id={row.id}
-            endpoint={API_ROUTES.USER}
-            queryKey="users"
-            entityName="user"
-          />
+          {currentUser?.id !== row.id && (
+            <DeleteButton
+              id={row.id}
+              endpoint={API_ROUTES.USER}
+              queryKey="users"
+              entityName="user"
+            />
+          )}
         </div>
       ),
     },
