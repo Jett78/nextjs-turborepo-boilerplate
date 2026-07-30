@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { signUp } from "@/lib/auth-client";
+import { signUp, signIn } from "@/lib/auth-client";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import PrimaryButton from "@/components/ui/primary-button";
 
@@ -63,7 +62,7 @@ export default function RegisterPage() {
   };
 
   const handleGoogleSignUp = async () => {
-    await signUp.social({
+    await signIn.social({
       provider: "google",
       callbackURL: "/auth/callback",
     });

@@ -15,9 +15,9 @@ function parseHsl(hsl?: string): { h: number; s: number; l: number; a: number } 
   const normalized = hsl.includes("/") ? hsl.replace("/", " ") : hsl;
   const parts = normalized.replace(/%/g, "").split(" ").filter(Boolean);
   return {
-    h: parseFloat(parts[0]) || 0,
-    s: parseFloat(parts[1]) || 0,
-    l: parseFloat(parts[2]) || 0,
+    h: parseFloat(parts[0] || "0") || 0,
+    s: parseFloat(parts[1] || "0") || 0,
+    l: parseFloat(parts[2] || "0") || 0,
     a: parts[3] !== undefined ? parseFloat(parts[3]) : 100,
   };
 }

@@ -17,9 +17,13 @@ import type { CompanyProfile } from "@/types/company-profile";
 
 function toCssHsl(hsl: string): string {
   if (hsl.includes("/")) {
-    const [colorPart, alphaPart] = hsl.split("/").map((s) => s.trim());
-    const alpha = parseFloat(alphaPart.replace("%", "")) / 100;
-    return `hsla(${colorPart}, ${alpha})`;
+    const parts = hsl.split("/").map((s) => s.trim());
+    const colorPart = parts[0];
+    const alphaPart = parts[1];
+    if (colorPart && alphaPart) {
+      const alpha = parseFloat(alphaPart.replace("%", "")) / 100;
+      return `hsla(${colorPart}, ${alpha})`;
+    }
   }
   return `hsl(${hsl})`;
 }

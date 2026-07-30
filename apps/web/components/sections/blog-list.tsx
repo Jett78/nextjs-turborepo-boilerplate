@@ -23,7 +23,7 @@ export default function BlogList({ posts }: { posts: Blog[] }) {
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <BlogCard blog={posts[0]} featured />
+              {posts[0] && <BlogCard blog={posts[0]} featured />}
             </motion.div>
 
             <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

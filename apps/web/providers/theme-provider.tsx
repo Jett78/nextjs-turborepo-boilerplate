@@ -8,9 +8,9 @@ import type { CompanyProfile } from "@/types/company-profile";
 function hslStringToHex(hsl: string): string {
   const normalized = hsl.includes("/") ? hsl.split("/").join(" ") : hsl;
   const parts = normalized.replace(/%/g, "").split(" ");
-  const h = parseFloat(parts[0]) || 0;
-  let s = parseFloat(parts[1]) || 0;
-  let l = parseFloat(parts[2]) || 0;
+  const h = parseFloat(parts[0] || "0") || 0;
+  let s = parseFloat(parts[1] || "0") || 0;
+  let l = parseFloat(parts[2] || "0") || 0;
   const a = parts[3] !== undefined ? parseFloat(parts[3]) : 100;
 
   s /= 100;

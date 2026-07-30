@@ -86,7 +86,7 @@ export default function DataTable<T>({
                 >
                   {col.render
                     ? col.render(row, rowIndex)
-                    : String((row as Record<string, unknown>)[col.key] ?? "")}
+                    : String((row as Record<string, unknown>)[String(col.key)] ?? "")}
                 </TableCell>
               ))}
             </TableRow>

@@ -24,11 +24,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+import { LucideIcon } from "lucide-react";
+
 interface NavItem {
   name: string;
   href?: string;
-  icon: any;
-  children?: { name: string; href: string; icon: any }[];
+  icon: LucideIcon;
+  children?: { name: string; href: string; icon: LucideIcon }[];
 }
 
 const navigation: NavItem[] = [

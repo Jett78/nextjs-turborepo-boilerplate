@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "@/lib/auth-client";
+import { signIn, signOut } from "@/lib/auth-client";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import PrimaryButton from "@/components/ui/primary-button";
 
@@ -38,9 +38,9 @@ export default function LoginPage() {
 
         if (role === "admin" || role === "super_admin") {
           setError("Admin users please use the admin login page.");
-          await signIn.signOut();
+          await signOut();
         } else if (!emailVerified) {
-          await signIn.signOut();
+          await signOut();
           router.push(
             `/verify-email?email=${encodeURIComponent(email)}&name=${encodeURIComponent(data?.data?.name || "")}`
           );
