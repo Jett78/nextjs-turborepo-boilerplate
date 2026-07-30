@@ -9,10 +9,6 @@ export interface BlogFormProps {
   blog?: import("./blog").Blog;
 }
 
-export interface DeleteBlogButtonProps {
-  id: string;
-}
-
 export interface BlogCardProps {
   blog: import("./blog").Blog;
   variant?: "default" | "featured";
@@ -34,18 +30,10 @@ export interface TestimonialFormProps {
   testimonial?: import("./testimonial").Testimonial;
 }
 
-export interface DeleteTestimonialButtonProps {
-  id: string;
-}
-
 export interface PageSeoFormProps {
   pageSeo?: import("./page-seo").PageSeo;
 }
 
 export interface FaqFormProps {
   faq?: import("./faq").Faq;
-}
-
-export interface DeleteFaqButtonProps {
-  id: string;
 }

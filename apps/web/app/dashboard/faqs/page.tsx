@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import DashboardHeading from "@/components/dashboard/dashboard-heading";
 import DataTable, { Column } from "@/components/dashboard/data-table";
-import { Search, Pencil } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useCrud } from "@/hooks/useCRUD";
 import { API_ROUTES } from "@/config/api-routes";
-import { DeleteFaqButton } from "@/components/dashboard/delete-faq-button";
+import { DeleteButton } from "@/components/dashboard/delete-button";
+import { EditButton } from "@/components/dashboard/edit-button";
+import { revalidateFaqs } from "@/actions/revalidate-action";
 import type { Faq } from "@/types/faq";
 
 export default function FaqsPage() {
@@ -81,14 +83,14 @@ export default function FaqsPage() {
       className: "text-right",
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
-          <a
-            href={`/dashboard/faqs/${row.id}/edit`}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all text-[10px] font-bold uppercase tracking-widest active:scale-95"
-          >
-            <Pencil className="size-3" />
-            Edit
-          </a>
-          <DeleteFaqButton id={row.id} />
+          <EditButton href={`/dashboard/faqs/${row.id}/edit`} />
+          <DeleteButton
+            id={row.id}
+            endpoint={API_ROUTES.FAQ}
+            queryKey="faqs"
+            entityName="FAQ"
+            onSuccess={revalidateFaqs}
+          />
         </div>
       ),
     },

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCrud } from "@/hooks/useCRUD";
 import { API_ROUTES } from "@/config/api-routes";
-import { DeleteInquiryButton } from "@/components/dashboard/delete-inquiry-button";
+import { DeleteButton } from "@/components/dashboard/delete-button";
 import InquiryModal from "./inquiry-modal";
 import type { Inquiry } from "@/types/inquiry";
 
@@ -105,7 +105,12 @@ export default function InquiriesPage() {
             <Eye className="size-3.5 mr-1" />
             View
           </Button>
-          <DeleteInquiryButton id={row.id} />
+          <DeleteButton
+            id={row.id}
+            endpoint={API_ROUTES.INQUIRY}
+            queryKey="inquiries"
+            entityName="inquiry"
+          />
         </div>
       ),
     },
