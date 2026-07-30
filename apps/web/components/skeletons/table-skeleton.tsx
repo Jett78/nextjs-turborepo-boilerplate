@@ -10,13 +10,13 @@ const TableSkeleton = ({ rows = 5 }: { rows?: number }) => {
           {Array.from({ length: rows }).map((_, i) => (
             <TableRow key={i}>
               <TableCell>
-                <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
+                <div className="h-10 w-32 bg-slate-200 rounded animate-pulse" />
               </TableCell>
               <TableCell className="hidden md:table-cell">
-                <div className="h-4 w-48 bg-slate-200 rounded animate-pulse" />
+                <div className="h-10 w-48 bg-slate-200 rounded animate-pulse" />
               </TableCell>
               <TableCell>
-                <div className="h-4 w-24 bg-slate-200 rounded animate-pulse" />
+                <div className="h-10 w-24 bg-slate-200 rounded animate-pulse" />
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
