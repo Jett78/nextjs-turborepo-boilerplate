@@ -52,7 +52,7 @@ const DashboardHeading = ({
       {/* Action Button */}
       {path && (
         <div className="shrink-0">
-          <Link href={`/dashboard/${path}/add`}>
+          <Link href={`/dashboard/${path}/new`}>
             <button
               name="add-new-btn"
               className="bg-primarymain flex items-center gap-2 rounded-md px-4 py-2 text-xs text-white duration-200 ease-in-out hover:bg-secondarymain"

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { signIn } from "@/lib/auth-client";
+import { signIn, signOut } from "@/lib/auth-client";
 import { Shield, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import PrimaryButton from "@/components/ui/primary-button";
 
@@ -34,14 +34,20 @@ export default function AdminLoginPage() {
       );
       const data = await response.json();
       const role = data?.data?.role || "user";
+      const emailVerified = data?.data?.emailVerified;
 
       document.cookie = `user_role=${role}; path=/; max-age=${60 * 60 * 24 * 7}`;
 
       if (role === "admin" || role === "super_admin") {
-        window.location.href = "/dashboard";
+        if (!emailVerified) {
+          await signOut();
+          window.location.href = `/verify-email?email=${encodeURIComponent(email)}&name=${encodeURIComponent(data?.data?.name || "")}`;
+        } else {
+          window.location.href = "/dashboard";
+        }
       } else {
         setError("Access denied. Admin credentials required.");
-        await signIn.signOut();
+        await signOut();
       }
     } catch {
       setError("An error occurred. Please try again.");

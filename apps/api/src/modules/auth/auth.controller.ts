@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from 
 import { Session, Public } from '@thallesp/nestjs-better-auth';
 import type { UserSession } from '@thallesp/nestjs-better-auth';
 import { DB_CONNECTION } from '../../db/db.module';
-import { user as userTable, session as sessionTable, account as accountTable } from '../../db/schema';
+import { user as userTable, session as sessionTable, account as accountTable, verification as verificationTable } from '../../db/schema';
 import { desc, eq, and } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { verifyOTP, sendOTP } from '../../lib/auth';
@@ -154,6 +154,99 @@ export class AuthController {
     };
   }
 
+  @Post('users')
+  @ApiOperation({
+    summary: 'Create a new user',
+    description: 'Creates a new user with the provided details. Requires admin session.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'John Doe' },
+        email: { type: 'string', example: 'john@example.com' },
+        password: { type: 'string', example: 'password123', minLength: 8 },
+        role: { type: 'string', enum: ['super_admin', 'admin', 'manager', 'customer'], example: 'customer' },
+        phone: { type: 'string', example: '+977-9841234567' },
+      },
+      required: ['name', 'email', 'password', 'role'],
+    },
+  })
+  @ApiResponse({ status: 201, description: 'User created successfully' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 400, description: 'User already exists' })
+  async createUser(
+    @Session() session: UserSession,
+    @Body('name') name: string,
+    @Body('email') email: string,
+    @Body('password') password: string,
+    @Body('role') role: string,
+    @Body('phone') phone?: string,
+  ) {
+    if (!session?.user) {
+      throw new HttpException('Not authenticated', HttpStatus.UNAUTHORIZED);
+    }
+
+    // Check if current user is admin or super_admin
+    const currentUser = await this.db
+      .select()
+      .from(userTable)
+      .where(eq(userTable.id, session.user.id))
+      .limit(1);
+
+    if (!currentUser.length || (currentUser[0].role !== 'admin' && currentUser[0].role !== 'super_admin')) {
+      throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
+    }
+
+    // Check if user already exists
+    const existingUser = await this.db
+      .select()
+      .from(userTable)
+      .where(eq(userTable.email, email))
+      .limit(1);
+
+    if (existingUser.length > 0) {
+      throw new HttpException('User with this email already exists', HttpStatus.BAD_REQUEST);
+    }
+
+    // Validate role
+    const validRoles = ['super_admin', 'admin', 'manager', 'customer'];
+    if (!validRoles.includes(role)) {
+      throw new HttpException('Invalid role', HttpStatus.BAD_REQUEST);
+    }
+
+    // Use Better Auth to create user (handles password hashing properly)
+    const { createUser } = await import('../../lib/auth');
+    
+    try {
+      const result = await createUser({
+        name,
+        email,
+        password,
+        role,
+        phone: phone || undefined,
+      });
+
+      return {
+        success: true,
+        statusCode: 201,
+        message: 'User created successfully',
+        data: {
+          id: result.id,
+          name: result.name,
+          email: result.email,
+          role: result.role,
+          phone: result.phone || null,
+        },
+      };
+    } catch (error: any) {
+      if (error.message?.includes('already exists')) {
+        throw new HttpException('User with this email already exists', HttpStatus.BAD_REQUEST);
+      }
+      throw new HttpException('Failed to create user', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @Delete('users/:id')
   @ApiOperation({
     summary: 'Delete a user',
@@ -203,6 +296,10 @@ export class AuthController {
 
     // Delete accounts
     await this.db.delete(accountTable).where(eq(accountTable.userId, id));
+
+    // Delete verification records for this user's email
+    const userEmail = userToDelete[0].email;
+    await this.db.delete(verificationTable).where(eq(verificationTable.identifier, userEmail));
 
     // Delete user
     await this.db.delete(userTable).where(eq(userTable.id, id));

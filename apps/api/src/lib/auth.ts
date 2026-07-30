@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import nodemailer from 'nodemailer';
 import { db } from '../db';
-import { verification } from '../db/schema';
+import { verification, user as userTable } from '../db/schema';
 import { eq } from 'drizzle-orm';
 
 const transporter = nodemailer.createTransport({
@@ -38,7 +38,7 @@ export async function sendOTP(email: string, name: string): Promise<string> {
     subject: 'Verify your email address',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #333;">Welcome to Samriddhi!</h2>
+        <h2 style="color: #333;">Welcome to Nextjs Boiler Plate!</h2>
         <p style="color: #666; line-height: 1.6;">
           Hi ${name},<br><br>
           Thank you for registering. Please use the following OTP to verify your email address.
@@ -145,3 +145,53 @@ export const auth = betterAuth({
   },
   trustedOrigins: [process.env.FRONTEND_URL || 'http://localhost:3000'],
 });
+
+// Helper function to create user via Better Auth
+export async function createUser(data: {
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  phone?: string;
+}) {
+  const { name, email, password, role = 'customer', phone } = data;
+
+  // Use Better Auth's signUpEmail to create user
+  const result = await auth.api.signUpEmail({
+    body: {
+      name,
+      email,
+      password,
+    },
+  });
+
+  // Handle result - Better Auth returns the user directly or with error
+  const resultObj = result as Record<string, unknown>;
+  if (resultObj.error) {
+    const errorObj = resultObj.error as { message?: string };
+    throw new Error(errorObj.message || 'Failed to create user');
+  }
+
+  // Get user from result
+  const userData = (resultObj.user || (resultObj.data && typeof resultObj.data === 'object' && (resultObj.data as Record<string, unknown>).user)) as { id?: string; name?: string; email?: string } | null;
+
+  // Update the user's role and phone (emailVerified stays false)
+  if (userData?.id) {
+    await db.update(userTable).set({
+      role,
+      phone: phone || null,
+      emailVerified: false, // User must verify email via OTP
+    }).where(eq(userTable.id, userData.id));
+  }
+
+  // Note: OTP is NOT sent here. It will be sent when user tries to login
+  // and is redirected to the verify-email page
+
+  return {
+    id: userData?.id,
+    name: userData?.name,
+    email: userData?.email,
+    role,
+    phone: phone || null,
+  };
+}

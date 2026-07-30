@@ -6,7 +6,6 @@ import Link from "next/link";
 import { CheckCircle, XCircle, Loader2, Mail, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams();
@@ -90,7 +89,7 @@ export default function VerifyEmailPage() {
 
       const data = await response.json();
 
-      if (data.success || response.ok) {
+      if (response.ok && data.success) {
         setStatus("success");
         setMessage("Email verified successfully!");
       } else {
@@ -133,6 +132,13 @@ export default function VerifyEmailPage() {
       setIsResending(false);
     }
   };
+
+  // Auto-send OTP when page loads (after handleResendOTP is defined)
+  useEffect(() => {
+    if (email && name) {
+      handleResendOTP();
+    }
+  }, [email, name]);
 
   if (!email) {
     return (

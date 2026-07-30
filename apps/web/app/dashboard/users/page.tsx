@@ -152,6 +152,7 @@ export default function UsersPage() {
       <DashboardHeading
         title="Users"
         description="Manage registered users and their roles."
+        path="users"
       />
 
       <div className="flex flex-col sm:flex-row gap-4">
