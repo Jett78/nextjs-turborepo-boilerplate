@@ -70,7 +70,7 @@ export function ProfileNav() {
 
       <div className="mt-3 pt-3 border-t border-slate-100">
         <AlertDialog>
-          <AlertDialogTrigger asChild>
+          <AlertDialogTrigger>
             <button className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all duration-200 w-full">
               <LogOut className="size-5" />
               <span>Logout</span>

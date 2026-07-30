@@ -115,11 +115,8 @@ export function Sidebar() {
           href="/dashboard"
           className="flex items-center gap-2 font-bold text-xl text-white whitespace-nowrap"
         >
-          <div className="size-7 bg-primary rounded-lg flex items-center justify-center shrink-0">
-            <span className="text-white text-lg">A</span>
-          </div>
-          <span className="opacity-100 transition-opacity duration-300">
-            Acme
+          <span className="opacity-100 text-center transition-opacity duration-300">
+            Dashboard
           </span>
         </Link>
       </div>
@@ -233,7 +230,7 @@ export function Sidebar() {
           </span>
         </Link>
         <AlertDialog>
-          <AlertDialogTrigger asChild>
+          <AlertDialogTrigger>
             <button className="flex items-center gap-3 px-3 py-2 w-full text-sm font-medium rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors overflow-hidden">
               <LogOut className="size-5 shrink-0" />
               <span className="truncate opacity-100 transition-opacity duration-300">
