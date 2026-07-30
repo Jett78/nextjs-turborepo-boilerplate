@@ -5,13 +5,30 @@ import {
   FileText,
   MessageSquare,
   Star,
-  Download,
 } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/stats-card";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { AnalyticsChart } from "@/components/dashboard/analytics-chart";
+import { useCrud } from "@/hooks/useCRUD";
+import { API_ROUTES } from "@/config/api-routes";
+
+interface DashboardStats {
+  blogs: number;
+  testimonials: number;
+  inquiries: number;
+  users: number;
+}
 
 export default function DashboardPage() {
+  const { getAll } = useCrud<DashboardStats>({
+    endpoint: API_ROUTES.DASHBOARD_STATS,
+    queryKey: "dashboard-stats",
+    isAuthenticated: true,
+  });
+
+  const { data } = getAll();
+  const stats = data as DashboardStats | undefined;
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
@@ -21,12 +38,11 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatsCard label="Total Blogs" value="24" icon={FileText} />
-        <StatsCard label="Testimonials" value="18" icon={Star} />
-        <StatsCard label="Inquiries" value="142" icon={MessageSquare} />
-        <StatsCard label="Page Views" value="12.4k" icon={Users} />
-        <StatsCard label="Downloads" value="1.2k" icon={Download} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsCard label="Total Blogs" value={stats?.blogs ?? 0} icon={FileText} />
+        <StatsCard label="Testimonials" value={stats?.testimonials ?? 0} icon={Star} />
+        <StatsCard label="Inquiries" value={stats?.inquiries ?? 0} icon={MessageSquare} />
+        <StatsCard label="Total Users" value={stats?.users ?? 0} icon={Users} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

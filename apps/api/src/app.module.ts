@@ -12,6 +12,7 @@ import { InquiryModule } from './modules/inquiry/inquiry.module';
 import { SeoModule } from './modules/seo/seo.module';
 import { PageSeoModule } from './modules/page-seo/page-seo.module';
 import { FaqModule } from './modules/faq/faq.module';
+import { DashboardStatsModule } from './modules/dashboard/dashboard-stats.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { FaqModule } from './modules/faq/faq.module';
     SeoModule,
     PageSeoModule,
     FaqModule,
+    DashboardStatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
