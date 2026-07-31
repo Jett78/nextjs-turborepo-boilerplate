@@ -10,11 +10,6 @@ interface ContactInfoProps {
     phoneNumber?: string;
     email?: string;
     whatsappNumber?: string;
-    socialMedia?: {
-      platform: string;
-      url: string;
-      order: number;
-    }[];
     [key: string]: unknown;
   } | null;
 }

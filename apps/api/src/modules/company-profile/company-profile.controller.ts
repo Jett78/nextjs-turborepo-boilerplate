@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Put,
   Body,
   HttpCode,
@@ -32,6 +33,22 @@ export class CompanyProfileController {
       success: true,
       statusCode: 200,
       message: 'Company profile fetched successfully',
+      data: profile,
+    };
+  }
+
+  @Post()
+  @Roles(['super_admin'])
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create company profile' })
+  @ApiResponse({ status: 201, description: 'Company profile created successfully', type: CompanyProfileEntity })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async create(@Body() dto: UpdateCompanyProfileDto) {
+    const profile = await this.companyProfileService.create(dto);
+    return {
+      success: true,
+      statusCode: 201,
+      message: 'Company profile created successfully',
       data: profile,
     };
   }

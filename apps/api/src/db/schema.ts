@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, timestamp, text, boolean, integer, uuid, index, pgEnum, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, timestamp, text, boolean, integer, uuid, index, pgEnum } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const userRoleEnum = pgEnum('user_role', ['super_admin', 'admin', 'manager', 'customer']);
@@ -30,12 +30,6 @@ export const users = pgTable('users', {
   roleIdx: index('users_role_idx').on(table.role),
 }));
 
-export interface SocialMediaItem {
-  platform: string;
-  url: string;
-  order: number;
-}
-
 export const companyProfiles = pgTable('company_profiles', {
   id: uuid('id').defaultRandom().primaryKey(),
   companyName: varchar('company_name', { length: 255 }).notNull(),
@@ -50,7 +44,10 @@ export const companyProfiles = pgTable('company_profiles', {
   googleMap: text('google_map'),
   primaryColor: varchar('primary_color', { length: 50 }),
   secondaryColor: varchar('secondary_color', { length: 50 }),
-  socialMedia: jsonb('social_media').$type<SocialMediaItem[]>().default([]),
+  facebookUrl: varchar('facebook_url', { length: 500 }),
+  instagramUrl: varchar('instagram_url', { length: 500 }),
+  tiktokUrl: varchar('tiktok_url', { length: 500 }),
+  twitterUrl: varchar('twitter_url', { length: 500 }),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),

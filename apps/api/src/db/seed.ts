@@ -78,13 +78,8 @@ async function seed() {
           googleMap: '<iframe>...</iframe>',
           primaryColor: '221.2 83.2% 53.3%',
           secondaryColor: '210 40% 96.1%',
-          socialMedia: [
-            {
-              platform: 'Facebook',
-              url: 'https://facebook.com/mycompany',
-              order: 0,
-            },
-          ],
+          facebookUrl: 'https://facebook.com/mycompany',
+          instagramUrl: 'https://instagram.com/mycompany',
           isActive: true,
         })
         .returning();

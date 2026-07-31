@@ -24,6 +24,18 @@ export class CompanyProfileService {
     return profile || null;
   }
 
+  async create(dto: UpdateCompanyProfileDto) {
+    const [profile] = await this.db
+      .insert(schema.companyProfiles)
+      .values({
+        companyName: dto.companyName || 'My Company',
+        ...dto,
+      })
+      .returning();
+
+    return profile;
+  }
+
   async update(dto: UpdateCompanyProfileDto) {
     const [existing] = await this.db
       .select()
@@ -34,13 +46,10 @@ export class CompanyProfileService {
       throw new NotFoundException('Company profile not found');
     }
 
-    const { socialMedia, ...profileData } = dto;
-
     await this.db
       .update(schema.companyProfiles)
       .set({
-        ...profileData,
-        socialMedia: (socialMedia || existing.socialMedia) as schema.SocialMediaItem[],
+        ...dto,
         updatedAt: new Date(),
       })
       .where(eq(schema.companyProfiles.id, existing.id));

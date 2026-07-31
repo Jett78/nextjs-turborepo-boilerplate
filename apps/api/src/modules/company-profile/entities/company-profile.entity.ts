@@ -1,16 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class SocialMediaEntity {
-  @ApiProperty()
-  platform: string;
-
-  @ApiProperty()
-  url: string;
-
-  @ApiProperty()
-  order: number;
-}
-
 export class CompanyProfileEntity {
   @ApiProperty()
   id: string;
@@ -51,8 +40,17 @@ export class CompanyProfileEntity {
   @ApiProperty({ required: false })
   secondaryColor: string | null;
 
-  @ApiProperty({ type: [SocialMediaEntity] })
-  socialMedia: SocialMediaEntity[] | null;
+  @ApiProperty({ required: false })
+  facebookUrl: string | null;
+
+  @ApiProperty({ required: false })
+  instagramUrl: string | null;
+
+  @ApiProperty({ required: false })
+  tiktokUrl: string | null;
+
+  @ApiProperty({ required: false })
+  twitterUrl: string | null;
 
   @ApiProperty()
   isActive: boolean;

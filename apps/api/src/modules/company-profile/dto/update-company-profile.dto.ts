@@ -1,20 +1,5 @@
-import { IsString, IsOptional, IsBoolean, ValidateNested, IsArray, MaxLength } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-
-export class SocialMediaDto {
-  @ApiProperty({ example: 'Facebook' })
-  @IsString()
-  platform: string;
-
-  @ApiProperty({ example: 'https://facebook.com/mycompany' })
-  @IsString()
-  url: string;
-
-  @ApiProperty({ example: 0 })
-  @IsOptional()
-  order?: number;
-}
+import { IsString, IsOptional, IsBoolean, MaxLength } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateCompanyProfileDto {
   @ApiPropertyOptional({ example: 'nextjs boilerplate' })
@@ -86,12 +71,29 @@ export class UpdateCompanyProfileDto {
   @MaxLength(50)
   secondaryColor?: string;
 
-  @ApiPropertyOptional({ type: [SocialMediaDto] })
+  @ApiPropertyOptional({ example: 'https://facebook.com/mycompany' })
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => SocialMediaDto)
-  socialMedia?: SocialMediaDto[];
+  @IsString()
+  @MaxLength(500)
+  facebookUrl?: string;
+
+  @ApiPropertyOptional({ example: 'https://instagram.com/mycompany' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  instagramUrl?: string;
+
+  @ApiPropertyOptional({ example: 'https://tiktok.com/@mycompany' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  tiktokUrl?: string;
+
+  @ApiPropertyOptional({ example: 'https://twitter.com/mycompany' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  twitterUrl?: string;
 
   @ApiPropertyOptional({ default: true })
   @IsOptional()

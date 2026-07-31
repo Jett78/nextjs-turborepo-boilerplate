@@ -1,11 +1,5 @@
 import { CommonResponse } from "./base-entity";
 
-export interface SocialMedia {
-  platform: string;
-  url: string;
-  order: number;
-}
-
 export interface CompanyProfile {
   id: string;
   companyName: string;
@@ -20,7 +14,10 @@ export interface CompanyProfile {
   googleMap?: string;
   primaryColor?: string;
   secondaryColor?: string;
-  socialMedia?: SocialMedia[];
+  facebookUrl?: string;
+  instagramUrl?: string;
+  tiktokUrl?: string;
+  twitterUrl?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
