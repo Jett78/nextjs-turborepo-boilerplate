@@ -12,4 +12,7 @@ export const API_ROUTES = {
   PAGE_SEO: `${API_BASE_URL}/page-seo`,
   FAQ: `${API_BASE_URL}/faqs`,
   DASHBOARD_STATS: `${API_BASE_URL}/dashboard/stats`,
+  PAYMENT_SETTINGS: `${API_BASE_URL}/payment-settings`,
+  KHALTI: `${API_BASE_URL}/khalti`,
+  KHALTI_ORDER: `${API_BASE_URL}/khalti/order`,
 } as const;

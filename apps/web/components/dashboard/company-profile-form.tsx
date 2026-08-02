@@ -1,12 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useForm } from "@/hooks/useForm";
-import { apiClient } from "@/lib/api-client";
+import { useCrud } from "@/hooks/useCRUD";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateCompanyProfile } from "@/actions/revalidate-action";
 import { showSuccess, showError } from "@/lib/toast-helper";
@@ -34,7 +33,13 @@ interface CompanyProfileFormProps {
 
 export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
   const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
+  const isEditing = !!profile;
+
+  const { create, put } = useCrud<Record<string, any>>({
+    endpoint: API_ROUTES.COMPANY_PROFILE,
+    queryKey: "company-profile",
+    isAuthenticated: true,
+  });
 
   const { values, handleChange, setField } = useForm({
     companyName: profile?.companyName || "",
@@ -55,28 +60,39 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
     twitterUrl: profile?.twitterUrl || "",
   });
 
-  const isEditing = !!profile;
+  const isPending = isEditing ? put.isPending : create.isPending;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsPending(true);
 
-    try {
-      const res = await apiClient<any>(API_ROUTES.COMPANY_PROFILE, {
-        method: isEditing ? "PUT" : "POST",
-        body: JSON.stringify(values),
-        isAuthenticated: true,
+    if (isEditing) {
+      put.mutate(
+        { id: profile!.id, data: values },
+        {
+          onSuccess: async (res: any) => {
+            if (res.success) {
+              await revalidateCompanyProfile();
+              router.refresh();
+              showSuccess("Company profile updated successfully");
+            }
+          },
+          onError: (error: any) => {
+            showError(error.message || "Failed to update company profile");
+          },
+        }
+      );
+    } else {
+      create.mutate(values, {
+        onSuccess: async (res: any) => {
+          if (res.success) {
+            await revalidateCompanyProfile();
+            showSuccess("Company profile created successfully");
+          }
+        },
+        onError: (error: any) => {
+          showError(error.message || "Failed to create company profile");
+        },
       });
-
-      if (res.success) {
-        await revalidateCompanyProfile();
-        router.refresh();
-        showSuccess(isEditing ? "Company profile updated successfully" : "Company profile created successfully");
-      }
-    } catch (error: any) {
-      showError(error.message || "Failed to save company profile");
-    } finally {
-      setIsPending(false);
     }
   };
 

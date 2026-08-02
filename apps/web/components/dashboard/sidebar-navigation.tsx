@@ -17,6 +17,7 @@ import {
   FileCode,
   Users,
   HelpCircle,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth-client";
@@ -73,6 +74,11 @@ const navigation: NavItem[] = [
         name: "Page SEO",
         href: "/dashboard/page-seo",
         icon: FileCode,
+      },
+      {
+        name: "Payment Settings",
+        href: "/dashboard/payment-settings",
+        icon: CreditCard,
       },
     ],
   },
