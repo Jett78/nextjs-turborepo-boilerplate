@@ -13,6 +13,8 @@ import { SeoModule } from './modules/seo/seo.module';
 import { PageSeoModule } from './modules/page-seo/page-seo.module';
 import { FaqModule } from './modules/faq/faq.module';
 import { DashboardStatsModule } from './modules/dashboard/dashboard-stats.module';
+import { PaymentSettingsModule } from './modules/payment-settings/payment-settings.module';
+import { KhaltiModule } from './modules/khalti/khalti.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { DashboardStatsModule } from './modules/dashboard/dashboard-stats.module
     PageSeoModule,
     FaqModule,
     DashboardStatsModule,
+    PaymentSettingsModule,
+    KhaltiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

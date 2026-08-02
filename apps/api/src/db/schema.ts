@@ -164,6 +164,44 @@ export const messages = pgTable('messages', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const paymentSettings = pgTable('payment_settings', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  provider: varchar('provider', { length: 50 }).notNull().unique(),
+  secretKey: text('secret_key').notNull(),
+  publicKey: text('public_key').notNull(),
+  apiUrl: varchar('api_url', { length: 500 }).notNull(),
+  isEnabled: boolean('is_enabled').default(false).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'completed', 'failed', 'refunded', 'expired', 'cancelled']);
+
+export const orders = pgTable('orders', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  orderId: varchar('order_id', { length: 255 }).notNull().unique(),
+  pidx: varchar('pidx', { length: 255 }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+  productName: varchar('product_name', { length: 255 }).notNull(),
+  productId: varchar('product_id', { length: 255 }).notNull(),
+  amount: integer('amount').notNull(),
+  currency: varchar('currency', { length: 10 }).default('NPR').notNull(),
+  status: paymentStatusEnum('status').default('pending').notNull(),
+  paymentMethod: varchar('payment_method', { length: 50 }),
+  transactionId: varchar('transaction_id', { length: 255 }),
+  customerName: varchar('customer_name', { length: 255 }),
+  customerEmail: varchar('customer_email', { length: 255 }),
+  customerPhone: varchar('customer_phone', { length: 50 }),
+  metadata: text('metadata'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  orderIdIdx: index('orders_order_id_idx').on(table.orderId),
+  pidxIdx: index('orders_pidx_idx').on(table.pidx),
+  userIdIdx: index('orders_user_id_idx').on(table.userId),
+  statusIdx: index('orders_status_idx').on(table.status),
+}));
+
 // Better Auth tables
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
