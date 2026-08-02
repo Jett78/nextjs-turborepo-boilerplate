@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import PrimaryButton from "@/components/ui/primary-button";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
@@ -8,28 +9,36 @@ import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
 import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
-import { CreditCard, Key, Shield, Loader2, Eye, EyeOff } from "lucide-react";
+import {  Key, Shield, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
-import type { PaymentSettings } from "@/types/payment-settings";
 
 export function PaymentSettingsForm() {
   const router = useRouter();
   const [showSecretKey, setShowSecretKey] = useState(false);
 
-  const { getAll, create, put } = useCrud({
-    endpoint: `${API_ROUTES.PAYMENT_SETTINGS}/khalti`,
+  const { getOne, create, put } = useCrud({
+    endpoint: API_ROUTES.PAYMENT_SETTINGS,
     queryKey: "payment-settings",
     isAuthenticated: true,
   });
 
-  const { data: settings, isLoading: isLoadingSettings } = getAll();
+  const { data: settings, isLoading: isLoadingSettings } = getOne("khalti");
 
-  const { values, handleChange } = useForm({
-    secretKey: settings?.secretKey || "",
-    publicKey: settings?.publicKey || "",
-    apiUrl: settings?.apiUrl || "https://a.khalti.com/api/v2",
-    isEnabled: settings?.isEnabled?.toString() || "false",
+  const { values, handleChange, setField } = useForm({
+    secretKey: "",
+    publicKey: "",
+    apiUrl: "https://a.khalti.com/api/v2",
+    isEnabled: "false",
   });
+
+  useEffect(() => {
+    if (settings) {
+      setField("secretKey", settings.secretKey || "");
+      setField("publicKey", settings.publicKey || "");
+      setField("apiUrl", settings.apiUrl || "https://a.khalti.com/api/v2");
+      setField("isEnabled", settings.isEnabled?.toString() || "false");
+    }
+  }, [settings]);
 
   const isEditing = !!settings;
   const isPending = isEditing ? put.isPending : create.isPending;
@@ -46,7 +55,7 @@ export function PaymentSettingsForm() {
 
     if (isEditing) {
       put.mutate(
-        { id: settings!.id, data: payload },
+        { id: "khalti", data: payload },
         {
           onSuccess: async (res: any) => {
             if (res.success) {

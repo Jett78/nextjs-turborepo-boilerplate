@@ -29,6 +29,8 @@ export default function TestPaymentPage() {
         amount: Number(values.amount),
         productName: values.productName,
         productId: values.productId,
+        returnUrl: `${window.origin}/payment/success`,
+        websiteUrl: window.origin,
         customerInfo: {
           name: values.customerName,
           email: values.customerEmail,
