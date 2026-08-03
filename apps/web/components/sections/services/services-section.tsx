@@ -1,4 +1,5 @@
 import { getServices } from "@/actions/service-action";
+import { formatPrice } from "@/lib/utils";
 import { Check } from "lucide-react";
 import Link from "next/link";
 
@@ -6,14 +7,6 @@ export default async function ServicesSection() {
   const services = await getServices();
 
   if (services.length === 0) return null;
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-NP", {
-      style: "currency",
-      currency: "NPR",
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
 
   return (
     <section className="py-24 sm:py-32 bg-white">

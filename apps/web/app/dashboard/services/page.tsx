@@ -7,6 +7,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useCrud } from "@/hooks/useCRUD";
 import { API_ROUTES } from "@/config/api-routes";
+import { formatPrice } from "@/lib/utils";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { EditButton } from "@/components/dashboard/edit-button";
 import { revalidateServices } from "@/actions/revalidate-action";
@@ -37,14 +38,6 @@ export default function ServicesPage() {
       s.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       (s.shortDescription && s.shortDescription.toLowerCase().includes(debouncedSearch.toLowerCase()))
   );
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-NP", {
-      style: "currency",
-      currency: "NPR",
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
 
   const columns: Column<Service>[] = [
     {

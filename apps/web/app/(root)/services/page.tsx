@@ -13,14 +13,6 @@ export const metadata: Metadata = {
 export default async function ServicesPage() {
   const services = await getServices();
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-NP", {
-      style: "currency",
-      currency: "NPR",
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
-
   return (
     <section className="py-24 sm:py-32 bg-slate-50 min-h-screen">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
