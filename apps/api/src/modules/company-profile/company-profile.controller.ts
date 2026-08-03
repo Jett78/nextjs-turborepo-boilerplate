@@ -4,6 +4,7 @@ import {
   Post,
   Put,
   Body,
+  Param,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -12,6 +13,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiUnauthorizedResponse,
+  ApiParam,
 } from '@nestjs/swagger';
 import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
 import { CompanyProfileService } from './company-profile.service';
@@ -53,13 +55,14 @@ export class CompanyProfileController {
     };
   }
 
-  @Put()
+  @Put(':id')
   @Roles(['super_admin'])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update company profile' })
+  @ApiParam({ name: 'id', description: 'Company Profile ID' })
   @ApiResponse({ status: 200, description: 'Company profile updated successfully', type: CompanyProfileEntity })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async update(@Body() dto: UpdateCompanyProfileDto) {
+  async update(@Param('id') id: string, @Body() dto: UpdateCompanyProfileDto) {
     const profile = await this.companyProfileService.update(dto);
     return {
       success: true,

@@ -43,6 +43,13 @@
       "when": 1785741897407,
       "tag": "0005_cool_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785745914386,
+      "tag": "0006_fresh_naoko",
+      "breakpoints": true
     }
   ]
 }
