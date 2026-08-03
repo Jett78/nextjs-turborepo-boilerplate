@@ -1,6 +1,5 @@
 import { getTeamMembers } from "@/actions/team-action";
 import TeamCard from "./team-card";
-import AnimatedCard from "./animated-card";
 
 export default async function TeamSection() {
   const teamMembers = await getTeamMembers();
@@ -25,10 +24,8 @@ export default async function TeamSection() {
         </div>
 
         <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {teamMembers.map((member, i) => (
-            <AnimatedCard key={member.id} index={i}>
-              <TeamCard member={member} />
-            </AnimatedCard>
+          {teamMembers.map((member) => (
+            <TeamCard key={member.id} member={member} />
           ))}
         </div>
       </div>
