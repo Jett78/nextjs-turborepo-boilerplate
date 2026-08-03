@@ -15,6 +15,8 @@ import { FaqModule } from './modules/faq/faq.module';
 import { DashboardStatsModule } from './modules/dashboard/dashboard-stats.module';
 import { PaymentSettingsModule } from './modules/payment-settings/payment-settings.module';
 import { KhaltiModule } from './modules/khalti/khalti.module';
+import { DomainModule } from './modules/domain/domain.module';
+import { TeamModule } from './modules/team/team.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { KhaltiModule } from './modules/khalti/khalti.module';
     DashboardStatsModule,
     PaymentSettingsModule,
     KhaltiModule,
+    DomainModule,
+    TeamModule,
   ],
   controllers: [AppController],
   providers: [AppService],

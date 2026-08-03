@@ -4,6 +4,7 @@ import StatsSection from "@/components/sections/about/stats-section";
 import StorySection from "@/components/sections/about/story-section";
 import FeaturesSection from "@/components/sections/about/features-section";
 import WhyChooseSection from "@/components/sections/about/why-choose-section";
+import TeamSection from "@/components/sections/about/team-section";
 import CTASection from "@/components/sections/about/cta-section";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,6 +27,7 @@ export default function AboutPage() {
       <StorySection />
       <StatsSection />
       <FeaturesSection />
+      <TeamSection />
       <WhyChooseSection />
       <CTASection />
     </div>

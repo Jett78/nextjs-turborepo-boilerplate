@@ -37,3 +37,7 @@ export interface PageSeoFormProps {
 export interface FaqFormProps {
   faq?: import("./faq").Faq;
 }
+
+export interface TeamMemberFormProps {
+  teamMember?: import("./team").TeamMember;
+}

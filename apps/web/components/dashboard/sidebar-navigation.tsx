@@ -18,6 +18,8 @@ import {
   Users,
   HelpCircle,
   CreditCard,
+  Globe,
+  UsersRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth-client";
@@ -45,12 +47,14 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Domains", href: "/dashboard/domains", icon: Globe },
   {
     name: "Content",
     icon: FileText,
     children: [
       { name: "Blogs", href: "/dashboard/blogs", icon: FileText },
       { name: "Testimonials", href: "/dashboard/testimonials", icon: Star },
+      { name: "Team", href: "/dashboard/team", icon: UsersRound },
       { name: "FAQs", href: "/dashboard/faqs", icon: HelpCircle },
     ],
   },

@@ -142,6 +142,23 @@ export const testimonials = pgTable('testimonials', {
   sortOrderIdx: index('testimonials_sort_order_idx').on(table.sortOrder),
 }));
 
+export const teamMembers = pgTable('team_members', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 500 }).notNull().unique(),
+  designation: varchar('designation', { length: 255 }),
+  joinedDate: timestamp('joined_date', { withTimezone: true }),
+  message: text('message'),
+  avatar: varchar('avatar', { length: 500 }),
+  whatsappUrl: varchar('whatsapp_url', { length: 500 }),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  slugIdx: index('team_members_slug_idx').on(table.slug),
+  sortOrderIdx: index('team_members_sort_order_idx').on(table.sortOrder),
+}));
+
 export const faqs = pgTable('faqs', {
   id: uuid('id').defaultRandom().primaryKey(),
   question: varchar('question', { length: 500 }).notNull(),
@@ -252,3 +269,26 @@ export const verification = pgTable('verification', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
+
+// Custom Domains
+export const domainStatusEnum = pgEnum('domain_status', ['pending', 'verifying', 'verified', 'active', 'failed']);
+export const sslStatusEnum = pgEnum('ssl_status', ['pending', 'active', 'failed', 'none']);
+export const deploymentStatusEnum = pgEnum('deployment_status', ['pending', 'deploying', 'deployed', 'failed']);
+
+export const customDomains = pgTable('custom_domains', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  domain: varchar('domain', { length: 255 }).notNull().unique(),
+  status: domainStatusEnum('status').default('pending').notNull(),
+  verifiedAt: timestamp('verified_at', { withTimezone: true }),
+  sslStatus: sslStatusEnum('ssl_status').default('none').notNull(),
+  sslIssuedAt: timestamp('ssl_issued_at', { withTimezone: true }),
+  deploymentStatus: deploymentStatusEnum('deployment_status').default('pending').notNull(),
+  errorMessage: text('error_message'),
+  dnsRecordsChecked: text('dns_records_checked'),
+  dokployDomainId: varchar('dokploy_domain_id', { length: 255 }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  domainIdx: index('custom_domains_domain_idx').on(table.domain),
+  statusIdx: index('custom_domains_status_idx').on(table.status),
+}));

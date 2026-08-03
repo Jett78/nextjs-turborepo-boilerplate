@@ -15,4 +15,6 @@ export const API_ROUTES = {
   PAYMENT_SETTINGS: `${API_BASE_URL}/payment-settings`,
   KHALTI: `${API_BASE_URL}/khalti`,
   KHALTI_ORDER: `${API_BASE_URL}/khalti/order`,
+  DOMAIN: `${API_BASE_URL}/domains`,
+  TEAM: `${API_BASE_URL}/team-members`,
 } as const;

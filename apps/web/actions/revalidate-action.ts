@@ -22,3 +22,12 @@ export async function revalidateTestimonials() {
 export async function revalidateFaqs() {
   revalidateTag("faqs", "updateTag");
 }
+
+export async function revalidateTeamMembers() {
+  revalidateTag("team-members", "updateTag");
+}
+
+export async function revalidateTeamMember(slug: string) {
+  revalidateTag("team-members", "updateTag");
+  revalidateTag(`team-member-${slug}`, "updateTag");
+}
