@@ -31,3 +31,12 @@ export async function revalidateTeamMember(slug: string) {
   revalidateTag("team-members", "updateTag");
   revalidateTag(`team-member-${slug}`, "updateTag");
 }
+
+export async function revalidateServices() {
+  revalidateTag("services", "updateTag");
+}
+
+export async function revalidateService(slug: string) {
+  revalidateTag("services", "updateTag");
+  revalidateTag(`service-${slug}`, "updateTag");
+}

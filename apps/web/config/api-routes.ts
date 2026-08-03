@@ -17,4 +17,5 @@ export const API_ROUTES = {
   KHALTI_ORDER: `${API_BASE_URL}/khalti/order`,
   DOMAIN: `${API_BASE_URL}/domains`,
   TEAM: `${API_BASE_URL}/team-members`,
+  SERVICE: `${API_BASE_URL}/services`,
 } as const;

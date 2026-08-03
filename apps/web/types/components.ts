@@ -41,3 +41,7 @@ export interface FaqFormProps {
 export interface TeamMemberFormProps {
   teamMember?: import("./team").TeamMember;
 }
+
+export interface ServiceFormProps {
+  service?: import("./service").Service;
+}

@@ -17,6 +17,7 @@ import { PaymentSettingsModule } from './modules/payment-settings/payment-settin
 import { KhaltiModule } from './modules/khalti/khalti.module';
 import { DomainModule } from './modules/domain/domain.module';
 import { TeamModule } from './modules/team/team.module';
+import { ServiceModule } from './modules/service/service.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { TeamModule } from './modules/team/team.module';
     KhaltiModule,
     DomainModule,
     TeamModule,
+    ServiceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

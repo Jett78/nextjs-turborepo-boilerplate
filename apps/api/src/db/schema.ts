@@ -159,6 +159,25 @@ export const teamMembers = pgTable('team_members', {
   sortOrderIdx: index('team_members_sort_order_idx').on(table.sortOrder),
 }));
 
+export const services = pgTable('services', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 500 }).notNull().unique(),
+  imageKey: varchar('image_key', { length: 500 }),
+  shortDescription: varchar('short_description', { length: 500 }),
+  description: text('description'),
+  price: integer('price'),
+  offerPrice: integer('offer_price'),
+  features: text('features').array(),
+  isActive: boolean('is_active').default(true).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  slugIdx: index('services_slug_idx').on(table.slug),
+  sortOrderIdx: index('services_sort_order_idx').on(table.sortOrder),
+}));
+
 export const faqs = pgTable('faqs', {
   id: uuid('id').defaultRandom().primaryKey(),
   question: varchar('question', { length: 500 }).notNull(),

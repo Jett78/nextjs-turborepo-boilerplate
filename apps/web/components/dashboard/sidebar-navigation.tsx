@@ -20,6 +20,7 @@ import {
   CreditCard,
   Globe,
   UsersRound,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth-client";
@@ -55,6 +56,7 @@ const navigation: NavItem[] = [
       { name: "Blogs", href: "/dashboard/blogs", icon: FileText },
       { name: "Testimonials", href: "/dashboard/testimonials", icon: Star },
       { name: "Team", href: "/dashboard/team", icon: UsersRound },
+      { name: "Services", href: "/dashboard/services", icon: Briefcase },
       { name: "FAQs", href: "/dashboard/faqs", icon: HelpCircle },
     ],
   },
