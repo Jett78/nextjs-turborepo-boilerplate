@@ -10,6 +10,7 @@ interface DashboardHeadingProps {
   description?: string;
   className?: string;
   buttonText?: string;
+  action?: React.ReactNode;
 }
 
 const DashboardHeading = ({
@@ -18,6 +19,7 @@ const DashboardHeading = ({
   description,
   className,
   buttonText = "Add New",
+  action,
 }: DashboardHeadingProps) => {
   return (
     <div className={cn("flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between", className)}>
@@ -50,7 +52,9 @@ const DashboardHeading = ({
       </div>
 
       {/* Action Button */}
-      {path && (
+      {action ? (
+        <div className="shrink-0">{action}</div>
+      ) : path ? (
         <div className="shrink-0">
           <Link href={`/dashboard/${path}/new`}>
             <button
@@ -62,7 +66,7 @@ const DashboardHeading = ({
             </button>
           </Link>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
