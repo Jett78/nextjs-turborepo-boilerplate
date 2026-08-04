@@ -18,7 +18,6 @@ import { KhaltiModule } from './modules/khalti/khalti.module';
 import { DomainModule } from './modules/domain/domain.module';
 import { TeamModule } from './modules/team/team.module';
 import { ServiceModule } from './modules/service/service.module';
-import { GalleryModule } from './modules/gallery/gallery.module';
 import { RedirectModule } from './modules/redirect/redirect.module';
 
 @Module({
@@ -40,7 +39,6 @@ import { RedirectModule } from './modules/redirect/redirect.module';
     DomainModule,
     TeamModule,
     ServiceModule,
-    GalleryModule,
     RedirectModule,
   ],
   controllers: [AppController],
