@@ -41,6 +41,9 @@ export class CompanyProfileEntity {
   secondaryColor: string | null;
 
   @ApiProperty({ required: false })
+  textForeground: string | null;
+
+  @ApiProperty({ required: false })
   facebookUrl: string | null;
 
   @ApiProperty({ required: false })

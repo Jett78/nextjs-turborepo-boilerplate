@@ -56,6 +56,7 @@ const config: Config = {
         },
         primarymain: "var(--primarymain)",
         secondarymain: "var(--secondarymain)",
+        textforeground: "var(--textforeground)",
         lighttext: "#71717b",
       },
       borderRadius: {

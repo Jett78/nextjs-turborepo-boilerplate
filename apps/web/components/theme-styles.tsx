@@ -43,6 +43,11 @@ export async function ThemeStyles({ children }: { children: React.ReactNode }) {
     styles["--secondarymain"] = hex;
     styles["--color-secondarymain"] = hex;
   }
+  if (company?.textForeground) {
+    const hex = hslStringToCss(company.textForeground);
+    styles["--textforeground"] = hex;
+    styles["--color-textforeground"] = hex;
+  }
 
   return (
     <div style={styles} className="contents">

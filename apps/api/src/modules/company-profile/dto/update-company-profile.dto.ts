@@ -71,6 +71,12 @@ export class UpdateCompanyProfileDto {
   @MaxLength(50)
   secondaryColor?: string;
 
+  @ApiPropertyOptional({ example: '222.2 84% 4.9%', description: 'HSL color value for text foreground (e.g., "222.2 84% 4.9%")' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  textForeground?: string;
+
   @ApiPropertyOptional({ example: 'https://facebook.com/mycompany' })
   @IsOptional()
   @IsString()

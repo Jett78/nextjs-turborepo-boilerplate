@@ -56,6 +56,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.style.setProperty("--secondarymain", hex);
         root.style.setProperty("--color-secondarymain", hex);
       }
+      if (profile.textForeground) {
+        const hex = hslStringToHex(profile.textForeground);
+        root.style.setProperty("--textforeground", hex);
+        root.style.setProperty("--color-textforeground", hex);
+      }
     }
   }, [data]);
 

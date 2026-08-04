@@ -14,6 +14,7 @@ export interface CompanyProfile {
   googleMap?: string;
   primaryColor?: string;
   secondaryColor?: string;
+  textForeground?: string;
   facebookUrl?: string;
   instagramUrl?: string;
   tiktokUrl?: string;

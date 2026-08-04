@@ -10,9 +10,15 @@ import { API_ROUTES } from "@/config/api-routes";
 import { revalidateCompanyProfile } from "@/actions/revalidate-action";
 import { showSuccess, showError } from "@/lib/toast-helper";
 import { HslColorPicker } from "@/components/ui/hsl-color-picker";
-import { Building2, Palette, Image as ImageIcon, Share2 } from "lucide-react";
+import { Building2, Palette, Image as ImageIcon, Share2, RotateCcw } from "lucide-react";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { CompanyProfile } from "@/types/company-profile";
+
+const DEFAULT_COLORS = {
+  primaryColor: "221.2 83.2% 53.3%",
+  secondaryColor: "210 40% 96.1%",
+  textForeground: "222.2 84% 4.9%",
+};
 
 function toCssHsl(hsl: string): string {
   if (hsl.includes("/")) {
@@ -54,6 +60,7 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
     googleMap: profile?.googleMap || "",
     primaryColor: profile?.primaryColor || "221.2 83.2% 53.3%",
     secondaryColor: profile?.secondaryColor || "210 40% 96.1%",
+    textForeground: profile?.textForeground || "222.2 84% 4.9%",
     facebookUrl: profile?.facebookUrl || "",
     instagramUrl: profile?.instagramUrl || "",
     tiktokUrl: profile?.tiktokUrl || "",
@@ -61,6 +68,12 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
   });
 
   const isPending = isEditing ? put.isPending : create.isPending;
+
+  const handleResetColors = () => {
+    setField("primaryColor", DEFAULT_COLORS.primaryColor);
+    setField("secondaryColor", DEFAULT_COLORS.secondaryColor);
+    setField("textForeground", DEFAULT_COLORS.textForeground);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -346,6 +359,20 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
                 value={values.secondaryColor}
                 onChange={(hsl) => setField("secondaryColor", hsl)}
               />
+              <HslColorPicker
+                label="Text Foreground"
+                value={values.textForeground}
+                onChange={(hsl) => setField("textForeground", hsl)}
+              />
+
+              <button
+                type="button"
+                onClick={handleResetColors}
+                className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Reset to default colors
+              </button>
 
               <div className="p-4 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200">
                 <p className="text-xs font-bold text-slate-700 mb-3">Preview</p>
@@ -363,6 +390,13 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
                       style={{ backgroundColor: toCssHsl(values.secondaryColor) }}
                     />
                     <p className="text-[10px] text-slate-500 mt-1.5 text-center font-medium">Secondary</p>
+                  </div>
+                  <div className="flex-1">
+                    <div
+                      className="h-12 rounded-lg shadow-inner border border-white"
+                      style={{ backgroundColor: toCssHsl(values.textForeground) }}
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1.5 text-center font-medium">Foreground</p>
                   </div>
                 </div>
               </div>
