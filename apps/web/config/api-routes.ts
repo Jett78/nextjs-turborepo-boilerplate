@@ -18,4 +18,6 @@ export const API_ROUTES = {
   DOMAIN: `${API_BASE_URL}/domains`,
   TEAM: `${API_BASE_URL}/team-members`,
   SERVICE: `${API_BASE_URL}/services`,
+  GALLERY: `${API_BASE_URL}/gallery`,
+  REDIRECT: `${API_BASE_URL}/redirects`,
 } as const;

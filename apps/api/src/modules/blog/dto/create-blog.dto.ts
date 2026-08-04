@@ -14,11 +14,6 @@ export class CreateSeoMetaDto {
   @IsString()
   metaDescription?: string;
 
-  @ApiPropertyOptional({ example: ['keyword1', 'keyword2', 'keyword3'] })
-  @IsOptional()
-  @IsString({ each: true })
-  metaKeywords?: string[];
-
   @ApiPropertyOptional({ example: 'https://example.com/blog/post' })
   @IsOptional()
   @IsString()

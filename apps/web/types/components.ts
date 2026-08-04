@@ -45,3 +45,7 @@ export interface TeamMemberFormProps {
 export interface ServiceFormProps {
   service?: import("./service").Service;
 }
+
+export interface GalleryFormProps {
+  item?: import("./gallery").Gallery;
+}

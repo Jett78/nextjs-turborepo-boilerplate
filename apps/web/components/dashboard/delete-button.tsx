@@ -65,7 +65,7 @@ export function DeleteButton({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger>
+      <AlertDialogTrigger render={<span className="inline-flex" />}>
         <Button
           variant="destructive"
           size="sm"
