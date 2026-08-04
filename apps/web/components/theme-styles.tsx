@@ -47,6 +47,10 @@ export async function ThemeStyles({ children }: { children: React.ReactNode }) {
     const hex = hslStringToCss(company.textForeground);
     styles["--textforeground"] = hex;
     styles["--color-textforeground"] = hex;
+    styles["--foreground"] = hex;
+    styles["--card-foreground"] = hex;
+    styles["--popover-foreground"] = hex;
+    styles["--accent-foreground"] = hex;
   }
 
   return (

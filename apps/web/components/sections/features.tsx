@@ -125,7 +125,7 @@ export function Features() {
                   {feature.title}
                 </h3>
               </div>
-              <p className="text-sm leading-relaxed text-lighttext font-medium">
+              <p className="text-sm leading-relaxed text-foreground font-medium">
                 {feature.description}
               </p>
             </div>

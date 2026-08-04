@@ -340,7 +340,7 @@ export default function DomainsPage() {
                     <div className="flex items-center gap-3">
                       <span className="px-2 py-0.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-md">A</span>
                       <span className="text-xs text-slate-400">@</span>
-                      <ArrowRight className="h-3 w-3 text-slate-300" />
+                      <ArrowRight className="h-3 w-3 text-foreground" />
                       <span className="font-mono text-sm text-slate-700">YOUR_VPS_IP</span>
                     </div>
                     <button

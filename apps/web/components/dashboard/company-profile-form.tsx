@@ -27,10 +27,12 @@ function toCssHsl(hsl: string): string {
     const alphaPart = parts[1];
     if (colorPart && alphaPart) {
       const alpha = parseFloat(alphaPart.replace("%", "")) / 100;
-      return `hsla(${colorPart}, ${alpha})`;
+      const [h, s, l] = colorPart.split(" ").map((v) => v.replace("%", "").trim());
+      return `hsla(${h}, ${s}%, ${l}%, ${alpha})`;
     }
   }
-  return `hsl(${hsl})`;
+  const [h, s, l] = hsl.split(" ").map((v) => v.replace("%", "").trim());
+  return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 interface CompanyProfileFormProps {
@@ -368,7 +370,7 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
               <button
                 type="button"
                 onClick={handleResetColors}
-                className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-black hover:bg-slate-800 rounded-lg transition-colors"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Reset to default colors
@@ -396,7 +398,7 @@ export function CompanyProfileForm({ profile }: CompanyProfileFormProps) {
                       className="h-12 rounded-lg shadow-inner border border-white"
                       style={{ backgroundColor: toCssHsl(values.textForeground) }}
                     />
-                    <p className="text-[10px] text-slate-500 mt-1.5 text-center font-medium">Foreground</p>
+                    <p className="text-[10px] text-slate-500 mt-1.5 text-center font-medium">Text</p>
                   </div>
                 </div>
               </div>

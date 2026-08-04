@@ -242,7 +242,7 @@ export default async function ServicesPage() {
             <div className="text-center py-20">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-slate-100 mb-6">
                 <svg
-                  className="w-10 h-10 text-slate-300"
+                  className="w-10 h-10 text-foreground"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

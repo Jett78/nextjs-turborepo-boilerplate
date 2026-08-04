@@ -7,7 +7,7 @@ import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
-import { revalidateRedirects } from "@/actions/redirect-action";
+import { revalidateRedirects } from "@/actions/revalidate-action";
 import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { Redirect } from "@/types/redirect";

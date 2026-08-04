@@ -11,7 +11,7 @@ type titleprops = {
 const PageHeader = ({ title, subtitle, desc, className }: titleprops) => {
   return (
     <div className="flex flex-col space-y-1 items-center justify-center">
-      <p className="tracking-wider text-lighttext uppercase text-base font-bold">{subtitle}</p>
+      <p className="tracking-wider text-foreground uppercase text-base font-bold">{subtitle}</p>
       <h2
         className={cn(
           className,
@@ -21,7 +21,7 @@ const PageHeader = ({ title, subtitle, desc, className }: titleprops) => {
         {title}
       </h2>
       {desc && (
-        <p className="tracking-wide text-sm text-center text-muted-foreground font-medium text-lighttext">{desc}</p>
+        <p className="tracking-wide text-sm text-center text-muted-foreground font-medium text-foreground">{desc}</p>
       )}
     </div>
   );

@@ -3,40 +3,44 @@
 import { revalidateTag } from "next/cache";
 
 export async function revalidateBlogs() {
-  revalidateTag("blogs", "updateTag");
+  revalidateTag("blogs");
 }
 
 export async function revalidateBlog(slug: string) {
-  revalidateTag("blogs", "updateTag");
-  revalidateTag(`blog-${slug}`, "updateTag");
+  revalidateTag("blogs");
+  revalidateTag(`blog-${slug}`);
 }
 
 export async function revalidateCompanyProfile() {
-  revalidateTag("company-profile", "updateTag");
+  revalidateTag("company-profile");
 }
 
 export async function revalidateTestimonials() {
-  revalidateTag("testimonials", "updateTag");
+  revalidateTag("testimonials");
 }
 
 export async function revalidateFaqs() {
-  revalidateTag("faqs", "updateTag");
+  revalidateTag("faqs");
 }
 
 export async function revalidateTeamMembers() {
-  revalidateTag("team-members", "updateTag");
+  revalidateTag("team-members");
 }
 
 export async function revalidateTeamMember(slug: string) {
-  revalidateTag("team-members", "updateTag");
-  revalidateTag(`team-member-${slug}`, "updateTag");
+  revalidateTag("team-members");
+  revalidateTag(`team-member-${slug}`);
 }
 
 export async function revalidateServices() {
-  revalidateTag("services", "updateTag");
+  revalidateTag("services");
 }
 
 export async function revalidateService(slug: string) {
-  revalidateTag("services", "updateTag");
-  revalidateTag(`service-${slug}`, "updateTag");
+  revalidateTag("services");
+  revalidateTag(`service-${slug}`);
+}
+
+export async function revalidateRedirects() {
+  revalidateTag("redirects");
 }

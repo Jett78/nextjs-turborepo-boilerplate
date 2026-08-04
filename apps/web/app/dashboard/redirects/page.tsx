@@ -9,7 +9,7 @@ import { useCrud } from "@/hooks/useCRUD";
 import { API_ROUTES } from "@/config/api-routes";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { EditButton } from "@/components/dashboard/edit-button";
-import { revalidateRedirects } from "@/actions/redirect-action";
+import { revalidateRedirects } from "@/actions/revalidate-action";
 import type { Redirect } from "@/types/redirect";
 
 export default function RedirectsPage() {

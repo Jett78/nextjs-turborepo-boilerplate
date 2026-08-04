@@ -105,7 +105,7 @@ export default function BlogsPage() {
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
-                    <FileText className="size-12 text-slate-300" />
+                    <FileText className="size-12 text-foreground" />
                   </div>
                 )}
               </div>
