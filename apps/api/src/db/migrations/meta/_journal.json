@@ -71,6 +71,13 @@
       "when": 1785826301386,
       "tag": "0009_daffy_oracle",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1785900000000,
+      "tag": "0011_add_redirect_status_code",
+      "breakpoints": true
     }
   ]
 }

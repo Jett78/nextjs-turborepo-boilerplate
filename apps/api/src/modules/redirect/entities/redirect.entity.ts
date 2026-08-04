@@ -11,6 +11,9 @@ export class RedirectEntity {
   toPath: string;
 
   @ApiProperty()
+  statusCode: number;
+
+  @ApiProperty()
   isActive: boolean;
 
   @ApiProperty()
@@ -23,6 +26,7 @@ export class RedirectEntity {
     this.id = partial.id;
     this.fromPath = partial.fromPath;
     this.toPath = partial.toPath;
+    this.statusCode = partial.statusCode ?? 301;
     this.isActive = partial.isActive;
     this.createdAt = partial.createdAt;
     this.updatedAt = partial.updatedAt;

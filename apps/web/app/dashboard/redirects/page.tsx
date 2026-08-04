@@ -62,6 +62,24 @@ export default function RedirectsPage() {
       ),
     },
     {
+      key: "statusCode",
+      label: "Code",
+      render: (row) => {
+        const labels: Record<number, string> = {
+          301: "Moved Permanently",
+          302: "Found (Temporary)",
+          307: "Temporary Redirect",
+          308: "Permanent Redirect",
+          410: "Gone",
+        };
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {row.statusCode} {labels[row.statusCode] || ""}
+          </span>
+        );
+      },
+    },
+    {
       key: "isActive",
       label: "Status",
       render: (row) => (

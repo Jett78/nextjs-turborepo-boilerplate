@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-let cachedRedirects: { fromPath: string; toPath: string }[] | null = null;
+let cachedRedirects: { fromPath: string; toPath: string; statusCode: number }[] | null = null;
 let lastFetchTime = 0;
 const CACHE_TTL = 60 * 1000;
 
@@ -46,7 +46,7 @@ export async function proxy(request: NextRequest) {
 
   if (redirect) {
     return NextResponse.redirect(new URL(redirect.toPath, request.url), {
-      status: 301,
+      status: redirect.statusCode || 301,
       headers: {
         "X-Redirected-From": pathname,
       },

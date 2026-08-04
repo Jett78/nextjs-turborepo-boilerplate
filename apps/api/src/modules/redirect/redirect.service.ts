@@ -19,6 +19,7 @@ export class RedirectService {
       const redirect = await this.repository.create({
         fromPath: dto.fromPath,
         toPath: dto.toPath,
+        statusCode: dto.statusCode ?? 301,
         isActive: true,
       });
 
@@ -92,6 +93,7 @@ export class RedirectService {
       const updatedRedirect = await this.repository.update(id, {
         fromPath: dto.fromPath,
         toPath: dto.toPath,
+        statusCode: dto.statusCode,
         isActive: dto.isActive,
       });
 

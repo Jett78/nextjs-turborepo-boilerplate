@@ -81,6 +81,7 @@ export class RedirectController {
       data: redirects.map((r) => ({
         fromPath: r.fromPath,
         toPath: r.toPath,
+        statusCode: r.statusCode ?? 301,
       })),
     };
   }

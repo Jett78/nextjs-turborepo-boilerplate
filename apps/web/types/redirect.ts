@@ -3,6 +3,7 @@ import { BaseEntity } from "./base-entity";
 export interface Redirect extends BaseEntity {
   fromPath: string;
   toPath: string;
+  statusCode: number;
   isActive: boolean;
 }
 

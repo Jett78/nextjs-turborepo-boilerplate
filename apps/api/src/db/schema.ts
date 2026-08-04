@@ -343,6 +343,7 @@ export const redirects = pgTable('redirects', {
   id: uuid('id').defaultRandom().primaryKey(),
   fromPath: varchar('from_path', { length: 500 }).notNull().unique(),
   toPath: varchar('to_path', { length: 500 }).notNull(),
+  statusCode: integer('status_code').default(301).notNull(),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
