@@ -22,7 +22,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: seo?.metaTitle ?? "",
     description: seo?.metaDescription ?? "",
-    keywords: seo?.metaKeywords?.join(", "),
     openGraph: {
       title: seo?.ogTitle ?? seo?.metaTitle ?? "",
       description: seo?.ogDescription ?? seo?.metaDescription ?? "",

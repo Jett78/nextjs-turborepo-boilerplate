@@ -24,7 +24,6 @@ export function SeoSettingsForm({ seo }: SeoSettingsFormProps) {
   const { values, handleChange, setField } = useForm({
     metaTitle: seo?.metaTitle || "",
     metaDescription: seo?.metaDescription || "",
-    metaKeywords: seo?.metaKeywords?.join(", ") || "",
     ogImageKey: seo?.ogImageKey || "",
     gtmContainerId: seo?.gtmContainerId || "",
     googleSearchConsoleVerification: seo?.googleSearchConsoleVerification || "",
@@ -34,13 +33,8 @@ export function SeoSettingsForm({ seo }: SeoSettingsFormProps) {
     e.preventDefault();
     setIsPending(true);
 
-    const metaKeywordsArray = values.metaKeywords
-      ? values.metaKeywords.split(",").map((k: string) => k.trim())
-      : [];
-
     const payload = {
       ...values,
-      metaKeywords: metaKeywordsArray,
     };
 
     try {
@@ -97,14 +91,6 @@ export function SeoSettingsForm({ seo }: SeoSettingsFormProps) {
                 value={values.metaDescription}
                 onChange={handleChange}
                 placeholder="This is a description of my awesome page."
-              />
-
-              <FormField
-                label="Meta Keywords"
-                name="metaKeywords"
-                value={values.metaKeywords}
-                onChange={handleChange}
-                placeholder="keyword1, keyword2, keyword3"
               />
             </div>
           </div>
