@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/components/ui/primary-button";
 import FormField from "@/components/forms/form-field";
 import FileUpload from "@/components/ui/file-upload";
+import ImageUploadMultiple from "@/components/ui/image-upload-multiple";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
@@ -109,6 +110,9 @@ export function ServiceForm({ service }: ServiceFormProps) {
   const [features, setFeatures] = useState<string[]>(service?.features || []);
   const [newFeature, setNewFeature] = useState("");
   const [imageKey, setImageKey] = useState<string>(service?.imageKey || "");
+  const [gallery, setGallery] = useState<Array<{ url: string; key: string }>>(
+    service?.gallery?.map((url) => ({ url, key: url })) || []
+  );
 
   const isPending = isEditing ? put.isPending : create.isPending;
 
@@ -159,6 +163,7 @@ export function ServiceForm({ service }: ServiceFormProps) {
       shortDescription: values.shortDescription,
       description: values.description,
       imageKey: imageKey || undefined,
+      gallery: gallery.length > 0 ? gallery.map((img) => img.url) : undefined,
       price: values.price !== "" ? parseInt(values.price, 10) : undefined,
       offerPrice: values.offerPrice !== "" ? parseInt(values.offerPrice, 10) : undefined,
       features: features.length > 0 ? features : undefined,
@@ -255,6 +260,18 @@ export function ServiceForm({ service }: ServiceFormProps) {
           <FileUpload
             defaultImage={imageKey}
             onSuccess={(url) => setImageKey(url)}
+          />
+        </div>
+
+        {/* Gallery Upload */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-700">Gallery Images</label>
+          <p className="text-xs text-slate-500">Upload additional images for this service.</p>
+          <ImageUploadMultiple
+            defaultImages={gallery}
+            onSuccess={setGallery}
+            folder="services/gallery"
+            maxImages={10}
           />
         </div>
       </div>

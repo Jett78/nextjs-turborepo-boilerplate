@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray, MaxLength } from 'class-validator';
+import { IsString, IsOptional, MaxLength } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateGlobalSeoDto {
@@ -12,11 +12,6 @@ export class UpdateGlobalSeoDto {
   @IsOptional()
   @IsString()
   metaDescription?: string;
-
-  @ApiPropertyOptional({ example: ['keyword1', 'keyword2'] })
-  @IsOptional()
-  @IsString({ each: true })
-  metaKeywords?: string[];
 
   @ApiPropertyOptional({ example: 'media/seo/og-image.jpg' })
   @IsOptional()

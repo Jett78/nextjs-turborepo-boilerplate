@@ -4,6 +4,7 @@ export interface Service extends BaseEntity {
   name: string;
   slug: string;
   imageKey?: string;
+  gallery?: string[];
   shortDescription?: string;
   description?: string;
   price?: number;

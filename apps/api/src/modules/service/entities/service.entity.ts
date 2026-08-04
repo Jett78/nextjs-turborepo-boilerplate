@@ -14,6 +14,9 @@ export class ServiceEntity {
   imageKey?: string;
 
   @ApiPropertyOptional()
+  gallery?: string[];
+
+  @ApiPropertyOptional()
   shortDescription?: string;
 
   @ApiPropertyOptional()
@@ -45,6 +48,7 @@ export class ServiceEntity {
     this.name = partial.name;
     this.slug = partial.slug;
     this.imageKey = partial.imageKey ?? undefined;
+    this.gallery = partial.gallery ?? undefined;
     this.shortDescription = partial.shortDescription ?? undefined;
     this.description = partial.description ?? undefined;
     this.price = partial.price ?? undefined;

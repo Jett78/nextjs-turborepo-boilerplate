@@ -43,3 +43,43 @@ export async function uploadSingleImage(
     return { success: false, error: "Upload failed" };
   }
 }
+
+export async function uploadMultipleImages(
+  formData: FormData
+): Promise<{ success: boolean; data?: Array<{ url: string; key: string }>; error?: string }> {
+  try {
+    const cookieStore = await cookies();
+    const sessionToken =
+      cookieStore.get("better-auth.session_token")?.value ||
+      cookieStore.get("__Secure-better-auth.session_token")?.value;
+
+    const headers: Record<string, string> = {};
+    if (sessionToken) {
+      headers["Cookie"] = `better-auth.session_token=${sessionToken}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/upload/multiple`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      return { success: false, error: data.message || "Upload failed" };
+    }
+
+    const results = Array.isArray(data.data) ? data.data : [data.data];
+    return {
+      success: true,
+      data: results.map((item: any) => ({
+        url: item.url,
+        key: item.key,
+      })),
+    };
+  } catch (error) {
+    console.error("Upload error:", error);
+    return { success: false, error: "Upload failed" };
+  }
+}

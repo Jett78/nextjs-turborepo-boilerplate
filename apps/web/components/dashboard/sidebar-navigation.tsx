@@ -21,6 +21,7 @@ import {
   Globe,
   UsersRound,
   Briefcase,
+  ArrowRightLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth-client";
@@ -63,14 +64,9 @@ const navigation: NavItem[] = [
   { name: "Inquiries", href: "/dashboard/inquiries", icon: MessageSquare },
   { name: "Users", href: "/dashboard/users", icon: Users },
   {
-    name: "Settings",
-    icon: Building2,
+    name: "SEO",
+    icon: Search,
     children: [
-      {
-        name: "Company Profile",
-        href: "/dashboard/company-profile",
-        icon: Building2,
-      },
       {
         name: "SEO & Analytics",
         href: "/dashboard/seo",
@@ -82,9 +78,21 @@ const navigation: NavItem[] = [
         icon: FileCode,
       },
       {
-        name: "Payment Settings",
-        href: "/dashboard/payment-settings",
-        icon: CreditCard,
+        name: "Redirects",
+        href: "/dashboard/redirects",
+        icon: ArrowRightLeft,
+      },
+    ],
+  },
+  { name: "Payment Settings", href: "/dashboard/payment-settings", icon: CreditCard },
+  {
+    name: "Settings",
+    icon: Building2,
+    children: [
+      {
+        name: "Company Profile",
+        href: "/dashboard/company-profile",
+        icon: Building2,
       },
     ],
   },
@@ -244,7 +252,7 @@ export function Sidebar() {
           </span>
         </Link>
         <AlertDialog>
-          <AlertDialogTrigger>
+          <AlertDialogTrigger render={<span className="block w-full" />}>
             <button className="flex items-center gap-3 px-3 py-2 w-full text-sm font-medium rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors overflow-hidden">
               <LogOut className="size-5 shrink-0" />
               <span className="truncate opacity-100 transition-opacity duration-300">

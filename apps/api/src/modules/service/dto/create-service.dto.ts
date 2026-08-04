@@ -14,6 +14,12 @@ export class CreateServiceDto {
   @MaxLength(500)
   imageKey?: string;
 
+  @ApiPropertyOptional({ example: ['https://example.com/gallery1.jpg', 'https://example.com/gallery2.jpg'], description: 'Array of gallery image URLs' })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  gallery?: string[];
+
   @ApiPropertyOptional({ example: 'Custom web development services' })
   @IsOptional()
   @IsString()
