@@ -5,6 +5,7 @@ import {
   Get,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
   Body,
   Param,
   Query,
@@ -12,7 +13,7 @@ import {
   HttpStatus,
   BadRequestException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -83,6 +84,60 @@ export class UploadController {
       statusCode: 201,
       message: 'File uploaded successfully',
       data: result,
+    };
+  }
+
+  @Post('multiple')
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      limits: {
+        fileSize: 10 * 1024 * 1024,
+      },
+      fileFilter: (req, file, cb) => {
+        const allowedMimes = [
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'image/webp',
+        ];
+        if (allowedMimes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(new BadRequestException('File type not allowed'), false);
+        }
+      },
+    }),
+  )
+  @ApiOperation({ summary: 'Upload multiple files to S3' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: { type: 'array', items: { type: 'string', format: 'binary' } },
+        folder: { type: 'string', example: 'services', description: 'Upload folder' },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Files uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid file type or size' })
+  async uploadMultipleFiles(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body('folder') folder?: string,
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No files provided');
+    }
+
+    const results = await Promise.all(
+      files.map(file => this.uploadService.uploadFile(file, folder || 'uploads'))
+    );
+
+    return {
+      success: true,
+      statusCode: 201,
+      message: 'Files uploaded successfully',
+      data: results,
     };
   }
 
