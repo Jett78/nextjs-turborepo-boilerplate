@@ -1,8 +1,57 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(request: NextRequest) {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+let cachedRedirects: { fromPath: string; toPath: string }[] | null = null;
+let lastFetchTime = 0;
+const CACHE_TTL = 60 * 1000;
+
+async function getRedirects() {
+  const now = Date.now();
+  if (cachedRedirects && now - lastFetchTime < CACHE_TTL) {
+    return cachedRedirects;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/redirects/all`, {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (data.success && data.data) {
+      cachedRedirects = data.data;
+      lastFetchTime = now;
+      return cachedRedirects;
+    }
+    return cachedRedirects || [];
+  } catch {
+    return cachedRedirects || [];
+  }
+}
+
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon.ico") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
+  }
+
+  const redirects = await getRedirects();
+  const redirect = redirects.find((r) => r.fromPath === pathname);
+
+  if (redirect) {
+    return NextResponse.redirect(new URL(redirect.toPath, request.url), {
+      status: 301,
+      headers: {
+        "X-Redirected-From": pathname,
+      },
+    });
+  }
 
   const sessionToken =
     request.cookies.get("better-auth.session_token")?.value ||
@@ -17,7 +66,6 @@ export function proxy(request: NextRequest) {
   const isUserLogin = pathname === "/login";
   const isUserRegister = pathname === "/register";
 
-  // Redirect unauthenticated to login
   if (isAdminDashboard && !sessionToken) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
@@ -26,7 +74,6 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Redirect authenticated users from login/register pages
   if (sessionToken && (isAdminLogin || isUserLogin || isUserRegister)) {
     if (isAdmin) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -35,7 +82,6 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // Prevent non-admin from accessing admin dashboard - redirect to admin login
   if (isAdminDashboard && sessionToken && !isAdmin) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
@@ -45,10 +91,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/profile/user/:path*",
-    "/login",
-    "/register",
-    "/admin",
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

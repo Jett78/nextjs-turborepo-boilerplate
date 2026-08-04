@@ -44,6 +44,7 @@ export const companyProfiles = pgTable('company_profiles', {
   googleMap: text('google_map'),
   primaryColor: varchar('primary_color', { length: 50 }),
   secondaryColor: varchar('secondary_color', { length: 50 }),
+  textForeground: varchar('text_foreground', { length: 50 }),
   facebookUrl: varchar('facebook_url', { length: 500 }),
   instagramUrl: varchar('instagram_url', { length: 500 }),
   tiktokUrl: varchar('tiktok_url', { length: 500 }),
@@ -70,7 +71,6 @@ export const seoMetas = pgTable('seo_metas', {
   id: uuid('id').defaultRandom().primaryKey(),
   metaTitle: varchar('meta_title', { length: 255 }),
   metaDescription: text('meta_description'),
-  metaKeywords: text('meta_keywords').array(),
   canonicalUrl: varchar('canonical_url', { length: 500 }),
   metaRobots: varchar('meta_robots', { length: 100 }).default('index, follow'),
   ogTitle: varchar('og_title', { length: 255 }),
@@ -103,7 +103,6 @@ export const globalSeo = pgTable('global_seo', {
   id: uuid('id').defaultRandom().primaryKey(),
   metaTitle: varchar('meta_title', { length: 255 }),
   metaDescription: text('meta_description'),
-  metaKeywords: text('meta_keywords').array(),
   ogTitle: varchar('og_title', { length: 255 }),
   ogDescription: text('og_description'),
   ogImageKey: varchar('og_image_key', { length: 500 }),
@@ -164,6 +163,7 @@ export const services = pgTable('services', {
   name: varchar('name', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 500 }).notNull().unique(),
   imageKey: varchar('image_key', { length: 500 }),
+  gallery: text('gallery').array(),
   shortDescription: varchar('short_description', { length: 500 }),
   description: text('description'),
   price: integer('price'),
@@ -176,6 +176,33 @@ export const services = pgTable('services', {
 }, (table) => ({
   slugIdx: index('services_slug_idx').on(table.slug),
   sortOrderIdx: index('services_sort_order_idx').on(table.sortOrder),
+}));
+
+export const galleryCategories = pgEnum('gallery_category', [
+  'portfolio',
+  'team',
+  'events',
+  'behind_the_scenes',
+  'testimonials',
+  'other',
+]);
+
+export const gallery = pgTable('gallery', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: varchar('title', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 500 }).notNull().unique(),
+  description: text('description'),
+  images: text('images').array().notNull(),
+  category: galleryCategories('category').default('other').notNull(),
+  tags: text('tags').array(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  slugIdx: index('gallery_slug_idx').on(table.slug),
+  categoryIdx: index('gallery_category_idx').on(table.category),
+  sortOrderIdx: index('gallery_sort_order_idx').on(table.sortOrder),
 }));
 
 export const faqs = pgTable('faqs', {
@@ -310,4 +337,16 @@ export const customDomains = pgTable('custom_domains', {
 }, (table) => ({
   domainIdx: index('custom_domains_domain_idx').on(table.domain),
   statusIdx: index('custom_domains_status_idx').on(table.status),
+}));
+
+export const redirects = pgTable('redirects', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  fromPath: varchar('from_path', { length: 500 }).notNull().unique(),
+  toPath: varchar('to_path', { length: 500 }).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  fromPathIdx: index('redirects_from_path_idx').on(table.fromPath),
+  isActiveIdx: index('redirects_is_active_idx').on(table.isActive),
 }));

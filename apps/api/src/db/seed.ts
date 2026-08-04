@@ -78,6 +78,7 @@ async function seed() {
           googleMap: '<iframe>...</iframe>',
           primaryColor: '221.2 83.2% 53.3%',
           secondaryColor: '210 40% 96.1%',
+          textForeground: '222.2 84% 4.9%',
           facebookUrl: 'https://facebook.com/mycompany',
           instagramUrl: 'https://instagram.com/mycompany',
           isActive: true,
@@ -89,7 +90,6 @@ async function seed() {
         .values({
           metaTitle: 'My Awesome Page Title',
           metaDescription: 'This is a description of my awesome page.',
-          metaKeywords: ['keyword1', 'keyword2'],
           canonicalUrl: 'https://example.com/canonical-url',
           metaRobots: 'index, follow',
           ogTitle: 'OG Title',

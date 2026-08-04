@@ -50,6 +50,27 @@
       "when": 1785745914386,
       "tag": "0006_fresh_naoko",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1785757761004,
+      "tag": "0007_add_service_gallery",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785760955042,
+      "tag": "0008_add_gallery_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1785826301386,
+      "tag": "0009_daffy_oracle",
+      "breakpoints": true
     }
   ]
 }
