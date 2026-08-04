@@ -39,7 +39,6 @@ export function BlogForm({ blog }: BlogFormProps) {
     seoMeta: {
       metaTitle: blog?.seoMeta?.metaTitle || "",
       metaDescription: blog?.seoMeta?.metaDescription || "",
-      metaKeywords: blog?.seoMeta?.metaKeywords?.join(", ") || "",
       ogTitle: blog?.seoMeta?.ogTitle || "",
       ogDescription: blog?.seoMeta?.ogDescription || "",
       ogImageKey: blog?.seoMeta?.ogImageKey || "",
@@ -56,10 +55,6 @@ export function BlogForm({ blog }: BlogFormProps) {
     const slug = generateSlug(values.title);
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-    const metaKeywordsArray = values.seoMeta.metaKeywords
-      ? values.seoMeta.metaKeywords.split(",").map((keyword: string) => keyword.trim())
-      : [];
-
     const payload = {
       title: values.title,
       slug,
@@ -68,7 +63,6 @@ export function BlogForm({ blog }: BlogFormProps) {
       seoMeta: {
         metaTitle: values.seoMeta.metaTitle || values.title,
         metaDescription: values.seoMeta.metaDescription || values.description,
-        metaKeywords: metaKeywordsArray,
         ogTitle: values.seoMeta.ogTitle || values.seoMeta.metaTitle || values.title,
         ogDescription: values.seoMeta.ogDescription || values.seoMeta.metaDescription || values.description,
         ogImageKey: values.seoMeta.ogImageKey || values.imageKey,
@@ -176,13 +170,6 @@ export function BlogForm({ blog }: BlogFormProps) {
             value={values.seoMeta.metaTitle}
             onChange={handleChange}
             placeholder={values.title || "SEO title"}
-          />
-          <FormField
-            label="Meta Keywords"
-            name="seoMeta.metaKeywords"
-            value={values.seoMeta.metaKeywords}
-            onChange={handleChange}
-            placeholder="keyword1, keyword2, keyword3"
           />
         </div>
 

@@ -11,9 +11,6 @@ export class GlobalSeoEntity {
   metaDescription: string | null;
 
   @ApiProperty()
-  metaKeywords: string[] | null;
-
-  @ApiProperty()
   ogTitle: string | null;
 
   @ApiProperty()

@@ -10,9 +10,6 @@ export class SeoMetaEntity {
   @ApiPropertyOptional()
   metaDescription?: string;
 
-  @ApiPropertyOptional({ type: [String] })
-  metaKeywords?: string[];
-
   @ApiPropertyOptional()
   canonicalUrl?: string;
 
@@ -41,7 +38,6 @@ export class SeoMetaEntity {
     this.id = partial.id;
     this.metaTitle = partial.metaTitle ?? undefined;
     this.metaDescription = partial.metaDescription ?? undefined;
-    this.metaKeywords = partial.metaKeywords ?? undefined;
     this.canonicalUrl = partial.canonicalUrl ?? undefined;
     this.metaRobots = partial.metaRobots ?? undefined;
     this.ogTitle = partial.ogTitle ?? undefined;

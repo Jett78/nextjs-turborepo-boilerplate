@@ -4,7 +4,6 @@ export interface GlobalSeo {
   id: string;
   metaTitle?: string;
   metaDescription?: string;
-  metaKeywords?: string[];
   ogTitle?: string;
   ogDescription?: string;
   ogImageKey?: string;
@@ -17,7 +16,6 @@ export interface GlobalSeo {
 export interface PublicSeo {
   metaTitle?: string;
   metaDescription?: string;
-  metaKeywords?: string[];
   ogTitle?: string;
   ogDescription?: string;
   ogImageKey?: string;
