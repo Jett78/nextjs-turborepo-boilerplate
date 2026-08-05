@@ -8,6 +8,7 @@ import { API_ROUTES } from "@/config/api-routes";
 import { FileText, Plus, Trash2 } from "lucide-react";
 import type { PageSeo } from "@/types/page-seo";
 import Link from "next/link";
+import { showSuccess, showError } from "@/lib/toast-helper";
 
 interface PageSeoManagerProps {
   pages: PageSeo[];
@@ -18,8 +19,6 @@ export function PageSeoManager({ pages: initialPages }: PageSeoManagerProps) {
   const [pages, setPages] = useState<PageSeo[]>(initialPages);
 
   const handleDelete = async (pagePath: string) => {
-    if (!confirm(`Delete SEO settings for ${pagePath}?`)) return;
-
     try {
       const res = await apiClient<any>(
         `${API_ROUTES.PAGE_SEO}/${pagePath}`,
@@ -28,9 +27,10 @@ export function PageSeoManager({ pages: initialPages }: PageSeoManagerProps) {
 
       if (res.success) {
         setPages((prev) => prev.filter((p) => p.pagePath !== pagePath));
+        showSuccess("Page SEO deleted successfully");
       }
     } catch (error: any) {
-      alert(error.message || "Failed to delete page SEO");
+      showError(error.message || "Failed to delete page SEO");
     }
   };
 

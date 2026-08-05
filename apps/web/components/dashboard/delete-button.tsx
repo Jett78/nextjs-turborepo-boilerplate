@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useCrud } from "@/hooks/useCRUD";
 import { Trash2 } from "lucide-react";
+import { showError } from "@/lib/toast-helper";
 
 interface DeleteButtonProps {
   id: string;
@@ -55,7 +56,7 @@ export function DeleteButton({
         }
       },
       onError: (error: Error) => {
-        alert(error.message || `Failed to delete ${entityName}`);
+        showError(error.message || `Failed to delete ${entityName}`);
         setOpen(false);
       },
     });
