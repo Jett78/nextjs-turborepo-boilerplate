@@ -14,7 +14,7 @@ interface FaqsApiResponse {
 export async function getFaqs(): Promise<Faq[]> {
   try {
     const response = await apiClient<FaqsApiResponse>(
-      `${API_ROUTES.FAQ}?sortBy=sortOrder&sortOrder=asc&isActive=true`,
+      `${API_ROUTES.FAQ}?sortBy=sortOrder&sortOrder=asc&isActive=true&take=10`,
       { next: { tags: ["faqs"] } }
     );
 

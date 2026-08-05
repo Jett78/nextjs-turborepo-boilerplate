@@ -29,7 +29,7 @@ export class FaqService {
 
   async findAll(params?: { skip?: number; take?: number; search?: string; isActive?: boolean }) {
     try {
-      const { skip = 0, take = 100, search, isActive } = params || {};
+      const { skip = 0, take = 10, search, isActive } = params || {};
       const faqs = await this.repository.findAll({ skip, take, search, isActive });
       return { data: faqs };
     } catch (error) {

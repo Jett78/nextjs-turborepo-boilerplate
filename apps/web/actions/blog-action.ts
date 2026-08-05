@@ -10,6 +10,7 @@ export async function getBlogs(params?: GetBlogsParams): Promise<Blog[]> {
     const searchParams = new URLSearchParams();
     if (params?.skip !== undefined) searchParams.set("skip", String(params.skip));
     if (params?.take !== undefined) searchParams.set("take", String(params.take));
+    else searchParams.set("take", "10");
     if (params?.search) searchParams.set("search", params.search);
     if (params?.isActive !== undefined) searchParams.set("isActive", String(params.isActive));
 

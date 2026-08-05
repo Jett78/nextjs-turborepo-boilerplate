@@ -14,7 +14,7 @@ interface TestimonialsApiResponse {
 export async function getTestimonials(): Promise<Testimonial[]> {
   try {
     const response = await apiClient<TestimonialsApiResponse>(
-      `${API_ROUTES.TESTIMONIAL}?sortBy=sortOrder&sortOrder=asc`,
+      `${API_ROUTES.TESTIMONIAL}?sortBy=sortOrder&sortOrder=asc&take=10`,
       { next: { tags: ["testimonials"] } }
     );
 

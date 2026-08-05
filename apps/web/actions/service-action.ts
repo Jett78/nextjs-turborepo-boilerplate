@@ -7,7 +7,7 @@ import type { Service, ServicesApiResponse, ServiceApiResponse } from "@/types/s
 export async function getServices(): Promise<Service[]> {
   try {
     const response = await apiClient<ServicesApiResponse>(
-      `${API_ROUTES.SERVICE}?sortBy=sortOrder&sortOrder=asc`,
+      `${API_ROUTES.SERVICE}?sortBy=sortOrder&sortOrder=asc&take=10`,
       { next: { tags: ["services"] } }
     );
 
