@@ -351,3 +351,37 @@ export const redirects = pgTable('redirects', {
   fromPathIdx: index('redirects_from_path_idx').on(table.fromPath),
   isActiveIdx: index('redirects_is_active_idx').on(table.isActive),
 }));
+
+export const permissions = pgTable('permissions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  resource: varchar('resource', { length: 100 }).notNull(),
+  action: varchar('action', { length: 50 }).notNull(),
+  key: varchar('key', { length: 150 }).notNull().unique(),
+  description: text('description'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  resourceActionIdx: index('permissions_resource_action_idx').on(table.resource, table.action),
+  keyIdx: index('permissions_key_idx').on(table.key),
+}));
+
+export const rolePermissions = pgTable('role_permissions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  role: varchar('role', { length: 50 }).notNull(),
+  permissionId: uuid('permission_id').notNull().references(() => permissions.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  rolePermissionIdx: index('role_permissions_role_permission_idx').on(table.role, table.permissionId),
+  uniqueRolePermission: index('unique_role_permission_idx').on(table.role, table.permissionId),
+}));
+
+export const permissionsRelations = relations(permissions, ({ many }) => ({
+  rolePermissions: many(rolePermissions),
+}));
+
+export const rolePermissionsRelations = relations(rolePermissions, ({ one }) => ({
+  permission: one(permissions, {
+    fields: [rolePermissions.permissionId],
+    references: [permissions.id],
+  }),
+}));

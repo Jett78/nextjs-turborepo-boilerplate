@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { Reflector } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DbModule } from './db/db.module';
@@ -19,6 +21,8 @@ import { DomainModule } from './modules/domain/domain.module';
 import { TeamModule } from './modules/team/team.module';
 import { ServiceModule } from './modules/service/service.module';
 import { RedirectModule } from './modules/redirect/redirect.module';
+import { PermissionModule } from './modules/permission/permission.module';
+import { PermissionGuard } from './guards/permission.guard';
 
 @Module({
   imports: [
@@ -40,8 +44,16 @@ import { RedirectModule } from './modules/redirect/redirect.module';
     TeamModule,
     ServiceModule,
     RedirectModule,
+    PermissionModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    Reflector,
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
+    },
+  ],
 })
 export class AppModule {}

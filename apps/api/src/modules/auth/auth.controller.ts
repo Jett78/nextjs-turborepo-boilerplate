@@ -2,6 +2,7 @@ import { Controller, Get, Delete, Post, Patch, Query, Param, Body, Inject, HttpE
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { Session, Public } from '@thallesp/nestjs-better-auth';
 import type { UserSession } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { DB_CONNECTION } from '../../db/db.module';
 import { user as userTable, session as sessionTable, account as accountTable, verification as verificationTable } from '../../db/schema';
 import { desc, eq, and } from 'drizzle-orm';
@@ -118,6 +119,7 @@ export class AuthController {
   }
 
   @Get('users')
+  @RequirePermissions('user.read')
   @ApiOperation({
     summary: 'Get all users',
     description: 'Returns a list of all registered users. Requires admin session.',
@@ -155,6 +157,7 @@ export class AuthController {
   }
 
   @Post('users')
+  @RequirePermissions('user.create')
   @ApiOperation({
     summary: 'Create a new user',
     description: 'Creates a new user with the provided details. Requires admin session.',
@@ -166,7 +169,7 @@ export class AuthController {
         name: { type: 'string', example: 'John Doe' },
         email: { type: 'string', example: 'john@example.com' },
         password: { type: 'string', example: 'password123', minLength: 8 },
-        role: { type: 'string', enum: ['super_admin', 'admin', 'manager', 'customer'], example: 'customer' },
+        role: { type: 'string', enum: ['super_admin', 'admin', 'editor', 'manager', 'customer'], example: 'customer' },
         phone: { type: 'string', example: '+977-9841234567' },
       },
       required: ['name', 'email', 'password', 'role'],
@@ -210,7 +213,7 @@ export class AuthController {
     }
 
     // Validate role
-    const validRoles = ['super_admin', 'admin', 'manager', 'customer'];
+    const validRoles = ['super_admin', 'admin', 'editor', 'manager', 'customer'];
     if (!validRoles.includes(role)) {
       throw new HttpException('Invalid role', HttpStatus.BAD_REQUEST);
     }
@@ -248,6 +251,7 @@ export class AuthController {
   }
 
   @Delete('users/:id')
+  @RequirePermissions('user.delete')
   @ApiOperation({
     summary: 'Delete a user',
     description: 'Deletes a user and all associated sessions and accounts. Requires admin session.',

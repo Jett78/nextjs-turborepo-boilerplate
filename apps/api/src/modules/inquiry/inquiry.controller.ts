@@ -19,7 +19,8 @@ import {
   ApiUnauthorizedResponse,
   ApiQuery,
 } from '@nestjs/swagger';
-import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { InquiryService } from './inquiry.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
 import { InquiryEntity } from './entities/inquiry.entity';
@@ -44,7 +45,7 @@ export class InquiryController {
   }
 
   @Get()
-  @Roles(['super_admin'])
+  @RequirePermissions('inquiry.read')
   @ApiOperation({ summary: 'Get all inquiries' })
   @ApiQuery({ name: 'skip', required: false, example: 0, description: 'Number of records to skip' })
   @ApiQuery({ name: 'take', required: false, example: 10, description: 'Number of records to take' })
@@ -74,7 +75,7 @@ export class InquiryController {
   }
 
   @Get(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('inquiry.read')
   @ApiOperation({ summary: 'Get an inquiry by ID' })
   @ApiParam({ name: 'id', description: 'Inquiry UUID' })
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -88,7 +89,7 @@ export class InquiryController {
   }
 
   @Delete(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('inquiry.delete')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete an inquiry' })
   @ApiParam({ name: 'id', description: 'Inquiry UUID' })

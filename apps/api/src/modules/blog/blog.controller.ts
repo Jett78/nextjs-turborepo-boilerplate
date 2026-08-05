@@ -21,7 +21,8 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
@@ -34,7 +35,7 @@ export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Post()
-  @Roles(['super_admin'])
+  @RequirePermissions('blog.create')
   @ApiOperation({ summary: 'Create a new blog' })
   @ApiResponse({ status: 201, description: 'Blog created successfully', type: BlogEntity })
   async create(@Body() createBlogDto: CreateBlogDto) {
@@ -95,7 +96,7 @@ export class BlogController {
   }
 
   @Put(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('blog.edit')
   @ApiOperation({ summary: 'Update a blog' })
   @ApiParam({ name: 'id', description: 'Blog UUID' })
   async update(
@@ -112,7 +113,7 @@ export class BlogController {
   }
 
   @Delete(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('blog.delete')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a blog' })
   @ApiParam({ name: 'id', description: 'Blog UUID' })

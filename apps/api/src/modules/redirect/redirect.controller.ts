@@ -17,7 +17,8 @@ import {
   ApiResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { RedirectService } from './redirect.service';
 import { CreateRedirectDto } from './dto/create-redirect.dto';
 import { UpdateRedirectDto } from './dto/update-redirect.dto';
@@ -29,7 +30,7 @@ export class RedirectController {
   constructor(private readonly redirectService: RedirectService) {}
 
   @Post()
-  @Roles(['super_admin'])
+  @RequirePermissions('redirect.create')
   @ApiOperation({ summary: 'Create a new redirect' })
   @ApiResponse({ status: 201, description: 'Redirect created successfully', type: RedirectEntity })
   async create(@Body() dto: CreateRedirectDto) {
@@ -43,7 +44,7 @@ export class RedirectController {
   }
 
   @Get()
-  @Roles(['super_admin'])
+  @RequirePermissions('redirect.read')
   @ApiOperation({ summary: 'Get all redirects (admin)' })
   async findAll(
     @Query('skip') skip?: string,
@@ -101,7 +102,7 @@ export class RedirectController {
   }
 
   @Put(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('redirect.edit')
   @ApiOperation({ summary: 'Update a redirect' })
   @ApiParam({ name: 'id', description: 'Redirect UUID' })
   async update(
@@ -118,7 +119,7 @@ export class RedirectController {
   }
 
   @Delete(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('redirect.delete')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a redirect' })
   @ApiParam({ name: 'id', description: 'Redirect UUID' })

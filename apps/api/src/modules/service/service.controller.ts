@@ -17,7 +17,8 @@ import {
   ApiResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { ServiceService } from './service.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
@@ -29,7 +30,7 @@ export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
   @Post()
-  @Roles(['super_admin'])
+  @RequirePermissions('service.create')
   @ApiOperation({ summary: 'Create a new service' })
   @ApiResponse({ status: 201, description: 'Service created successfully', type: ServiceEntity })
   async create(@Body() dto: CreateServiceDto) {
@@ -92,7 +93,7 @@ export class ServiceController {
   }
 
   @Put(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('service.edit')
   @ApiOperation({ summary: 'Update a service' })
   @ApiParam({ name: 'id', description: 'Service UUID' })
   async update(
@@ -109,7 +110,7 @@ export class ServiceController {
   }
 
   @Delete(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('service.delete')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a service' })
   @ApiParam({ name: 'id', description: 'Service UUID' })

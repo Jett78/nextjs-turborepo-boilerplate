@@ -18,7 +18,8 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { FaqService } from './faq.service';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
@@ -30,7 +31,7 @@ export class FaqController {
   constructor(private readonly faqService: FaqService) {}
 
   @Post()
-  @Roles(['super_admin'])
+  @RequirePermissions('faq.create')
   @ApiOperation({ summary: 'Create a new FAQ' })
   @ApiResponse({ status: 201, description: 'FAQ created successfully', type: FaqEntity })
   async create(@Body() dto: CreateFaqDto) {
@@ -85,7 +86,7 @@ export class FaqController {
   }
 
   @Put(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('faq.edit')
   @ApiOperation({ summary: 'Update a FAQ' })
   @ApiParam({ name: 'id', description: 'FAQ UUID' })
   async update(
@@ -102,7 +103,7 @@ export class FaqController {
   }
 
   @Delete(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('faq.delete')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a FAQ' })
   @ApiParam({ name: 'id', description: 'FAQ UUID' })

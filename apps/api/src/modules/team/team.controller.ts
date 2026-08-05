@@ -17,7 +17,8 @@ import {
   ApiResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { TeamService } from './team.service';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
 import { UpdateTeamMemberDto } from './dto/update-team-member.dto';
@@ -29,7 +30,7 @@ export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Post()
-  @Roles(['super_admin'])
+  @RequirePermissions('team.create')
   @ApiOperation({ summary: 'Create a new team member' })
   @ApiResponse({ status: 201, description: 'Team member created successfully', type: TeamMemberEntity })
   async create(@Body() dto: CreateTeamMemberDto) {
@@ -92,7 +93,7 @@ export class TeamController {
   }
 
   @Put(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('team.edit')
   @ApiOperation({ summary: 'Update a team member' })
   @ApiParam({ name: 'id', description: 'Team member UUID' })
   async update(
@@ -109,7 +110,7 @@ export class TeamController {
   }
 
   @Delete(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('team.delete')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a team member' })
   @ApiParam({ name: 'id', description: 'Team member UUID' })

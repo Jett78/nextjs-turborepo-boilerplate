@@ -19,7 +19,8 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AllowAnonymous, Roles } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { TestimonialService } from './testimonial.service';
 import { CreateTestimonialDto } from './dto/create-testimonial.dto';
 import { UpdateTestimonialDto } from './dto/update-testimonial.dto';
@@ -31,7 +32,7 @@ export class TestimonialController {
   constructor(private readonly testimonialService: TestimonialService) {}
 
   @Post()
-  @Roles(['super_admin'])
+  @RequirePermissions('testimonial.create')
   @ApiOperation({ summary: 'Create a new testimonial' })
   @ApiResponse({ status: 201, description: 'Testimonial created successfully', type: TestimonialEntity })
   async create(@Body() dto: CreateTestimonialDto) {
@@ -80,7 +81,7 @@ export class TestimonialController {
   }
 
   @Put(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('testimonial.edit')
   @ApiOperation({ summary: 'Update a testimonial' })
   @ApiParam({ name: 'id', description: 'Testimonial UUID' })
   async update(
@@ -97,7 +98,7 @@ export class TestimonialController {
   }
 
   @Delete(':id')
-  @Roles(['super_admin'])
+  @RequirePermissions('testimonial.delete')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a testimonial' })
   @ApiParam({ name: 'id', description: 'Testimonial UUID' })
