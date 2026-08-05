@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/dashboard/sidebar-navigation";
 import { Header } from "@/components/dashboard/dashboard-header";
+import { PermissionGuard } from "@/components/dashboard/permission-guard";
 import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({
@@ -77,7 +78,9 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header onToggleSidebar={toggleSidebar} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 scrollbar-hide">
-          <div className="space-y-6">{children}</div>
+          <PermissionGuard>
+            <div className="space-y-6">{children}</div>
+          </PermissionGuard>
         </main>
       </div>
     </div>

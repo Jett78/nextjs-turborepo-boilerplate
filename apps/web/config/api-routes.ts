@@ -19,4 +19,5 @@ export const API_ROUTES = {
   TEAM: `${API_BASE_URL}/team-members`,
   SERVICE: `${API_BASE_URL}/services`,
   REDIRECT: `${API_BASE_URL}/redirects`,
+  PERMISSION: `${API_BASE_URL}/permissions`,
 } as const;

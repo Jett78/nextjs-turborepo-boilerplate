@@ -36,9 +36,15 @@ export default function LoginPage() {
 
         document.cookie = `user_role=${role}; path=/; max-age=${60 * 60 * 24 * 7}`;
 
-        if (role === "admin" || role === "super_admin") {
-          setError("Admin users please use the admin login page.");
-          await signOut();
+        if (role === "admin" || role === "super_admin" || role === "editor" || role === "manager") {
+          if (!emailVerified) {
+            await signOut();
+            router.push(
+              `/verify-email?email=${encodeURIComponent(email)}&name=${encodeURIComponent(data?.data?.name || "")}`
+            );
+          } else {
+            router.push("/dashboard");
+          }
         } else if (!emailVerified) {
           await signOut();
           router.push(

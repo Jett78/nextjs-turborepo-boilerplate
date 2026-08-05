@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   LayoutDashboard,
   FileText,
@@ -22,10 +22,13 @@ import {
   UsersRound,
   Briefcase,
   ArrowRightLeft,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth-client";
 import { showSuccess } from "@/lib/toast-helper";
+import { useCrud } from "@/hooks/useCRUD";
+import { API_ROUTES } from "@/config/api-routes";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,55 +47,70 @@ interface NavItem {
   name: string;
   href?: string;
   icon: LucideIcon;
-  children?: { name: string; href: string; icon: LucideIcon }[];
+  permission?: string;
+  permissions?: string[];
+  children?: {
+    name: string;
+    href: string;
+    icon: LucideIcon;
+    permission?: string;
+  }[];
 }
 
 const navigation: NavItem[] = [
-  { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Domains", href: "/dashboard/domains", icon: Globe },
+  { name: "Overview", href: "/dashboard", icon: LayoutDashboard, permission: "dashboard.view_stats" },
+  { name: "Domains", href: "/dashboard/domains", icon: Globe, permission: "domain.read" },
   {
     name: "Content",
     icon: FileText,
+    permissions: ["blog.read", "testimonial.read", "team.read", "service.read", "faq.read"],
     children: [
-      { name: "Blogs", href: "/dashboard/blogs", icon: FileText },
-      { name: "Testimonials", href: "/dashboard/testimonials", icon: Star },
-      { name: "Team", href: "/dashboard/team", icon: UsersRound },
-      { name: "Services", href: "/dashboard/services", icon: Briefcase },
-      { name: "FAQs", href: "/dashboard/faqs", icon: HelpCircle },
+      { name: "Blogs", href: "/dashboard/blogs", icon: FileText, permission: "blog.read" },
+      { name: "Testimonials", href: "/dashboard/testimonials", icon: Star, permission: "testimonial.read" },
+      { name: "Team", href: "/dashboard/team", icon: UsersRound, permission: "team.read" },
+      { name: "Services", href: "/dashboard/services", icon: Briefcase, permission: "service.read" },
+      { name: "FAQs", href: "/dashboard/faqs", icon: HelpCircle, permission: "faq.read" },
     ],
   },
-  { name: "Inquiries", href: "/dashboard/inquiries", icon: MessageSquare },
-  { name: "Users", href: "/dashboard/users", icon: Users },
+  { name: "Inquiries", href: "/dashboard/inquiries", icon: MessageSquare, permission: "inquiry.read" },
+  { name: "Users", href: "/dashboard/users", icon: Users, permission: "user.read" },
+  { name: "Role Permissions", href: "/dashboard/role-permissions", icon: Shield },
   {
     name: "SEO",
     icon: Search,
+    permissions: ["seo.read", "page_seo.read", "redirect.read"],
     children: [
       {
         name: "SEO & Analytics",
         href: "/dashboard/seo",
         icon: Search,
+        permission: "seo.read",
       },
       {
         name: "Page SEO",
         href: "/dashboard/page-seo",
         icon: FileCode,
+        permission: "page_seo.read",
       },
       {
         name: "Redirects",
         href: "/dashboard/redirects",
         icon: ArrowRightLeft,
+        permission: "redirect.read",
       },
     ],
   },
-  { name: "Payment Settings", href: "/dashboard/payment-settings", icon: CreditCard },
+  { name: "Payment Settings", href: "/dashboard/payment-settings", icon: CreditCard, permission: "payment_settings.read" },
   {
     name: "Settings",
     icon: Building2,
+    permissions: ["company_profile.read"],
     children: [
       {
         name: "Company Profile",
         href: "/dashboard/company-profile",
         icon: Building2,
+        permission: "company_profile.read",
       },
     ],
   },
@@ -102,6 +120,70 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const { getAll: getProfile } = useCrud<{ role: string }>({
+    endpoint: API_ROUTES.AUTH_PROFILE,
+    queryKey: "profile",
+    isAuthenticated: true,
+  });
+
+  const { getAll: getPermissions } = useCrud<string[]>({
+    endpoint: `${API_ROUTES.PERMISSION}/me`,
+    queryKey: "user-permissions",
+    isAuthenticated: true,
+  });
+
+  const { data: profile, isLoading: profileLoading } = getProfile();
+  const { data: permissions, isLoading: permissionsLoading } = getPermissions();
+
+  const role = profile?.role ?? "";
+  const permissionsLoadingState = profileLoading || permissionsLoading;
+
+  const hasPermission = useCallback(
+    (permission: string): boolean => {
+      if (role === "super_admin") return true;
+      if (permissions && permissions.includes("__all__")) return true;
+      if (permissions && permissions.includes(permission)) return true;
+      return false;
+    },
+    [permissions, role]
+  );
+
+  const hasAnyPermission = useCallback(
+    (permissionList: string[]): boolean => {
+      if (role === "super_admin") return true;
+      if (permissions && permissions.includes("__all__")) return true;
+      return permissionList.some((p) => permissions?.includes(p));
+    },
+    [permissions, role]
+  );
+
+  const filteredNavigation = useMemo(() => {
+    if (permissionsLoadingState) return navigation;
+    if (role === "super_admin") return navigation;
+
+    return navigation
+      .map((item) => {
+        if (item.name === "Role Permissions") {
+          return role === "super_admin" ? item : null;
+        }
+
+        if (item.children) {
+          const filteredChildren = item.children.filter((child) =>
+            child.permission ? hasPermission(child.permission) : true
+          );
+
+          if (filteredChildren.length === 0) return null;
+
+          return { ...item, children: filteredChildren };
+        }
+
+        if (item.permission && !hasPermission(item.permission)) return null;
+
+        return item;
+      })
+      .filter(Boolean) as NavItem[];
+  }, [role, permissionsLoadingState, hasPermission, hasAnyPermission]);
 
   const isPathActive = (path?: string) => {
     if (!path) return false;
@@ -116,8 +198,7 @@ export function Sidebar() {
 
   const handleLogout = async () => {
     await signOut();
-    
-    // Clear all cookies
+
     const cookies = document.cookie.split(";");
     for (const cookie of cookies) {
       const eqPos = cookie.indexOf("=");
@@ -125,7 +206,7 @@ export function Sidebar() {
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
     }
-    
+
     showSuccess("Logged out successfully");
     router.push("/login");
   };
@@ -144,7 +225,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto scrollbar-hide">
-        {navigation.map((item) => {
+        {filteredNavigation.map((item) => {
           const hasChildren = !!item.children;
           const isActive = isPathActive(item.href);
           const isChildActive = isAnyChildActive(item.children);

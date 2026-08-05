@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
 
       document.cookie = `user_role=${role}; path=/; max-age=${60 * 60 * 24 * 7}`;
 
-      if (role === "admin" || role === "super_admin") {
+      if (role === "admin" || role === "super_admin" || role === "editor" || role === "manager") {
         if (!emailVerified) {
           await signOut();
           window.location.href = `/verify-email?email=${encodeURIComponent(email)}&name=${encodeURIComponent(data?.data?.name || "")}`;

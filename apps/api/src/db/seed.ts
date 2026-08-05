@@ -102,6 +102,140 @@ async function seed() {
     } else {
       console.log('Company profile already exists, skipping.');
     }
+
+    console.log('\n--- Seeding Permissions ---');
+    const permissionsData = [
+      { resource: 'blog', action: 'read', key: 'blog.read', description: 'View blogs' },
+      { resource: 'blog', action: 'create', key: 'blog.create', description: 'Create new blogs' },
+      { resource: 'blog', action: 'edit', key: 'blog.edit', description: 'Edit existing blogs' },
+      { resource: 'blog', action: 'delete', key: 'blog.delete', description: 'Delete blogs' },
+      
+      { resource: 'service', action: 'read', key: 'service.read', description: 'View services' },
+      { resource: 'service', action: 'create', key: 'service.create', description: 'Create new services' },
+      { resource: 'service', action: 'edit', key: 'service.edit', description: 'Edit existing services' },
+      { resource: 'service', action: 'delete', key: 'service.delete', description: 'Delete services' },
+      
+      { resource: 'testimonial', action: 'read', key: 'testimonial.read', description: 'View testimonials' },
+      { resource: 'testimonial', action: 'create', key: 'testimonial.create', description: 'Create new testimonials' },
+      { resource: 'testimonial', action: 'edit', key: 'testimonial.edit', description: 'Edit existing testimonials' },
+      { resource: 'testimonial', action: 'delete', key: 'testimonial.delete', description: 'Delete testimonials' },
+      
+      { resource: 'team', action: 'read', key: 'team.read', description: 'View team members' },
+      { resource: 'team', action: 'create', key: 'team.create', description: 'Create new team members' },
+      { resource: 'team', action: 'edit', key: 'team.edit', description: 'Edit existing team members' },
+      { resource: 'team', action: 'delete', key: 'team.delete', description: 'Delete team members' },
+      
+      { resource: 'faq', action: 'read', key: 'faq.read', description: 'View FAQs' },
+      { resource: 'faq', action: 'create', key: 'faq.create', description: 'Create new FAQs' },
+      { resource: 'faq', action: 'edit', key: 'faq.edit', description: 'Edit existing FAQs' },
+      { resource: 'faq', action: 'delete', key: 'faq.delete', description: 'Delete FAQs' },
+      
+      { resource: 'user', action: 'read', key: 'user.read', description: 'View users' },
+      { resource: 'user', action: 'create', key: 'user.create', description: 'Create new users' },
+      { resource: 'user', action: 'edit', key: 'user.edit', description: 'Edit existing users' },
+      { resource: 'user', action: 'delete', key: 'user.delete', description: 'Delete users' },
+      
+      { resource: 'inquiry', action: 'read', key: 'inquiry.read', description: 'View inquiries' },
+      { resource: 'inquiry', action: 'delete', key: 'inquiry.delete', description: 'Delete inquiries' },
+      
+      { resource: 'company_profile', action: 'read', key: 'company_profile.read', description: 'View company profile' },
+      { resource: 'company_profile', action: 'edit', key: 'company_profile.edit', description: 'Edit company profile' },
+      
+      { resource: 'seo', action: 'read', key: 'seo.read', description: 'View SEO settings' },
+      { resource: 'seo', action: 'edit', key: 'seo.edit', description: 'Edit SEO settings' },
+      
+      { resource: 'page_seo', action: 'read', key: 'page_seo.read', description: 'View page SEO' },
+      { resource: 'page_seo', action: 'create', key: 'page_seo.create', description: 'Create new page SEO' },
+      { resource: 'page_seo', action: 'edit', key: 'page_seo.edit', description: 'Edit existing page SEO' },
+      { resource: 'page_seo', action: 'delete', key: 'page_seo.delete', description: 'Delete page SEO' },
+      
+      { resource: 'redirect', action: 'read', key: 'redirect.read', description: 'View redirects' },
+      { resource: 'redirect', action: 'create', key: 'redirect.create', description: 'Create new redirects' },
+      { resource: 'redirect', action: 'edit', key: 'redirect.edit', description: 'Edit existing redirects' },
+      { resource: 'redirect', action: 'delete', key: 'redirect.delete', description: 'Delete redirects' },
+      
+      { resource: 'payment_settings', action: 'read', key: 'payment_settings.read', description: 'View payment settings' },
+      { resource: 'payment_settings', action: 'edit', key: 'payment_settings.edit', description: 'Edit payment settings' },
+      
+      { resource: 'domain', action: 'read', key: 'domain.read', description: 'View custom domains' },
+      { resource: 'domain', action: 'create', key: 'domain.create', description: 'Create new custom domains' },
+      { resource: 'domain', action: 'edit', key: 'domain.edit', description: 'Edit existing custom domains' },
+      { resource: 'domain', action: 'delete', key: 'domain.delete', description: 'Delete custom domains' },
+      
+      { resource: 'dashboard', action: 'view_stats', key: 'dashboard.view_stats', description: 'View dashboard statistics' },
+    ];
+
+    for (const perm of permissionsData) {
+      const existing = await db
+        .select()
+        .from(schema.permissions)
+        .where(eq(schema.permissions.key, perm.key))
+        .limit(1);
+      
+      if (existing.length === 0) {
+        await db.insert(schema.permissions).values(perm);
+        console.log(`✓ Created permission: ${perm.key}`);
+      }
+    }
+
+    console.log('\n--- Seeding Role Permissions ---');
+    
+    const allPermissions = await db.select().from(schema.permissions);
+    const permissionMap = new Map(allPermissions.map(p => [p.key, p.id]));
+
+    const rolePermissionsData = [
+      { role: 'admin', permissions: [
+        'blog.read', 'blog.create', 'blog.edit', 'blog.delete',
+        'service.read', 'service.create', 'service.edit', 'service.delete',
+        'testimonial.read', 'testimonial.create', 'testimonial.edit', 'testimonial.delete',
+        'team.read', 'team.create', 'team.edit', 'team.delete',
+        'faq.read', 'faq.create', 'faq.edit', 'faq.delete',
+        'user.read', 'user.create',
+        'inquiry.read', 'inquiry.delete',
+        'company_profile.read', 'company_profile.edit',
+        'seo.read', 'seo.edit',
+        'page_seo.read', 'page_seo.create', 'page_seo.edit', 'page_seo.delete',
+        'redirect.read', 'redirect.create', 'redirect.edit', 'redirect.delete',
+        'payment_settings.read',
+        'domain.read', 'domain.create', 'domain.edit', 'domain.delete',
+        'dashboard.view_stats',
+      ]},
+      { role: 'editor', permissions: [
+        'blog.read', 'blog.create', 'blog.edit', 'blog.delete',
+        'service.read', 'service.create', 'service.edit', 'service.delete',
+        'testimonial.read', 'testimonial.create', 'testimonial.edit', 'testimonial.delete',
+        'team.read', 'team.create', 'team.edit', 'team.delete',
+        'faq.read', 'faq.create', 'faq.edit', 'faq.delete',
+        'inquiry.read',
+        'dashboard.view_stats',
+      ]},
+      { role: 'manager', permissions: [
+        'blog.read',
+        'service.read',
+        'testimonial.read',
+        'team.read',
+        'faq.read',
+        'inquiry.read',
+        'dashboard.view_stats',
+      ]},
+    ];
+
+    for (const { role, permissions } of rolePermissionsData) {
+      await db.delete(schema.rolePermissions).where(eq(schema.rolePermissions.role, role));
+      
+      for (const permKey of permissions) {
+        const permId = permissionMap.get(permKey);
+        if (permId) {
+          await db.insert(schema.rolePermissions).values({
+            role,
+            permissionId: permId,
+          });
+        }
+      }
+      console.log(`✓ Assigned ${permissions.length} permissions to role: ${role}`);
+    }
+
+    console.log('\n✅ All permissions seeded successfully!');
   } catch (error) {
     console.error('Seed failed:', error);
     throw error;

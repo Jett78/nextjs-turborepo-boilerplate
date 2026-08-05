@@ -58,7 +58,7 @@ export async function proxy(request: NextRequest) {
     request.cookies.get("__Secure-better-auth.session_token")?.value;
 
   const userRole = request.cookies.get("user_role")?.value;
-  const isAdmin = userRole === "admin" || userRole === "super_admin";
+  const isAdmin = userRole === "admin" || userRole === "super_admin" || userRole === "editor" || userRole === "manager";
 
   const isAdminDashboard = pathname.startsWith("/dashboard");
   const isAdminLogin = pathname === "/admin";
