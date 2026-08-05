@@ -3,48 +3,48 @@
 import { revalidateTag } from "next/cache";
 
 export async function revalidateBlogs() {
-  revalidateTag("blogs");
+  revalidateTag("blogs", "max");
 }
 
 export async function revalidateBlog(slug: string) {
-  revalidateTag("blogs");
-  revalidateTag(`blog-${slug}`);
+  revalidateTag("blogs", "max");
+  revalidateTag(`blog-${slug}`, "max");
 }
 
 export async function revalidateCompanyProfile() {
-  revalidateTag("company-profile");
+  revalidateTag("company-profile", "max");
 }
 
 export async function revalidateTestimonials() {
-  revalidateTag("testimonials");
+  revalidateTag("testimonials", "max");
 }
 
 export async function revalidateFaqs() {
-  revalidateTag("faqs");
+  revalidateTag("faqs", "max");
 }
 
 export async function revalidateTeamMembers() {
-  revalidateTag("team-members");
+  revalidateTag("team-members", "max");
 }
 
 export async function revalidateTeamMember(slug: string) {
-  revalidateTag("team-members");
-  revalidateTag(`team-member-${slug}`);
+  revalidateTag("team-members", "max");
+  revalidateTag(`team-member-${slug}`, "max");
 }
 
 export async function revalidateServices() {
-  revalidateTag("services");
+  revalidateTag("services", "max");
 }
 
 export async function revalidateService(slug: string) {
-  revalidateTag("services");
-  revalidateTag(`service-${slug}`);
+  revalidateTag("services", "max");
+  revalidateTag(`service-${slug}`, "max");
 }
 
 export async function revalidateRedirects() {
-  revalidateTag("redirects");
+  revalidateTag("redirects", "max");
 }
 
 export async function revalidateNavigation() {
-  revalidateTag("navigation");
+  revalidateTag("navigation", "max");
 }

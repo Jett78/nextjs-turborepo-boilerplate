@@ -244,7 +244,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-slate-500">You save</span>
                           <span className="text-sm font-bold text-emerald-600">
-                            {formatPrice(service.price - service.offerPrice)}
+                            {formatPrice((service.price ?? 0) - (service.offerPrice ?? 0))}
                           </span>
                         </div>
                       )}

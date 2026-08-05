@@ -42,7 +42,7 @@ export async function proxy(request: NextRequest) {
   }
 
   const redirects = await getRedirects();
-  const redirect = redirects.find((r) => r.fromPath === pathname);
+  const redirect = redirects?.find((r) => r.fromPath === pathname);
 
   if (redirect) {
     return NextResponse.redirect(new URL(redirect.toPath, request.url), {
