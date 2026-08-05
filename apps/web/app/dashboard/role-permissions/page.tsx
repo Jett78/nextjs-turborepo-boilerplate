@@ -1,19 +1,15 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
-import {
-  getRolePermissionsMap,
-  syncRolePermissions,
-  type Permission,
-  type RolePermissionsMap,
-} from "@/actions/permission-action";
+import { useCrud } from "@/hooks/useCRUD";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
+import { API_ROUTES } from "@/config/api-routes";
 import { showSuccess, showWarning, showError } from "@/lib/toast-helper";
 import {
   Shield,
-  Save,
   Search,
   ChevronDown,
-  ChevronRight,
   FileText,
   Briefcase,
   Star,
@@ -31,8 +27,24 @@ import {
   Check,
   RotateCcw,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import PrimaryButton from "@/components/ui/primary-button";
+import { Input } from "@/components/ui/input";
+import DashboardHeading from "@/components/dashboard/dashboard-heading";
+import SubmittingLoader from "@/components/dashboard/submitting-loader";
+
+interface Permission {
+  id: string;
+  resource: string;
+  action: string;
+  key: string;
+  description: string | null;
+}
+
+interface RolePermissionsMap {
+  roles: string[];
+  permissions: Permission[];
+  rolePermissions: Record<string, Permission[]>;
+}
 
 const resourceIcons: Record<string, React.ReactNode> = {
   blog: <FileText className="h-4 w-4" />,
@@ -68,11 +80,11 @@ const resourceColors: Record<string, { bg: string; text: string; border: string 
   dashboard: { bg: "bg-lime-50", text: "text-lime-600", border: "border-lime-200" },
 };
 
-const roleColors: Record<string, { bg: string; text: string; ring: string }> = {
-  admin: { bg: "bg-indigo-600", text: "text-white", ring: "ring-indigo-600" },
-  editor: { bg: "bg-emerald-600", text: "text-white", ring: "ring-emerald-600" },
-  manager: { bg: "bg-amber-600", text: "text-white", ring: "ring-amber-600" },
-  customer: { bg: "bg-slate-600", text: "text-white", ring: "ring-slate-600" },
+const roleBadgeStyles: Record<string, string> = {
+  admin: "bg-purple-50 text-purple-700 border-purple-200",
+  editor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  manager: "bg-blue-50 text-blue-700 border-blue-200",
+  customer: "bg-slate-50 text-slate-700 border-slate-200",
 };
 
 function formatResourceName(resource: string): string {
@@ -106,7 +118,7 @@ function ToggleSwitch({
       onClick={onChange}
       disabled={disabled}
       className={`
-        relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full
+        relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full
         transition-colors duration-200 ease-in-out
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
         disabled:cursor-not-allowed disabled:opacity-50
@@ -119,9 +131,9 @@ function ToggleSwitch({
     >
       <span
         className={`
-          pointer-events-none inline-block h-4 w-4 transform rounded-full
+          pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full
           bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out
-          ${checked ? "translate-x-6" : "translate-x-1"}
+          ${checked ? "translate-x-4.5" : "translate-x-0.5"}
         `}
       />
     </button>
@@ -131,17 +143,15 @@ function ToggleSwitch({
 function ResourceCard({
   resource,
   permissions,
-  selectedRole,
   checkedPermissions,
   onToggle,
 }: {
   resource: string;
   permissions: Permission[];
-  selectedRole: string;
   checkedPermissions: Set<string>;
   onToggle: (key: string) => void;
 }) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const colors = resourceColors[resource] ?? resourceColors.blog!;
   const icon = resourceIcons[resource] || <Shield className="h-4 w-4" />;
 
@@ -154,7 +164,7 @@ function ResourceCard({
   const toggleAll = () => {
     permissions.forEach((p) => {
       const isEnabled = checkedPermissions.has(p.key);
-      if (allEnabled || (someEnabled && !isEnabled)) {
+      if (allEnabled) {
         onToggle(p.key);
       } else if (!isEnabled) {
         onToggle(p.key);
@@ -163,20 +173,22 @@ function ResourceCard({
   };
 
   return (
-    <div className={`rounded-xl border ${colors.border} bg-white overflow-hidden transition-all duration-200 hover:shadow-md`}>
+    <div className="bg-white rounded-md border border-slate-200 shadow-xs overflow-hidden">
       <div
-        className={`flex items-center justify-between px-4 py-3 cursor-pointer ${colors.bg} select-none`}
+        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-slate-50/50 transition-colors select-none"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
-          <div className={`${colors.text}`}>{icon}</div>
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-sm text-slate-800">
+          <div className={`flex items-center justify-center h-8 w-8 rounded-md ${colors.bg} ${colors.text}`}>
+            {icon}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-slate-900">
               {formatResourceName(resource)}
             </span>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-              {enabledCount}/{permissions.length}
-            </Badge>
+            <span className="text-[10px] text-slate-400 font-medium">
+              {enabledCount}/{permissions.length} enabled
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -185,18 +197,18 @@ function ResourceCard({
               e.stopPropagation();
               toggleAll();
             }}
-            className={`text-xs px-2 py-1 rounded-md transition-colors ${
+            className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full transition-colors ${
               allEnabled
-                ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                 : someEnabled
-                ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                : "bg-slate-100 text-slate-500 hover:bg-slate-200"
             }`}
           >
-            {allEnabled ? "All On" : someEnabled ? "Some" : "All Off"}
+            {allEnabled ? "ALL" : someEnabled ? "PARTIAL" : "NONE"}
           </button>
           <ChevronDown
-            className={`h-4 w-4 text-slate-500 transition-transform duration-200 ${
+            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
               expanded ? "rotate-180" : ""
             }`}
           />
@@ -204,36 +216,50 @@ function ResourceCard({
       </div>
 
       {expanded && (
-        <div className="divide-y divide-slate-100">
-          {permissions.map((perm) => {
-            const isChecked = checkedPermissions.has(perm.key);
-            return (
-              <div
-                key={perm.key}
-                className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      isChecked ? "bg-emerald-500" : "bg-slate-300"
-                    }`}
-                  />
-                  <span className="text-sm font-medium text-slate-700">
-                    {formatAction(perm.action)}
-                  </span>
-                  {perm.description && (
-                    <span className="text-xs text-slate-400 hidden sm:inline">
-                      {perm.description}
-                    </span>
-                  )}
-                </div>
-                <ToggleSwitch
-                  checked={isChecked}
-                  onChange={() => onToggle(perm.key)}
-                />
-              </div>
-            );
-          })}
+        <div className="border-t border-slate-100">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-slate-50">
+                <th className="px-6 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Action
+                </th>
+                <th className="px-6 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Description
+                </th>
+                <th className="px-6 py-2.5 text-right text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Enabled
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {permissions.map((perm) => {
+                const isChecked = checkedPermissions.has(perm.key);
+                return (
+                  <tr
+                    key={perm.key}
+                    className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors"
+                  >
+                    <td className="px-6 py-2.5">
+                      <span className="text-xs font-semibold text-slate-900">
+                        {formatAction(perm.action)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-2.5">
+                      <span className="text-xs text-slate-500">
+                        {perm.description || "—"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-2.5 text-right">
+                      <ToggleSwitch
+                        checked={isChecked}
+                        onChange={() => onToggle(perm.key)}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -241,39 +267,49 @@ function ResourceCard({
 }
 
 export default function RolePermissionsPage() {
-  const [data, setData] = useState<RolePermissionsMap | null>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedRole, setSelectedRole] = useState<string>("admin");
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [pendingChanges, setPendingChanges] = useState<Set<string>>(new Set());
-  const [initialized, setInitialized] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const result = await getRolePermissionsMap();
-      setData(result);
-    } catch {
-      showError("Failed to load permissions");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { getAll } = useCrud<RolePermissionsMap>({
+    endpoint: `${API_ROUTES.PERMISSION}/roles`,
+    queryKey: "role-permissions",
+    isAuthenticated: true,
+  });
+
+  const { data, isLoading } = getAll();
+  const roleData = data as RolePermissionsMap | undefined;
+
+  const syncMutation = useMutation({
+    mutationFn: ({ role, permissionKeys }: { role: string; permissionKeys: string[] }) =>
+      apiClient(`${API_ROUTES.PERMISSION}/roles/${role}/sync`, {
+        method: "PUT",
+        body: JSON.stringify({ permissionKeys }),
+        isAuthenticated: true,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["role-permissions"] });
+    },
+  });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const roles = useMemo(() => {
-    if (!data) return [];
-    return data.roles.filter((role) => role !== "super_admin");
-  }, [data]);
+    if (!roleData) return [];
+    return roleData.roles.filter((role) => role !== "super_admin" && role !== "customer");
+  }, [roleData]);
 
   const groupedPermissions = useMemo(() => {
-    if (!data) return {};
+    if (!roleData) return {};
     const grouped: Record<string, Permission[]> = {};
-    data.permissions.forEach((perm) => {
+    roleData.permissions.forEach((perm) => {
       if (!grouped[perm.resource]) grouped[perm.resource] = [];
       grouped[perm.resource]!.push(perm);
     });
@@ -284,14 +320,14 @@ export default function RolePermissionsPage() {
       });
     });
     return grouped;
-  }, [data]);
+  }, [roleData]);
 
   const currentRolePermissions = useMemo(() => {
-    if (!data || !selectedRole) return new Set<string>();
+    if (!roleData || !selectedRole) return new Set<string>();
     return new Set(
-      data.rolePermissions[selectedRole]?.map((p) => p.key) || []
+      roleData.rolePermissions[selectedRole]?.map((p) => p.key) || []
     );
-  }, [data, selectedRole]);
+  }, [roleData, selectedRole]);
 
   const checkedPermissions = useMemo(() => {
     if (pendingChanges.size > 0) return pendingChanges;
@@ -300,16 +336,13 @@ export default function RolePermissionsPage() {
 
   const filteredResources = useMemo(() => {
     const keys = Object.keys(groupedPermissions);
-    if (!searchTerm) return keys;
+    if (!debouncedSearch) return keys;
     return keys.filter((resource) =>
-      resource.toLowerCase().includes(searchTerm.toLowerCase())
+      resource.toLowerCase().includes(debouncedSearch.toLowerCase())
     );
-  }, [groupedPermissions, searchTerm]);
+  }, [groupedPermissions, debouncedSearch]);
 
-  const totalEnabled = useMemo(() => {
-    return checkedPermissions.size;
-  }, [checkedPermissions]);
-
+  const totalEnabled = checkedPermissions.size;
   const hasUnsavedChanges = pendingChanges.size > 0;
 
   const handleToggle = useCallback(
@@ -329,233 +362,174 @@ export default function RolePermissionsPage() {
 
   const handleRoleChange = async (role: string) => {
     if (hasUnsavedChanges) {
-      setSaving(true);
-      const result = await syncRolePermissions(selectedRole, Array.from(pendingChanges));
-      if (result.success) {
-        showWarning("Unsaved changes saved automatically");
-        await fetchData();
-      }
-      setSaving(false);
+      await syncMutation.mutateAsync(
+        { role: selectedRole, permissionKeys: Array.from(pendingChanges) },
+        {
+          onSuccess: () => showWarning("Unsaved changes saved automatically"),
+          onError: () => showError("Failed to save changes"),
+        }
+      );
     }
     setPendingChanges(new Set());
     setSelectedRole(role);
   };
 
   const handleSave = async () => {
-    setSaving(true);
-    try {
-      const result = await syncRolePermissions(
-        selectedRole,
-        Array.from(pendingChanges)
-      );
-      if (result.success) {
-        setPendingChanges(new Set());
-        showSuccess(`Permissions updated for ${selectedRole}`);
-        await fetchData();
-      } else {
-        showError("Failed to update permissions");
+    await syncMutation.mutateAsync(
+      { role: selectedRole, permissionKeys: Array.from(pendingChanges) },
+      {
+        onSuccess: () => {
+          setPendingChanges(new Set());
+          showSuccess(`Permissions updated for ${selectedRole}`);
+        },
+        onError: () => showError("Failed to update permissions"),
       }
-    } finally {
-      setSaving(false);
-    }
+    );
   };
 
   const handleReset = () => {
     setPendingChanges(new Set());
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
-          <p className="mt-4 text-sm text-slate-500">Loading permissions...</p>
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <DashboardHeading
+          title="Role Permissions"
+          description="Control what each role can access in the admin panel."
+        />
+        <div className="flex items-center justify-center min-h-[40vh]">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent" />
         </div>
       </div>
     );
   }
 
-  if (!data) {
+  if (!roleData) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-slate-500">Failed to load permissions</p>
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <DashboardHeading
+          title="Role Permissions"
+          description="Control what each role can access in the admin panel."
+        />
+        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+          <p className="text-slate-500">Failed to load permissions</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-6 py-5">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-indigo-100">
-              <Shield className="h-5 w-5 text-indigo-600" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">
-                Role Permissions
-              </h1>
-              <p className="text-xs text-slate-500">
-                Control what each role can access in the admin panel
-              </p>
-            </div>
-          </div>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {syncMutation.isPending && <SubmittingLoader status="Saving permissions" />}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+        <DashboardHeading
+          title="Role Permissions"
+          description="Control what each role can access in the admin panel."
+        />
+        <div className="relative w-full sm:w-80 shrink-0">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+          <Input
+            placeholder="Search resources..."
+            className="pl-10 h-11 bg-white border-slate-200 rounded-md focus:ring-primary/20 focus:border-primary transition-all font-medium"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-6">
-        {/* Role Tabs */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Select Role
+      {/* Role Tabs */}
+      <div className="flex flex-wrap gap-2">
+        {roles.map((role) => {
+          const isSelected = selectedRole === role;
+          const rolePermCount = roleData.rolePermissions[role]?.length || 0;
+          const badgeStyle = roleBadgeStyles[role] ?? "bg-slate-50 text-slate-700 border-slate-200";
+
+          return (
+            <button
+              key={role}
+              onClick={() => handleRoleChange(role)}
+              className={`
+                flex items-center gap-2.5 px-4 py-2.5 rounded-md border text-sm font-semibold capitalize transition-all duration-200
+                ${
+                  isSelected
+                    ? "bg-primarymain text-white border-primarymain shadow-md"
+                    : `${badgeStyle} hover:shadow-sm`
+                }
+              `}
+            >
+              <Shield className="h-3.5 w-3.5" />
+              {role.replace("_", " ")}
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                isSelected ? "bg-white/20 text-white" : "bg-white text-slate-500"
+              }`}>
+                {rolePermCount}
+              </span>
+              {isSelected && (
+                <Check className="h-3.5 w-3.5" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Stats + Save Bar */}
+      <div className="bg-white rounded-md border border-slate-200 shadow-xs px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-xs text-slate-600">
+            <div className="h-2 w-2 rounded-full bg-emerald-500" />
+            <span>
+              <strong className="text-slate-900">{totalEnabled}</strong> of{" "}
+              {roleData.permissions.length} permissions enabled
             </span>
           </div>
-          <div className="flex flex-wrap gap-3">
-            {roles.map((role) => {
-              const isSelected = selectedRole === role;
-              const rolePermCount =
-                data.rolePermissions[role]?.length || 0;
-              const colors = roleColors[role] ?? roleColors.admin!;
-
-              return (
-                <button
-                  key={role}
-                  onClick={() => handleRoleChange(role)}
-                  className={`
-                    relative flex items-center gap-3 px-5 py-3 rounded-xl
-                    border-2 transition-all duration-200
-                    ${
-                      isSelected
-                        ? `${colors.bg} ${colors.text} border-transparent shadow-lg scale-[1.02]`
-                        : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:shadow-md"
-                    }
-                  `}
-                >
-                  <Shield className="h-4 w-4" />
-                  <div className="text-left">
-                    <div className="text-sm font-semibold capitalize">
-                      {role.replace("_", " ")}
-                    </div>
-                    <div
-                      className={`text-xs ${
-                        isSelected ? "text-white/80" : "text-slate-400"
-                      }`}
-                    >
-                      {rolePermCount} permissions
-                    </div>
-                  </div>
-                  {isSelected && (
-                    <div className="absolute -top-1.5 -right-1.5 h-5 w-5 bg-white rounded-full flex items-center justify-center shadow">
-                      <Check className="h-3 w-3 text-emerald-500" />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
-        {/* Stats Bar */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <div className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span>
-                <strong className="text-slate-900">{totalEnabled}</strong> of{" "}
-                {data.permissions.length} permissions enabled
-              </span>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Filter resources..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white w-56"
-              />
-            </div>
-          </div>
-
+        <div className="flex items-center gap-2">
           {hasUnsavedChanges && (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleReset}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                Reset
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 shadow-sm"
-              >
-                <Save className="h-3.5 w-3.5" />
-                {saving ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors"
+            >
+              <RotateCcw className="size-3" />
+              Reset
+            </button>
           )}
+          <PrimaryButton
+            text={syncMutation.isPending ? "Saving..." : "Save Changes"}
+            onClick={handleSave}
+            disabled={syncMutation.isPending}
+          />
         </div>
-
-        {/* Resource Cards */}
-        <div className="space-y-4">
-          {filteredResources.map((resource) => (
-            <ResourceCard
-              key={resource}
-              resource={resource}
-              permissions={groupedPermissions[resource]!}
-              selectedRole={selectedRole}
-              checkedPermissions={checkedPermissions}
-              onToggle={handleToggle}
-            />
-          ))}
-        </div>
-
-        {filteredResources.length === 0 && (
-          <div className="text-center py-16">
-            <Search className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500">
-              No resources found matching &quot;{searchTerm}&quot;
-            </p>
-          </div>
-        )}
       </div>
 
-      {/* Sticky Save Bar */}
-      {hasUnsavedChanges && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50">
-          <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-              <span>
-                Unsaved changes for{" "}
-                <strong className="capitalize">
-                  {selectedRole.replace("_", " ")}
-                </strong>
-              </span>
+      {/* Resource Cards */}
+      <div className="space-y-4">
+        {filteredResources.map((resource) => (
+          <ResourceCard
+            key={resource}
+            resource={resource}
+            permissions={groupedPermissions[resource]!}
+            checkedPermissions={checkedPermissions}
+            onToggle={handleToggle}
+          />
+        ))}
+      </div>
+
+      {filteredResources.length === 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 p-12">
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="size-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+              <Search className="size-8 text-slate-400" />
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleReset}
-                className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 transition-colors"
-              >
-                Discard
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 shadow-sm"
-              >
-                <Save className="h-4 w-4" />
-                {saving ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-1">No resources found</h3>
+            <p className="text-sm text-slate-500">
+              {debouncedSearch ? "Try a different search term." : "No resources available."}
+            </p>
           </div>
         </div>
       )}
+
     </div>
   );
 }

@@ -10,8 +10,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { Roles, Session } from '@thallesp/nestjs-better-auth';
+import { Session } from '@thallesp/nestjs-better-auth';
 import type { UserSession } from '@thallesp/nestjs-better-auth';
+import { RequirePermissions } from '../../decorators/require-permissions.decorator';
 import { PermissionService } from './permission.service';
 import { AssignPermissionDto, SyncRolePermissionsDto } from './dto/assign-permission.dto';
 import { PermissionEntity } from './entities/permission.entity';
@@ -22,7 +23,7 @@ export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
   @Get()
-  @Roles(['super_admin'])
+  @RequirePermissions('permission.read')
   @ApiOperation({ summary: 'Get all available permissions' })
   @ApiResponse({ status: 200, description: 'Permissions fetched successfully', type: [PermissionEntity] })
   async getAllPermissions() {
@@ -36,7 +37,7 @@ export class PermissionController {
   }
 
   @Get('roles')
-  @Roles(['super_admin'])
+  @RequirePermissions('permission.read')
   @ApiOperation({ summary: 'Get all roles with their permissions (for matrix UI)' })
   @ApiResponse({ status: 200, description: 'Role permissions map fetched successfully' })
   async getRolePermissionsMap() {
@@ -50,7 +51,7 @@ export class PermissionController {
   }
 
   @Get('roles/:role')
-  @Roles(['super_admin'])
+  @RequirePermissions('permission.read')
   @ApiOperation({ summary: 'Get permissions for a specific role' })
   @ApiParam({ name: 'role', enum: ['admin', 'editor', 'manager', 'customer'] })
   @ApiResponse({ status: 200, description: 'Role permissions fetched successfully' })
@@ -65,7 +66,7 @@ export class PermissionController {
   }
 
   @Post('roles/:role')
-  @Roles(['super_admin'])
+  @RequirePermissions('permission.edit')
   @ApiOperation({ summary: 'Assign a permission to a role' })
   @ApiParam({ name: 'role', enum: ['admin', 'editor', 'manager', 'customer'] })
   @ApiResponse({ status: 200, description: 'Permission assigned successfully' })
@@ -82,7 +83,7 @@ export class PermissionController {
   }
 
   @Delete('roles/:role/permissions/:permissionId')
-  @Roles(['super_admin'])
+  @RequirePermissions('permission.edit')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Revoke a permission from a role' })
   @ApiParam({ name: 'role', enum: ['admin', 'editor', 'manager', 'customer'] })
@@ -101,7 +102,7 @@ export class PermissionController {
   }
 
   @Put('roles/:role/sync')
-  @Roles(['super_admin'])
+  @RequirePermissions('permission.edit')
   @ApiOperation({ summary: 'Sync all permissions for a role (replaces existing)' })
   @ApiParam({ name: 'role', enum: ['admin', 'editor', 'manager', 'customer'] })
   @ApiResponse({ status: 200, description: 'Role permissions synced successfully' })

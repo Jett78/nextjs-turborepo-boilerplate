@@ -13,7 +13,7 @@ const routePermissions: Record<string, string[]> = {
   "/dashboard/faqs": ["faq.read", "faq.create", "faq.edit", "faq.delete"],
   "/dashboard/inquiries": ["inquiry.read", "inquiry.delete"],
   "/dashboard/users": ["user.read", "user.create", "user.edit", "user.delete"],
-  "/dashboard/role-permissions": ["__super_admin_only__"],
+  "/dashboard/role-permissions": ["permission.read", "permission.edit"],
   "/dashboard/seo": ["seo.read", "seo.edit"],
   "/dashboard/page-seo": ["page_seo.read", "page_seo.create", "page_seo.edit", "page_seo.delete"],
   "/dashboard/redirects": ["redirect.read", "redirect.create", "redirect.edit", "redirect.delete"],

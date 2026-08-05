@@ -162,6 +162,9 @@ async function seed() {
       { resource: 'domain', action: 'edit', key: 'domain.edit', description: 'Edit existing custom domains' },
       { resource: 'domain', action: 'delete', key: 'domain.delete', description: 'Delete custom domains' },
       
+      { resource: 'permission', action: 'read', key: 'permission.read', description: 'View permissions and roles' },
+      { resource: 'permission', action: 'edit', key: 'permission.edit', description: 'Edit role permissions' },
+      
       { resource: 'dashboard', action: 'view_stats', key: 'dashboard.view_stats', description: 'View dashboard statistics' },
     ];
 
@@ -198,6 +201,7 @@ async function seed() {
         'redirect.read', 'redirect.create', 'redirect.edit', 'redirect.delete',
         'payment_settings.read',
         'domain.read', 'domain.create', 'domain.edit', 'domain.delete',
+        'permission.read', 'permission.edit',
         'dashboard.view_stats',
       ]},
       { role: 'editor', permissions: [
