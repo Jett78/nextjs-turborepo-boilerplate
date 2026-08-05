@@ -165,6 +165,9 @@ async function seed() {
       { resource: 'permission', action: 'read', key: 'permission.read', description: 'View permissions and roles' },
       { resource: 'permission', action: 'edit', key: 'permission.edit', description: 'Edit role permissions' },
       
+      { resource: 'navigation', action: 'read', key: 'navigation.read', description: 'View navigation items' },
+      { resource: 'navigation', action: 'edit', key: 'navigation.edit', description: 'Edit navigation items' },
+      
       { resource: 'dashboard', action: 'view_stats', key: 'dashboard.view_stats', description: 'View dashboard statistics' },
     ];
 
@@ -202,6 +205,7 @@ async function seed() {
         'payment_settings.read',
         'domain.read', 'domain.create', 'domain.edit', 'domain.delete',
         'permission.read', 'permission.edit',
+        'navigation.read', 'navigation.edit',
         'dashboard.view_stats',
       ]},
       { role: 'editor', permissions: [
@@ -237,6 +241,22 @@ async function seed() {
         }
       }
       console.log(`✓ Assigned ${permissions.length} permissions to role: ${role}`);
+    }
+
+    console.log('\n--- Seeding Navigation Items ---');
+    const existingNavItems = await db.select().from(schema.navigationItems).limit(1);
+
+    if (existingNavItems.length === 0) {
+      await db.insert(schema.navigationItems).values([
+        { key: 'home', label: 'Home', path: '/', sortOrder: 1, isActive: true },
+        { key: 'about', label: 'About', path: '/about', sortOrder: 2, isActive: true },
+        { key: 'services', label: 'Services', path: '/services', sortOrder: 3, isActive: true },
+        { key: 'blog', label: 'Blog', path: '/blog', sortOrder: 4, isActive: true },
+        { key: 'contact', label: 'Contact', path: '/contact', sortOrder: 5, isActive: true },
+      ]);
+      console.log('✓ Navigation items seeded successfully!');
+    } else {
+      console.log('Navigation items already exist, skipping.');
     }
 
     console.log('\n✅ All permissions seeded successfully!');

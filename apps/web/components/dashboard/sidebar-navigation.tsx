@@ -23,6 +23,7 @@ import {
   Briefcase,
   ArrowRightLeft,
   Shield,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth-client";
@@ -73,6 +74,7 @@ const navigation: NavItem[] = [
     ],
   },
   { name: "Inquiries", href: "/dashboard/inquiries", icon: MessageSquare, permission: "inquiry.read" },
+  { name: "Navigation", href: "/dashboard/navigation", icon: Menu, permission: "navigation.read" },
   { name: "Users", href: "/dashboard/users", icon: Users, permission: "user.read" },
   { name: "Role Permissions", href: "/dashboard/role-permissions", icon: Shield },
   {

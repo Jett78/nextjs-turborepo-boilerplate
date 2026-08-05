@@ -44,3 +44,7 @@ export async function revalidateService(slug: string) {
 export async function revalidateRedirects() {
   revalidateTag("redirects");
 }
+
+export async function revalidateNavigation() {
+  revalidateTag("navigation");
+}

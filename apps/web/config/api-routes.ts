@@ -20,4 +20,5 @@ export const API_ROUTES = {
   SERVICE: `${API_BASE_URL}/services`,
   REDIRECT: `${API_BASE_URL}/redirects`,
   PERMISSION: `${API_BASE_URL}/permissions`,
+  NAVIGATION: `${API_BASE_URL}/navigation`,
 } as const;

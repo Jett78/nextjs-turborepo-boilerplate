@@ -385,3 +385,17 @@ export const rolePermissionsRelations = relations(rolePermissions, ({ one }) => 
     references: [permissions.id],
   }),
 }));
+
+export const navigationItems = pgTable('navigation_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  key: varchar('key', { length: 50 }).notNull().unique(),
+  label: varchar('label', { length: 100 }).notNull(),
+  path: varchar('path', { length: 255 }).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  keyIdx: index('navigation_items_key_idx').on(table.key),
+  sortOrderIdx: index('navigation_items_sort_order_idx').on(table.sortOrder),
+}));

@@ -8,14 +8,6 @@ import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CompanyProfile } from "@/types/company-profile";
 
-const navItems = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/about" },
-  { name: "Services", path: "/services" },
-  { name: "Blog", path: "/blog" },
-  { name: "Contact", path: "/contact" },
-];
-
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -24,11 +16,18 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-interface NavbarClientProps {
-  company: CompanyProfile | null;
+interface NavItem {
+  key: string;
+  label: string;
+  path: string;
 }
 
-export function NavbarClient({ company }: NavbarClientProps) {
+interface NavbarClientProps {
+  company: CompanyProfile | null;
+  navItems: NavItem[];
+}
+
+export function NavbarClient({ company, navItems }: NavbarClientProps) {
   const pathname = usePathname();
   const [showNavbar, setShowNavbar] = React.useState(true);
   const [lastScrollY, setLastScrollY] = React.useState(0);
@@ -114,7 +113,7 @@ export function NavbarClient({ company }: NavbarClientProps) {
                           : "text-gray-500 hover:bg-gray-50 hover:text-gray-900",
                       )}
                     >
-                      {item.name}
+                      {item.label}
                       {isActive && (
                         <span className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 rounded-full bg-secondarymain" />
                       )}
@@ -196,7 +195,7 @@ export function NavbarClient({ company }: NavbarClientProps) {
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                     )}
                   >
-                    {item.name}
+                    {item.label}
                   </Link>
                 );
               })}
