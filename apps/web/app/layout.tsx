@@ -5,6 +5,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { ThemeStyles } from "@/components/theme-styles";
 import { getPublicSeoSettings } from "@/actions/seo-action";
+import { getCompanyProfile } from "@/actions/company-profile-action";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -17,7 +18,12 @@ const montserrat = Montserrat({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getPublicSeoSettings();
+  const [seo, company] = await Promise.all([
+    getPublicSeoSettings(),
+    getCompanyProfile(),
+  ]);
+
+  const faviconUrl = company?.faviconKey || undefined;
 
   return {
     title: seo?.metaTitle ?? "",
@@ -31,6 +37,9 @@ export async function generateMetadata(): Promise<Metadata> {
     verification: seo?.googleSearchConsoleVerification
       ? { google: seo.googleSearchConsoleVerification }
       : undefined,
+    icons: {
+      icon: faviconUrl ? [faviconUrl] : ["/favicon.svg"],
+    },
   };
 }
 
