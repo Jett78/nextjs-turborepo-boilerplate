@@ -210,7 +210,7 @@ export function Sidebar() {
     }
 
     showSuccess("Logged out successfully");
-    router.push("/login");
+    router.push("/admin");
   };
 
   return (
