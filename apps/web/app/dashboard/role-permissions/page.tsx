@@ -410,7 +410,7 @@ export default function RolePermissionsPage() {
       <div className="flex flex-wrap gap-2">
         {roles.map((role) => {
           const isSelected = selectedRole === role;
-          const rolePermCount = roleData.rolePermissions[role]?.length || 0;
+          const rolePermCount = roleData?.rolePermissions[role]?.length || 0;
           const badgeStyle = roleBadgeStyles[role] ?? "bg-slate-50 text-slate-700 border-slate-200";
 
           return (
@@ -448,7 +448,7 @@ export default function RolePermissionsPage() {
             <div className="h-2 w-2 rounded-full bg-emerald-500" />
             <span>
               <strong className="text-slate-900">{totalEnabled}</strong> of{" "}
-              {roleData.permissions.length} permissions enabled
+              {roleData?.permissions.length} permissions enabled
             </span>
           </div>
         </div>
