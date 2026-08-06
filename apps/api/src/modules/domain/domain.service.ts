@@ -123,13 +123,11 @@ export class DomainService {
 
       return this.findOne(id);
     } else {
-      // DNS verification failed
+      // DNS verification failed - keep as pending so user can retry
       await this.db
         .update(schema.customDomains)
         .set({
-          status: 'failed',
-          errorMessage: dnsResult.error || 'DNS verification failed',
-          dnsRecordsChecked: JSON.stringify(dnsResult),
+          status: 'pending',
           updatedAt: new Date(),
         })
         .where(eq(schema.customDomains.id, id));

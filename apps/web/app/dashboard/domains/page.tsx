@@ -1,20 +1,16 @@
 "use client";
 
-import { useState} from "react";
+import { useState } from "react";
 import {
   Globe,
   Loader2,
   CheckCircle,
-  XCircle,
   AlertCircle,
-  Copy,
   ExternalLink,
-  Server,
-  Shield,
   ArrowRight,
-  Check,
   Zap,
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import DashboardHeading from "@/components/dashboard/dashboard-heading";
 import PrimaryButton from "@/components/ui/primary-button";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
@@ -35,8 +31,8 @@ interface Domain {
 
 export default function DomainsPage() {
   const [domain, setDomain] = useState("");
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const queryClient = useQueryClient();
 
   const { getAll, create } = useCrud<Domain>({
     endpoint: API_ROUTES.DOMAIN,
@@ -45,7 +41,9 @@ export default function DomainsPage() {
   });
 
   const { data: domains, isLoading } = getAll();
-  const savedDomain = domains?.[0] || null;
+  const savedDomain = domains?.length
+    ? [...domains].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+    : null;
 
   const handleSave = async () => {
     if (!domain) {
@@ -80,9 +78,9 @@ export default function DomainsPage() {
       });
       if (data.success) {
         showSuccess("Domain verification completed");
-        getAll();
+        queryClient.invalidateQueries({ queryKey: ["domains"] });
       } else {
-        showError(data.message || "Verification failed");
+        showError(data.message || "DNS not configured yet. Please update your DNS records and try again.");
       }
     } catch (err: any) {
       showError(err.message || "Failed to verify domain");
@@ -120,22 +118,8 @@ export default function DomainsPage() {
         text: "Live",
         description: "Domain is active and serving traffic",
       },
-      failed: {
-        color: "text-red-700",
-        bg: "bg-red-50 border-red-200",
-        icon: XCircle,
-        text: "Failed",
-        description: "Verification or deployment failed",
-      },
     };
     return configs[status] || configs.pending;
-  };
-
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(field);
-    showSuccess("Copied!");
-    setTimeout(() => setCopiedField(null), 2000);
   };
 
   if (isLoading) {
@@ -197,169 +181,61 @@ export default function DomainsPage() {
           </div>
         )}
 
-        {/* Error */}
-        {savedDomain?.errorMessage && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-            <XCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-            <p className="text-sm text-red-700">{savedDomain.errorMessage}</p>
-          </div>
-        )}
-
-        {/* Two Column Layout */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Domain Input - Left */}
-          <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-              <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-500/10 rounded-xl">
-                    <Globe className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">Domain Configuration</h3>
-                    <p className="text-xs text-slate-500">Enter the domain you want to connect</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 space-y-5">
-                {/* Domain Input */}
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Domain</label>
-                  <input
-                    type="text"
-                    value={domain}
-                    onChange={(e) => setDomain(e.target.value.toLowerCase())}
-                    placeholder="example.com"
-                    className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
-                  />
-                  <p className="text-xs text-slate-400">Enter your root domain (e.g., shop.com, brand.com)</p>
-                </div>
-
-                {/* Preview */}
-                {domain && (
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-100">
-                    <div className="p-2 bg-white rounded-lg shadow-sm">
-                      <Globe className="h-4 w-4 text-purple-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-purple-600 font-medium">Your site will be available at</p>
-                      <p className="text-sm font-bold text-purple-900 font-mono truncate">https://{domain}</p>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-purple-400" />
-                  </div>
-                )}
-
-                {/* Action Button */}
-                <div className="flex items-center gap-3 pt-2">
-                  {!savedDomain ? (
-                    <PrimaryButton
-                      text={create.isPending ? "Saving..." : "Save Domain"}
-                      onClick={handleSave}
-                      disabled={create.isPending || !domain}
-                    />
-                  ) : (
-                    <PrimaryButton
-                      text="Verify & Deploy"
-                      onClick={handleVerify}
-                      disabled={savedDomain.status === "active"}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* DNS Instructions - Right */}
+        {/* Domain Input */}
+        <div>
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
             <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-transparent">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-purple-500/10 rounded-xl">
-                  <Server className="h-5 w-5 text-purple-600" />
+                  <Globe className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">DNS Setup</h3>
-                  <p className="text-xs text-slate-500">Configure your domain DNS records</p>
+                  <h3 className="text-sm font-bold text-slate-900">Domain Configuration</h3>
+                  <p className="text-xs text-slate-500">Enter the domain you want to connect</p>
                 </div>
               </div>
             </div>
 
             <div className="p-6 space-y-5">
-              {/* Option 1: Nameservers */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-900 text-white text-xs font-bold">1</span>
-                  <h4 className="text-sm font-semibold text-slate-900">Nameservers</h4>
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">Recommended</span>
-                </div>
-                <p className="text-xs text-slate-500 pl-7">Update your domain nameservers at your registrar</p>
-                <div className="ml-7 space-y-2">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 group hover:border-slate-200 transition-colors">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                      <span className="font-mono text-sm text-slate-700">ns1.yourdomain.com</span>
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard("ns1.yourdomain.com", "ns1")}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-purple-600 hover:bg-purple-50 transition-all"
-                    >
-                      {copiedField === "ns1" ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 group hover:border-slate-200 transition-colors">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                      <span className="font-mono text-sm text-slate-700">ns2.yourdomain.com</span>
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard("ns2.yourdomain.com", "ns2")}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-purple-600 hover:bg-purple-50 transition-all"
-                    >
-                      {copiedField === "ns2" ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-                    </button>
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Domain</label>
+                <input
+                  type="text"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value.toLowerCase())}
+                  placeholder="example.com"
+                  className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                />
+                <p className="text-xs text-slate-400">Enter your root domain (e.g., shop.com, brand.com)</p>
               </div>
 
-              {/* Divider */}
-              <div className="flex items-center gap-4">
-                <div className="flex-1 h-px bg-slate-100"></div>
-                <span className="text-xs font-medium text-slate-400 uppercase">or</span>
-                <div className="flex-1 h-px bg-slate-100"></div>
-              </div>
-
-              {/* Option 2: A Record */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-900 text-white text-xs font-bold">2</span>
-                  <h4 className="text-sm font-semibold text-slate-900">A Record</h4>
-                </div>
-                <p className="text-xs text-slate-500 pl-7">Add an A record pointing to our server</p>
-                <div className="ml-7">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 group hover:border-slate-200 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="px-2 py-0.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-md">A</span>
-                      <span className="text-xs text-slate-400">@</span>
-                      <ArrowRight className="h-3 w-3 text-foreground" />
-                      <span className="font-mono text-sm text-slate-700">YOUR_VPS_IP</span>
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard("YOUR_VPS_IP", "a-record")}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-purple-600 hover:bg-purple-50 transition-all"
-                    >
-                      {copiedField === "a-record" ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-                    </button>
+              {domain && (
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-100">
+                  <div className="p-2 bg-white rounded-lg shadow-sm">
+                    <Globe className="h-4 w-4 text-purple-600" />
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-purple-600 font-medium">Your site will be available at</p>
+                    <p className="text-sm font-bold text-purple-900 font-mono truncate">https://{domain}</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-purple-400" />
                 </div>
-              </div>
+              )}
 
-              {/* Info Note */}
-              <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                <Shield className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                <div className="text-xs text-blue-700 space-y-1">
-                  <p className="font-medium">SSL certificates are automatic</p>
-                  <p>Once DNS is verified, we&apos;ll automatically provision a free Let&apos;s Encrypt SSL certificate for your domain.</p>
-                </div>
+              <div className="flex items-center gap-3 pt-2">
+                {!savedDomain ? (
+                  <PrimaryButton
+                    text={create.isPending ? "Saving..." : "Save Domain"}
+                    onClick={handleSave}
+                    disabled={create.isPending || !domain}
+                  />
+                ) : (
+                  <PrimaryButton
+                    text="Verify & Deploy"
+                    onClick={handleVerify}
+                    disabled={savedDomain.status === "active"}
+                  />
+                )}
               </div>
             </div>
           </div>
