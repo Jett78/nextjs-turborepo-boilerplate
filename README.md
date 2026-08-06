@@ -49,48 +49,106 @@ my-turborepo/
 
 - Node.js >= 18
 - npm 11+
+- PostgreSQL database (Neon, Supabase, or local)
 
-### Install Dependencies
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/my-turborepo.git
+cd my-turborepo
+```
+
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### Environment Variables
+### 3. Set up environment variables
 
 **Backend** (`apps/api/.env`):
 ```bash
-DATABASE_URL=postgresql://...
+# Database
+DATABASE_URL=postgresql://username:password@host:5432/dbname?sslmode=require
+
+# Server
 PORT=4000
+
+# Better Auth
 BETTER_AUTH_URL=http://localhost:4000
-BETTER_AUTH_SECRET=your-secret
+BETTER_AUTH_SECRET=your-random-secret-key
 FRONTEND_URL=http://localhost:3000
+
+# Email (SMTP)
+MAIL_HOST=smtp.your-provider.com
+MAIL_PORT=465
+MAIL_SECURE=true
+MAIL_USER=your-email@domain.com
+MAIL_PASSWORD=your-email-password
+MAIL_FROM="Your App <no-reply@domain.com>"
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# AWS S3 (for file uploads)
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_REGION=ap-south-1
+S3_BUCKET_NAME=your-bucket-name
+AWS_CLOUDFRONT_URL=your-bucket-name.s3.region.amazonaws.com
 ```
 
 **Frontend** (`apps/web/.env`):
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:4000
-FRONTEND_URL=http://localhost:3000
 ```
 
-### Database Setup
+### 4. Set up database
 
 ```bash
 cd apps/api
-npm run db:generate    # Generate migrations from schema
-npm run db:migrate     # Run migrations
-npm run db:studio      # Open Drizzle Studio (optional)
+
+# Push schema to database (creates tables)
+npm run db:push
+
+# Seed default data (admin user, permissions, navigation)
+npm run db:seed
 ```
 
-### Start Development
+Default admin login after seeding:
+- **Email:** admin@gmail.com
+- **Password:** Admin@123
+
+### 5. Start development servers
 
 ```bash
-# Run all apps
+# From root - runs both frontend and backend
 npm run dev
+```
 
-# Or run individually
+Or run individually:
+```bash
 cd apps/web && npm run dev    # Frontend: http://localhost:3000
 cd apps/api && npm run dev    # Backend:  http://localhost:4000
+```
+
+## Database Commands
+
+```bash
+cd apps/api
+
+npm run db:generate    # Generate migration files from schema
+npm run db:push        # Push schema changes to database
+npm run db:seed        # Seed default data
+npm run db:reset       # Truncate all tables (no seed)
+npm run db:studio      # Open Drizzle Studio (database GUI)
+```
+
+### Reset and re-seed
+
+```bash
+npm run db:reset && npm run db:seed
 ```
 
 ## Backend Features
@@ -105,6 +163,7 @@ cd apps/api && npm run dev    # Backend:  http://localhost:4000
 | faq | FAQ management |
 | inquiry | Contact form submissions |
 | media | Media/file uploads |
+| navigation | Navigation menu management |
 | page-seo | Per-page SEO settings |
 | redirect | URL redirects with status codes (301, 302, 307, 308, 410) |
 | role-permissions | Role-based access control |
@@ -114,15 +173,6 @@ cd apps/api && npm run dev    # Backend:  http://localhost:4000
 | team | Team member management |
 | testimonial | Testimonial management |
 | upload | S3 file uploads |
-
-### Database Commands
-
-```bash
-npm run db:generate    # Generate migration files
-npm run db:migrate     # Apply migrations
-npm run db:studio      # Open database GUI
-npm run db:seed        # Seed database
-```
 
 ## Frontend Features
 
@@ -163,7 +213,9 @@ npm run db:seed        # Seed database
 | `npm run dev:watch` | Start with file watching |
 | `npm run build` | Build for production |
 | `npm run db:generate` | Generate migrations |
-| `npm run db:migrate` | Run migrations |
+| `npm run db:push` | Push schema to database |
+| `npm run db:seed` | Seed default data |
+| `npm run db:reset` | Truncate all tables |
 | `npm run db:studio` | Open Drizzle Studio |
 
 ### Frontend (`apps/web`)
