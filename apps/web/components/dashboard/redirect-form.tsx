@@ -1,14 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/components/ui/primary-button";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateRedirects } from "@/actions/revalidate-action";
-import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { Redirect } from "@/types/redirect";
 
@@ -45,7 +44,6 @@ interface RedirectFormProps {
 }
 
 export function RedirectForm({ redirect }: RedirectFormProps) {
-  const router = useRouter();
   const isEditing = !!redirect;
 
   const { create, put } = useCrud<Record<string, any>>({
@@ -62,6 +60,13 @@ export function RedirectForm({ redirect }: RedirectFormProps) {
 
   const isPending = isEditing ? put.isPending : create.isPending;
 
+  const { onSuccess, onError } = useFormSubmit({
+    entityName: "Redirect",
+    redirectPath: "/dashboard/redirects",
+    entityId: redirect?.id,
+    revalidateAction: revalidateRedirects,
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -74,34 +79,9 @@ export function RedirectForm({ redirect }: RedirectFormProps) {
     };
 
     if (isEditing) {
-      put.mutate(
-        { id: redirect.id, data: payload },
-        {
-          onSuccess: async (res: any) => {
-            if (res.success) {
-              await revalidateRedirects();
-              showSuccess("Redirect updated successfully");
-              router.push("/dashboard/redirects");
-            }
-          },
-          onError: (error: any) => {
-            showError(error.message || "Failed to update redirect");
-          },
-        }
-      );
+      put.mutate({ id: redirect.id, data: payload }, { onSuccess, onError });
     } else {
-      create.mutate(payload, {
-        onSuccess: async (res: any) => {
-          if (res.success) {
-            await revalidateRedirects();
-            showSuccess("Redirect created successfully");
-            router.push("/dashboard/redirects");
-          }
-        },
-        onError: (error: any) => {
-          showError(error.message || "Failed to create redirect");
-        },
-      });
+      create.mutate(payload, { onSuccess, onError });
     }
   };
 
@@ -181,7 +161,7 @@ export function RedirectForm({ redirect }: RedirectFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/redirects")}
+          onClick={() => window.history.back()}
         >
           Cancel
         </Button>

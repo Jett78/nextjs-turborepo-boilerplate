@@ -6,14 +6,13 @@ import PrimaryButton from "@/components/ui/primary-button";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateFaqs } from "@/actions/revalidate-action";
-import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { FaqFormProps } from "@/types/components";
 
 export function FaqForm({ faq }: FaqFormProps) {
-  const router = useRouter();
   const isEditing = !!faq;
 
   const { create, put } = useCrud<Record<string, any>>({
@@ -22,7 +21,7 @@ export function FaqForm({ faq }: FaqFormProps) {
     isAuthenticated: true,
   });
 
-  const { values, handleChange, setField } = useForm({
+  const { values, handleChange } = useForm({
     question: faq?.question || "",
     answer: faq?.answer || "",
     sortOrder: faq?.sortOrder?.toString() || "",
@@ -30,6 +29,13 @@ export function FaqForm({ faq }: FaqFormProps) {
   });
 
   const isPending = isEditing ? put.isPending : create.isPending;
+
+  const { onSuccess, onError } = useFormSubmit({
+    entityName: "FAQ",
+    redirectPath: "/dashboard/faqs",
+    entityId: faq?.id,
+    revalidateAction: revalidateFaqs,
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,34 +51,9 @@ export function FaqForm({ faq }: FaqFormProps) {
     }
 
     if (isEditing) {
-      put.mutate(
-        { id: faq.id, data: payload },
-        {
-          onSuccess: async (res: any) => {
-            if (res.success) {
-              await revalidateFaqs();
-              showSuccess("FAQ updated successfully");
-              router.push("/dashboard/faqs");
-            }
-          },
-          onError: (error: any) => {
-            showError(error.message || "Failed to update FAQ");
-          },
-        }
-      );
+      put.mutate({ id: faq.id, data: payload }, { onSuccess, onError });
     } else {
-      create.mutate(payload, {
-        onSuccess: async (res: any) => {
-          if (res.success) {
-            await revalidateFaqs();
-            showSuccess("FAQ created successfully");
-            router.push("/dashboard/faqs");
-          }
-        },
-        onError: (error: any) => {
-          showError(error.message || "Failed to create FAQ");
-        },
-      });
+      create.mutate(payload, { onSuccess, onError });
     }
   };
 
@@ -147,7 +128,7 @@ export function FaqForm({ faq }: FaqFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/faqs")}
+          onClick={() => window.history.back()}
         >
           Cancel
         </Button>

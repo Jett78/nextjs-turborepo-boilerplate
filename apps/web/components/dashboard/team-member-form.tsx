@@ -1,20 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateTeamMembers } from "@/actions/revalidate-action";
-import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { TeamMemberFormProps } from "@/types/components";
 
 export function TeamMemberForm({ teamMember }: TeamMemberFormProps) {
-  const router = useRouter();
   const isEditing = !!teamMember;
 
   const { create, put } = useCrud<Record<string, any>>({
@@ -37,6 +35,13 @@ export function TeamMemberForm({ teamMember }: TeamMemberFormProps) {
 
   const isPending = isEditing ? put.isPending : create.isPending;
 
+  const { onSuccess, onError } = useFormSubmit({
+    entityName: "Team member",
+    redirectPath: "/dashboard/team",
+    entityId: teamMember?.id,
+    revalidateAction: revalidateTeamMembers,
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -54,34 +59,9 @@ export function TeamMemberForm({ teamMember }: TeamMemberFormProps) {
     }
 
     if (isEditing) {
-      put.mutate(
-        { id: teamMember.id, data: payload },
-        {
-          onSuccess: async (res: any) => {
-            if (res.success) {
-              await revalidateTeamMembers();
-              showSuccess("Team member updated successfully");
-              router.push("/dashboard/team");
-            }
-          },
-          onError: (error: any) => {
-            showError(error.message || "Failed to update team member");
-          },
-        }
-      );
+      put.mutate({ id: teamMember.id, data: payload }, { onSuccess, onError });
     } else {
-      create.mutate(payload, {
-        onSuccess: async (res: any) => {
-          if (res.success) {
-            await revalidateTeamMembers();
-            showSuccess("Team member created successfully");
-            router.push("/dashboard/team");
-          }
-        },
-        onError: (error: any) => {
-          showError(error.message || "Failed to create team member");
-        },
-      });
+      create.mutate(payload, { onSuccess, onError });
     }
   };
 
@@ -183,7 +163,7 @@ export function TeamMemberForm({ teamMember }: TeamMemberFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/team")}
+          onClick={() => window.history.back()}
         >
           Cancel
         </Button>

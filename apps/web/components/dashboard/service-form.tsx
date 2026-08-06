@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/components/ui/primary-button";
@@ -9,9 +8,9 @@ import FileUpload from "@/components/ui/file-upload";
 import ImageUploadMultiple from "@/components/ui/image-upload-multiple";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateServices } from "@/actions/revalidate-action";
-import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import {
   DndContext,
@@ -87,7 +86,6 @@ function SortableFeature({
 }
 
 export function ServiceForm({ service }: ServiceFormProps) {
-  const router = useRouter();
   const isEditing = !!service;
 
   const { create, put } = useCrud<Record<string, any>>({
@@ -122,6 +120,13 @@ export function ServiceForm({ service }: ServiceFormProps) {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const { onSuccess, onError } = useFormSubmit({
+    entityName: "Service",
+    redirectPath: "/dashboard/services",
+    entityId: service?.id,
+    revalidateAction: revalidateServices,
+  });
 
   const addFeature = () => {
     if (newFeature.trim()) {
@@ -175,34 +180,9 @@ export function ServiceForm({ service }: ServiceFormProps) {
     }
 
     if (isEditing) {
-      put.mutate(
-        { id: service.id, data: payload },
-        {
-          onSuccess: async (res: any) => {
-            if (res.success) {
-              await revalidateServices();
-              showSuccess("Service updated successfully");
-              router.push("/dashboard/services");
-            }
-          },
-          onError: (error: any) => {
-            showError(error.message || "Failed to update service");
-          },
-        }
-      );
+      put.mutate({ id: service.id, data: payload }, { onSuccess, onError });
     } else {
-      create.mutate(payload, {
-        onSuccess: async (res: any) => {
-          if (res.success) {
-            await revalidateServices();
-            showSuccess("Service created successfully");
-            router.push("/dashboard/services");
-          }
-        },
-        onError: (error: any) => {
-          showError(error.message || "Failed to create service");
-        },
-      });
+      create.mutate(payload, { onSuccess, onError });
     }
   };
 
@@ -400,7 +380,7 @@ export function ServiceForm({ service }: ServiceFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/services")}
+          onClick={() => window.history.back()}
         >
           Cancel
         </Button>

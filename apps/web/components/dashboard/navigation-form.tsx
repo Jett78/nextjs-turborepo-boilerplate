@@ -1,14 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/components/ui/primary-button";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateNavigation } from "@/actions/revalidate-action";
-import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { NavigationItem } from "@/types/navigation";
 
@@ -17,7 +16,6 @@ interface NavigationFormProps {
 }
 
 export function NavigationForm({ item }: NavigationFormProps) {
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -36,6 +34,13 @@ export function NavigationForm({ item }: NavigationFormProps) {
 
   const isPending = put.isPending;
 
+  const { onSuccess, onError } = useFormSubmit({
+    entityName: "Navigation item",
+    redirectPath: "/dashboard/navigation",
+    entityId: item.id,
+    revalidateAction: revalidateNavigation,
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -45,21 +50,7 @@ export function NavigationForm({ item }: NavigationFormProps) {
       isActive: isActive === "true",
     };
 
-    put.mutate(
-      { id: item.id, data: payload },
-      {
-        onSuccess: async (res: any) => {
-          if (res.success) {
-            await revalidateNavigation();
-            showSuccess("Navigation item updated successfully");
-            router.push("/dashboard/navigation");
-          }
-        },
-        onError: (error: any) => {
-          showError(error.message || "Failed to update navigation item");
-        },
-      }
-    );
+    put.mutate({ id: item.id, data: payload }, { onSuccess, onError });
   };
 
   if (!mounted) {
@@ -154,7 +145,7 @@ export function NavigationForm({ item }: NavigationFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/navigation")}
+          onClick={() => window.history.back()}
         >
           Cancel
         </Button>

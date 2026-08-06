@@ -32,3 +32,12 @@ export function toInputDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return d.toISOString().split("T")[0] ?? "";
 }
+
+export function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

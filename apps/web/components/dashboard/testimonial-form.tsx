@@ -1,20 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateTestimonials } from "@/actions/revalidate-action";
-import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { TestimonialFormProps } from "@/types/components";
 
 export function TestimonialForm({ testimonial }: TestimonialFormProps) {
-  const router = useRouter();
   const isEditing = !!testimonial;
 
   const { create, put } = useCrud<Record<string, any>>({
@@ -33,6 +31,13 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
 
   const isPending = isEditing ? put.isPending : create.isPending;
 
+  const { onSuccess, onError } = useFormSubmit({
+    entityName: "Testimonial",
+    redirectPath: "/dashboard/testimonials",
+    entityId: testimonial?.id,
+    revalidateAction: revalidateTestimonials,
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -48,34 +53,9 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
     }
 
     if (isEditing) {
-      put.mutate(
-        { id: testimonial.id, data: payload },
-        {
-          onSuccess: async (res: any) => {
-            if (res.success) {
-              await revalidateTestimonials();
-              showSuccess("Testimonial updated successfully");
-              router.push("/dashboard/testimonials");
-            }
-          },
-          onError: (error: any) => {
-            showError(error.message || "Failed to update testimonial");
-          },
-        }
-      );
+      put.mutate({ id: testimonial.id, data: payload }, { onSuccess, onError });
     } else {
-      create.mutate(payload, {
-        onSuccess: async (res: any) => {
-          if (res.success) {
-            await revalidateTestimonials();
-            showSuccess("Testimonial created successfully");
-            router.push("/dashboard/testimonials");
-          }
-        },
-        onError: (error: any) => {
-          showError(error.message || "Failed to create testimonial");
-        },
-      });
+      create.mutate(payload, { onSuccess, onError });
     }
   };
 
@@ -160,7 +140,7 @@ export function TestimonialForm({ testimonial }: TestimonialFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/testimonials")}
+          onClick={() => window.history.back()}
         >
           Cancel
         </Button>

@@ -1,20 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { API_ROUTES } from "@/config/api-routes";
-import { showSuccess, showError } from "@/lib/toast-helper";
 import type { PageSeoFormProps } from "@/types/components";
 import { ArrowLeft, FileText, Globe, Image as ImageIcon } from "lucide-react";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 
 export function PageSeoForm({ pageSeo }: PageSeoFormProps) {
-  const router = useRouter();
   const isEditing = !!pageSeo;
 
   const { create, put } = useCrud<Record<string, any>>({
@@ -35,6 +33,12 @@ export function PageSeoForm({ pageSeo }: PageSeoFormProps) {
 
   const isPending = isEditing ? put.isPending : create.isPending;
 
+  const { onSuccess, onError } = useFormSubmit({
+    entityName: "Page SEO",
+    redirectPath: "/dashboard/page-seo",
+    entityId: pageSeo?.pagePath,
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -53,28 +57,9 @@ export function PageSeoForm({ pageSeo }: PageSeoFormProps) {
     };
 
     if (isEditing) {
-      put.mutate(
-        { id: pageSeo.pagePath, data: payload },
-        {
-          onSuccess: () => {
-            showSuccess("Page SEO updated successfully");
-            router.push("/dashboard/page-seo");
-          },
-          onError: (error: any) => {
-            showError(error.message || "Failed to update page SEO");
-          },
-        }
-      );
+      put.mutate({ id: pageSeo.pagePath, data: payload }, { onSuccess, onError });
     } else {
-      create.mutate(payload as any, {
-        onSuccess: () => {
-          showSuccess("Page SEO created successfully");
-          router.push("/dashboard/page-seo");
-        },
-        onError: (error: any) => {
-          showError(error.message || "Failed to create page SEO");
-        },
-      });
+      create.mutate(payload as any, { onSuccess, onError });
     }
   };
 
@@ -204,7 +189,7 @@ export function PageSeoForm({ pageSeo }: PageSeoFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/page-seo")}
+          onClick={() => window.history.back()}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />

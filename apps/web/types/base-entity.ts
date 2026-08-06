@@ -4,12 +4,15 @@ export interface BaseEntity {
   updatedAt: Date;
 }
 
-export interface CommonResponse<T> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   statusCode: number;
   message: string;
-  data: T;
+  data?: T;
 }
+
+/** @deprecated Use ApiResponse instead */
+export type CommonResponse<T> = ApiResponse<T>;
 
 export interface PaginatedResponse<T> {
   data: T[];
