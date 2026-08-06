@@ -1,43 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { apiClient } from "@/lib/api-client";
-import { API_ROUTES } from "@/config/api-routes";
-import { FileText, Plus, Trash2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import type { PageSeo } from "@/types/page-seo";
 import Link from "next/link";
-import { showSuccess, showError } from "@/lib/toast-helper";
+import { EditButton } from "@/components/dashboard/edit-button";
+import { DeleteButton } from "@/components/dashboard/delete-button";
+import { API_ROUTES } from "@/config/api-routes";
 
 interface PageSeoManagerProps {
   pages: PageSeo[];
 }
 
-export function PageSeoManager({ pages: initialPages }: PageSeoManagerProps) {
-  const router = useRouter();
-  const [pages, setPages] = useState<PageSeo[]>(initialPages);
-
-  const handleDelete = async (pagePath: string) => {
-    try {
-      const res = await apiClient<any>(
-        `${API_ROUTES.PAGE_SEO}/${pagePath}`,
-        { method: "DELETE", isAuthenticated: true }
-      );
-
-      if (res.success) {
-        setPages((prev) => prev.filter((p) => p.pagePath !== pagePath));
-        showSuccess("Page SEO deleted successfully");
-      }
-    } catch (error: any) {
-      showError(error.message || "Failed to delete page SEO");
-    }
-  };
-
+export function PageSeoManager({ pages }: PageSeoManagerProps) {
   return (
     <div className="space-y-6">
- 
-
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6">
           {pages.length === 0 ? (
@@ -66,19 +42,13 @@ export function PageSeoManager({ pages: initialPages }: PageSeoManagerProps) {
                     </div>
                   </Link>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-400 group-hover:text-primarymain mr-2">
-                      Edit →
-                    </span>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleDelete(page.pagePath);
-                      }}
-                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <EditButton href={`/dashboard/page-seo/${page.pagePath}/edit`} />
+                    <DeleteButton
+                      id={page.pagePath}
+                      endpoint={API_ROUTES.PAGE_SEO}
+                      queryKey="page-seo"
+                      entityName="page SEO"
+                    />
                   </div>
                 </div>
               ))}

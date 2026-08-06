@@ -1,13 +1,23 @@
+import { getPageSeoForMetadata } from "@/actions/page-seo-action";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getServices } from "@/actions/service-action";
 import { formatPrice } from "@/lib/utils";
 import { ArrowUpRight, Sparkles, Check } from "lucide-react";
-import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Services - Jeet Deula",
-  description: "Professional web development services tailored to your business needs.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getPageSeoForMetadata("/services");
+
+  return {
+    title: seo?.metaTitle ?? "Services",
+    description: seo?.metaDescription ?? "",
+    openGraph: {
+      title: seo?.ogTitle ?? seo?.metaTitle ?? "Services",
+      description: seo?.ogDescription ?? seo?.metaDescription ?? "",
+      images: seo?.ogImageKey ? [{ url: seo.ogImageKey }] : [],
+    },
+  };
+}
 
 function ServiceCard({
   service,

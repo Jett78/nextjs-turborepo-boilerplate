@@ -1,11 +1,22 @@
+import { getPageSeoForMetadata } from "@/actions/page-seo-action";
+import type { Metadata } from "next";
 import { BookOpen } from "lucide-react";
 import { getBlogs } from "@/actions/blog-action";
 import BlogList from "@/components/sections/blog-list";
 
-export const metadata = {
-  title: "Blog | Page",
-  description: "Read our latest blog posts and insights.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getPageSeoForMetadata("/blog");
+
+  return {
+    title: seo?.metaTitle ?? "Blog",
+    description: seo?.metaDescription ?? "",
+    openGraph: {
+      title: seo?.ogTitle ?? seo?.metaTitle ?? "Blog",
+      description: seo?.ogDescription ?? seo?.metaDescription ?? "",
+      images: seo?.ogImageKey ? [{ url: seo.ogImageKey }] : [],
+    },
+  };
+}
 
 export default async function BlogPage() {
   const posts = await getBlogs({ take: 50, isActive: true });

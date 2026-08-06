@@ -1,6 +1,22 @@
+import { getPageSeoForMetadata } from "@/actions/page-seo-action";
+import type { Metadata } from "next";
 import ContactInfo from "./contact-info";
 import ContactForm from "./contact-form";
 import { getCompanyProfile } from "@/actions/company-profile-action";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getPageSeoForMetadata("/contact");
+
+  return {
+    title: seo?.metaTitle ?? "Contact Us",
+    description: seo?.metaDescription ?? "",
+    openGraph: {
+      title: seo?.ogTitle ?? seo?.metaTitle ?? "Contact Us",
+      description: seo?.ogDescription ?? seo?.metaDescription ?? "",
+      images: seo?.ogImageKey ? [{ url: seo.ogImageKey }] : [],
+    },
+  };
+}
 
 const ContactPage = async () => {
   let companyInfo = null;
