@@ -93,7 +93,7 @@ export function NavbarClient({ company, navItems }: NavbarClientProps) {
 
             {/* Mobile logo text */}
             <span className="text-sm font-extrabold tracking-tight text-gray-900 sm:hidden">
-              {company?.companyName || "Linkstar Manpower"}
+              {company?.companyName || "Nextjs"}
             </span>
 
             {/* Right section */}

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { BlogCard } from "@/components/blog-card";
-import { BookOpen } from "lucide-react";
+import NoData from "@/components/no-data";
 import type { Blog } from "@/types/blog";
 
 export default function BlogList({ posts }: { posts: Blog[] }) {
@@ -10,11 +10,7 @@ export default function BlogList({ posts }: { posts: Blog[] }) {
     <section className="py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {posts.length === 0 ? (
-          <div className="py-24 text-center">
-            <BookOpen className="mx-auto h-12 w-12 text-gray-300" />
-            <p className="mt-4 text-lg font-medium text-gray-500">No blog posts yet.</p>
-            <p className="mt-1 text-sm text-gray-400">Check back soon for new content.</p>
-          </div>
+          <NoData title="blog posts" />
         ) : (
           <>
             <motion.div

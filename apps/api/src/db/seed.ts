@@ -18,7 +18,7 @@ async function seed() {
     const existingAdmin = await db
       .select()
       .from(schema.user)
-      .where(eq(schema.user.email, 'admin@page.com'))
+      .where(eq(schema.user.email, 'admin@gmail.com'))
       .limit(1);
 
     if (existingAdmin.length === 0) {
@@ -28,7 +28,7 @@ async function seed() {
       await db.insert(schema.user).values({
         id: userId,
         name: 'Super Admin',
-        email: 'admin@page.com',
+        email: 'admin@gmail.com',
         emailVerified: true,
         role: 'super_admin',
       });
@@ -42,7 +42,7 @@ async function seed() {
       });
 
       console.log('Super admin created successfully!');
-      console.log('Email: admin@page.com');
+      console.log('Email: admin@gmail.com');
       console.log('Password: Admin@123');
     } else {
       // Ensure existing admin has super_admin role
@@ -50,7 +50,7 @@ async function seed() {
         await db
           .update(schema.user)
           .set({ role: 'super_admin' })
-          .where(eq(schema.user.email, 'admin@page.com'));
+          .where(eq(schema.user.email, 'admin@gmail.com'));
         console.log('Updated existing admin to super_admin role.');
       }
       console.log('Super admin already exists, skipping.');
@@ -71,9 +71,9 @@ async function seed() {
           address: 'Kathmandu, Nepal',
           phoneNumber: '+977-9800000000',
           email: 'info@nepaltech.com',
-          logoKey: 'string',
-          footerLogoKey: 'string',
-          faviconKey: 'string',
+          logoKey: '',
+          footerLogoKey: '',
+          faviconKey: '',
           whatsappNumber: '+977-9800000000',
           googleMap: '<iframe>...</iframe>',
           primaryColor: '221.2 83.2% 53.3%',
