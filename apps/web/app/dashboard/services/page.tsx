@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardHeading from "@/components/dashboard/dashboard-heading";
 import DataTable, { Column } from "@/components/dashboard/data-table";
 import { Search } from "lucide-react";
@@ -11,18 +11,12 @@ import { formatPrice } from "@/lib/utils";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { EditButton } from "@/components/dashboard/edit-button";
 import { revalidateServices } from "@/actions/revalidate-action";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { Service } from "@/types/service";
 
 export default function ServicesPage() {
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+  const debouncedSearch = useDebounce(search);
 
   const { getAll } = useCrud<Service>({
     endpoint: API_ROUTES.SERVICE,

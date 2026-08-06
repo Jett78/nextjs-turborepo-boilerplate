@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardHeading from "@/components/dashboard/dashboard-heading";
 import { Search, Plus, Calendar, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -9,20 +9,14 @@ import { API_ROUTES } from "@/config/api-routes";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { EditButton } from "@/components/dashboard/edit-button";
 import { revalidateBlogs } from "@/actions/revalidate-action";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { Blog } from "@/types/blog";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function BlogsPage() {
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+  const debouncedSearch = useDebounce(search);
 
   const { getAll } = useCrud<Blog>({
     endpoint: API_ROUTES.BLOG,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardHeading from "@/components/dashboard/dashboard-heading";
 import DataTable, { Column } from "@/components/dashboard/data-table";
 import { Search } from "lucide-react";
@@ -10,18 +10,12 @@ import { API_ROUTES } from "@/config/api-routes";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { EditButton } from "@/components/dashboard/edit-button";
 import { revalidateFaqs } from "@/actions/revalidate-action";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { Faq } from "@/types/faq";
 
 export default function FaqsPage() {
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+  const debouncedSearch = useDebounce(search);
 
   const { getAll } = useCrud<Faq>({
     endpoint: API_ROUTES.FAQ,

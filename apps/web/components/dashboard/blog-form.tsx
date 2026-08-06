@@ -1,29 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/components/ui/primary-button";
 import FileUpload from "@/components/ui/file-upload";
 import FormField from "@/components/forms/form-field";
 import { useCrud } from "@/hooks/useCRUD";
 import { useForm } from "@/hooks/useForm";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { API_ROUTES } from "@/config/api-routes";
 import { revalidateBlogs, revalidateBlog } from "@/actions/revalidate-action";
-import { showSuccess, showError } from "@/lib/toast-helper";
+import { generateSlug } from "@/lib/utils";
 import { TiptapEditor } from "@/components/ui/tiptap-editor";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
 import type { BlogFormProps } from "@/types/components";
 
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 export function BlogForm({ blog }: BlogFormProps) {
-  const router = useRouter();
   const isEditing = !!blog;
 
   const { create, put } = useCrud<Record<string, any>>({
@@ -49,6 +40,16 @@ export function BlogForm({ blog }: BlogFormProps) {
 
   const isPending = isEditing ? put.isPending : create.isPending;
 
+  const { onSuccess, onError } = useFormSubmit({
+    entityName: "Blog",
+    redirectPath: "/dashboard/blogs",
+    entityId: blog?.id,
+    revalidateAction: async () => {
+      await revalidateBlogs();
+      await revalidateBlog(generateSlug(values.title));
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -72,36 +73,9 @@ export function BlogForm({ blog }: BlogFormProps) {
     };
 
     if (isEditing) {
-      put.mutate(
-        { id: blog.id, data: payload },
-        {
-          onSuccess: async (res: any) => {
-            if (res.success) {
-              await revalidateBlogs();
-              await revalidateBlog(slug);
-              showSuccess("Blog updated successfully");
-              router.push("/dashboard/blogs");
-            }
-          },
-          onError: (error: any) => {
-            showError(error.message || "Failed to update blog");
-          },
-        }
-      );
+      put.mutate({ id: blog.id, data: payload }, { onSuccess, onError });
     } else {
-      create.mutate(payload, {
-        onSuccess: async (res: any) => {
-          if (res.success) {
-            await revalidateBlogs();
-            await revalidateBlog(slug);
-            showSuccess("Blog created successfully");
-            router.push("/dashboard/blogs");
-          }
-        },
-        onError: (error: any) => {
-          showError(error.message || "Failed to create blog");
-        },
-      });
+      create.mutate(payload, { onSuccess, onError });
     }
   };
 
@@ -194,7 +168,7 @@ export function BlogForm({ blog }: BlogFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/blogs")}
+          onClick={() => window.history.back()}
         >
           Cancel
         </Button>
