@@ -1,7 +1,6 @@
+import { getServiceById } from "@/actions/service-action";
 import { ServiceForm } from "@/components/dashboard/service-form";
-import { apiClient } from "@/lib/api-client";
-import { API_ROUTES } from "@/config/api-routes";
-import type { Service } from "@/types/service";
+import NoData from "@/components/no-data";
 import BreadCrumbs from "@/components/ui/bread-crumbs";
 
 export default async function EditServicePage({
@@ -10,13 +9,7 @@ export default async function EditServicePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  const res = await apiClient<{ data: Service }>(
-    `${API_ROUTES.SERVICE}/${id}`,
-    { next: { tags: [`service-${id}`] } }
-  );
-
-  const service = res.data;
+  const service = await getServiceById(id);
 
   return (
     <div className="space-y-6">
@@ -24,7 +17,7 @@ export default async function EditServicePage({
         <h2 className="text-lg font-black tracking-tight text-primarymain">Edit Service</h2>
         <BreadCrumbs path="services" page="Edit" />
       </div>
-      <ServiceForm service={service} />
+      {service ? <ServiceForm service={service} /> : <NoData title="Service" />}
     </div>
   );
 }

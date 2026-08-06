@@ -1,4 +1,6 @@
-import { NavigationEditClient } from "@/components/dashboard/navigation-edit-client";
+import { getNavigationItemById } from "@/actions/navigation-action";
+import { NavigationForm } from "@/components/dashboard/navigation-form";
+import NoData from "@/components/no-data";
 import BreadCrumbs from "@/components/ui/bread-crumbs";
 
 export default async function EditNavigationPage({
@@ -7,6 +9,7 @@ export default async function EditNavigationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const item = await getNavigationItemById(id);
 
   return (
     <div className="space-y-6">
@@ -14,7 +17,7 @@ export default async function EditNavigationPage({
         <h2 className="text-lg font-black tracking-tight text-primarymain">Edit Navigation Item</h2>
         <BreadCrumbs path="navigation" page="Edit" />
       </div>
-      <NavigationEditClient id={id} />
+      {item ? <NavigationForm item={item} /> : <NoData title="Navigation Item" />}
     </div>
   );
 }

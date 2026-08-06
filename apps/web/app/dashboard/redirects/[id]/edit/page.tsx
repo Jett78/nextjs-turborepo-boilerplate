@@ -1,7 +1,6 @@
+import { getRedirectById } from "@/actions/redirect-action";
 import { RedirectForm } from "@/components/dashboard/redirect-form";
-import { apiClient } from "@/lib/api-client";
-import { API_ROUTES } from "@/config/api-routes";
-import type { Redirect } from "@/types/redirect";
+import NoData from "@/components/no-data";
 import BreadCrumbs from "@/components/ui/bread-crumbs";
 
 export default async function EditRedirectPage({
@@ -10,13 +9,7 @@ export default async function EditRedirectPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  const res = await apiClient<{ data: Redirect }>(
-    `${API_ROUTES.REDIRECT}/${id}`,
-    { next: { tags: [`redirect-${id}`] } }
-  );
-
-  const redirect = res.data;
+  const redirect = await getRedirectById(id);
 
   return (
     <div className="space-y-6">
@@ -24,7 +17,7 @@ export default async function EditRedirectPage({
         <h2 className="text-lg font-black tracking-tight text-primarymain">Edit Redirect</h2>
         <BreadCrumbs path="redirects" page="Edit" />
       </div>
-      <RedirectForm redirect={redirect} />
+      {redirect ? <RedirectForm redirect={redirect} /> : <NoData title="Redirect" />}
     </div>
   );
 }

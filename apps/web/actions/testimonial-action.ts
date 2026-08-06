@@ -25,3 +25,18 @@ export async function getTestimonials(): Promise<Testimonial[]> {
     return [];
   }
 }
+
+export async function getTestimonialById(id: string): Promise<Testimonial | null> {
+  try {
+    const response = await apiClient<{ data: Testimonial }>(
+      `${API_ROUTES.TESTIMONIAL}/${id}`,
+      { next: { tags: [`testimonial-${id}`] } }
+    );
+
+    if (!response || !response.data) return null;
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching testimonial:", error);
+    return null;
+  }
+}

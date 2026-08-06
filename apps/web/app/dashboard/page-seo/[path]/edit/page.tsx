@@ -1,17 +1,7 @@
+import { getPageSeoByPath } from "@/actions/page-seo-action";
 import { PageSeoForm } from "@/components/dashboard/page-seo-form";
+import NoData from "@/components/no-data";
 import BreadCrumbs from "@/components/ui/bread-crumbs";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-async function getPageSeo(path: string) {
-  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-  const res = await fetch(`${API_BASE_URL}/page-seo/${cleanPath}`, {
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.data;
-}
 
 export default async function EditPageSeoPage({
   params,
@@ -19,18 +9,7 @@ export default async function EditPageSeoPage({
   params: Promise<{ path: string }>;
 }) {
   const { path } = await params;
-  const pageSeo = await getPageSeo(path);
-
-  if (!pageSeo) {
-    return (
-      <div className="space-y-6">
-        <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
-          <h2 className="text-lg font-black tracking-tight text-primarymain">Page SEO Not Found</h2>
-          <BreadCrumbs path="page-seo" page="Edit" />
-        </div>
-      </div>
-    );
-  }
+  const pageSeo = await getPageSeoByPath(path);
 
   return (
     <div className="space-y-6">
@@ -38,7 +17,7 @@ export default async function EditPageSeoPage({
         <h2 className="text-lg font-black tracking-tight text-primarymain">Edit Page SEO</h2>
         <BreadCrumbs path="page-seo" page="Edit" />
       </div>
-      <PageSeoForm pageSeo={pageSeo} />
+      {pageSeo ? <PageSeoForm pageSeo={pageSeo} /> : <NoData title="Page SEO" />}
     </div>
   );
 }

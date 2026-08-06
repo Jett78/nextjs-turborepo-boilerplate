@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
 import type { PageSeo, PageSeoResponse, PageSeoListResponse } from "@/types/page-seo";
 
@@ -34,16 +35,13 @@ export async function getPageSeoList(): Promise<PageSeo[]> {
 export async function getPageSeoByPath(path: string): Promise<PageSeo | null> {
   try {
     const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-    const response = await fetch(`${API_ROUTES.PAGE_SEO}/${cleanPath}`, {
-      headers: { "Content-Type": "application/json" },
-    });
-    if (!response.ok) return null;
+    const response = await apiClient<{ data: PageSeo }>(
+      `${API_ROUTES.PAGE_SEO}/${cleanPath}`,
+      { next: { tags: [`page-seo-${cleanPath}`] } }
+    );
 
-    const data: PageSeoResponse = await response.json();
-    if (data?.success && data.data) {
-      return data.data;
-    }
-    return null;
+    if (!response || !response.data) return null;
+    return response.data;
   } catch (error) {
     return null;
   }

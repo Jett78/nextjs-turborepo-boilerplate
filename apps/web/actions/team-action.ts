@@ -26,8 +26,23 @@ export async function getTeamMemberBySlug(slug: string): Promise<TeamMember | nu
       { next: { tags: [`team-member-${slug}`] } }
     );
 
-    if (!response || !response.success || !response.data) return null;
+    if (!response || !response.data) return null;
     return response.data || null;
+  } catch (error) {
+    console.error("Error fetching team member:", error);
+    return null;
+  }
+}
+
+export async function getTeamMemberById(id: string): Promise<TeamMember | null> {
+  try {
+    const response = await apiClient<{ data: TeamMember }>(
+      `${API_ROUTES.TEAM}/${id}`,
+      { next: { tags: [`team-member-${id}`] } }
+    );
+
+    if (!response || !response.data) return null;
+    return response.data;
   } catch (error) {
     console.error("Error fetching team member:", error);
     return null;

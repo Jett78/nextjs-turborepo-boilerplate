@@ -1,16 +1,7 @@
+import { getBlogById } from "@/actions/blog-action";
 import { BlogForm } from "@/components/dashboard/blog-form";
+import NoData from "@/components/no-data";
 import BreadCrumbs from "@/components/ui/bread-crumbs";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-async function getBlog(id: string) {
-  const res = await fetch(`${API_BASE_URL}/blogs/${id}`, {
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.data;
-}
 
 export default async function EditBlogPage({
   params,
@@ -18,18 +9,7 @@ export default async function EditBlogPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const blog = await getBlog(id);
-
-  if (!blog) {
-    return (
-      <div className="space-y-6">
-        <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
-          <h2 className="text-lg font-black tracking-tight text-primarymain">Blog Not Found</h2>
-          <BreadCrumbs path="blogs" page="Edit" />
-        </div>
-      </div>
-    );
-  }
+  const blog = await getBlogById(id);
 
   return (
     <div className="space-y-6">
@@ -37,7 +17,7 @@ export default async function EditBlogPage({
         <h2 className="text-lg font-black tracking-tight text-primarymain">Edit Blog</h2>
         <BreadCrumbs path="blogs" page="Edit" />
       </div>
-      <BlogForm blog={blog} />
+      {blog ? <BlogForm blog={blog} /> : <NoData title="Blog" />}
     </div>
   );
 }

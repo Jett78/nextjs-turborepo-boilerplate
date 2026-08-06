@@ -26,8 +26,23 @@ export async function getServiceBySlug(slug: string): Promise<Service | null> {
       { next: { tags: [`service-${slug}`] } }
     );
 
-    if (!response || !response.success || !response.data) return null;
+    if (!response || !response.data) return null;
     return response.data || null;
+  } catch (error) {
+    console.error("Error fetching service:", error);
+    return null;
+  }
+}
+
+export async function getServiceById(id: string): Promise<Service | null> {
+  try {
+    const response = await apiClient<{ data: Service }>(
+      `${API_ROUTES.SERVICE}/${id}`,
+      { next: { tags: [`service-${id}`] } }
+    );
+
+    if (!response || !response.data) return null;
+    return response.data;
   } catch (error) {
     console.error("Error fetching service:", error);
     return null;

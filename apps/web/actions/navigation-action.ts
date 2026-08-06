@@ -25,3 +25,18 @@ export async function getNavigationItems(): Promise<NavigationItem[]> {
     return [];
   }
 }
+
+export async function getNavigationItemById(id: string): Promise<NavigationItem | null> {
+  try {
+    const response = await apiClient<{ data: NavigationItem }>(
+      `${API_ROUTES.NAVIGATION}/${id}`,
+      { next: { tags: [`navigation-${id}`] } }
+    );
+
+    if (!response || !response.data) return null;
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching navigation item:", error);
+    return null;
+  }
+}
