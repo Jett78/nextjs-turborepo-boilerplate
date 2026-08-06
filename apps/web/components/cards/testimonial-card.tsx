@@ -79,9 +79,9 @@ const TestimonialCard = ({
         </div>
 
         <div>
-          <h4 className="text-sm font-semibold text-zinc-900">
+          <p className="text-sm font-semibold text-zinc-900">
             {testimonial.name}
-          </h4>
+          </p>
           {testimonial.designation && (
             <p className="text-muted-foreground text-xs">
               {testimonial.designation}

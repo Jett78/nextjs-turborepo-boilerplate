@@ -10,6 +10,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -71,10 +72,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         {/* Hero Image Overlay */}
         {service.imageKey && (
           <div className="absolute inset-0">
-            <img
+            <Image
               src={service.imageKey}
               alt={service.name}
-              className="h-full w-full object-cover opacity-20"
+              fill
+              className="object-cover opacity-20"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-slate-900/60" />
           </div>
@@ -140,9 +142,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               {/* Service Image */}
               {service.imageKey && (
                 <div className="rounded-3xl overflow-hidden shadow-sm ring-1 ring-slate-900/5">
-                  <img
+                  <Image
                     src={service.imageKey}
                     alt={service.name}
+                    width={800}
+                    height={500}
                     className="w-full h-auto object-cover max-h-[500px]"
                   />
                 </div>
@@ -161,10 +165,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                         key={i}
                         className="relative aspect-square overflow-hidden rounded-2xl"
                       >
-                        <img
+                        <Image
                           src={image}
                           alt={`${service.name} gallery ${i + 1}`}
-                          className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                          fill
+                          className="object-cover transition-transform duration-300 hover:scale-105"
                         />
                       </div>
                     ))}
@@ -285,10 +290,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   >
                     {related.imageKey && (
                       <div className="relative h-48 overflow-hidden">
-                        <img
+                        <Image
                           src={related.imageKey}
                           alt={related.name}
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                       </div>

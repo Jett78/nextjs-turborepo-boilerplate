@@ -40,6 +40,7 @@ export default function InquiryModal({ inquiry, onClose }: InquiryModalProps) {
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            aria-label="Close"
           >
             <X className="size-5 text-slate-500" />
           </button>
@@ -51,7 +52,7 @@ export default function InquiryModal({ inquiry, onClose }: InquiryModalProps) {
               {inquiry.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h4 className="text-lg font-bold text-slate-900">{inquiry.name}</h4>
+              <p className="text-lg font-bold text-slate-900">{inquiry.name}</p>
               <p className="text-sm text-slate-500">Contact Person</p>
             </div>
           </div>

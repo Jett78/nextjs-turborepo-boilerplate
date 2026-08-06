@@ -7,6 +7,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useCrud } from "@/hooks/useCRUD";
 import { API_ROUTES } from "@/config/api-routes";
+import Image from "next/image";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { EditButton } from "@/components/dashboard/edit-button";
 import { revalidateTeamMembers } from "@/actions/revalidate-action";
@@ -52,9 +53,11 @@ export default function TeamPage() {
       render: (row) => (
         <div className="flex items-center gap-3">
           {row.avatar ? (
-            <img
+            <Image
               src={row.avatar}
               alt={row.name}
+              width={36}
+              height={36}
               className="size-9 rounded-full object-cover"
             />
           ) : (

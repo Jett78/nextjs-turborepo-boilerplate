@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { uploadMultipleImages } from "@/actions/upload-action";
 import { showSuccess, showError } from "@/lib/toast-helper";
+import Image from "next/image";
 import { X, Upload, Loader2 } from "lucide-react";
 
 interface ImageUploadMultipleProps {
@@ -159,10 +160,11 @@ export default function ImageUploadMultiple({
               key={index}
               className="group relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-white"
             >
-              <img
+              <Image
                 src={image.url}
                 alt={`Upload ${index + 1}`}
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
               />
 
               {/* Overlay */}

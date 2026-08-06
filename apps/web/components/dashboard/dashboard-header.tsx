@@ -48,7 +48,10 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       </button>
 
       <div className="flex items-center gap-4">
-        <button className="relative p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors">
+        <button
+          className="relative p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors"
+          aria-label="Notifications"
+        >
           <Bell className="size-5" />
           <span className="absolute top-2 right-2 size-2 bg-secondary rounded-full border-2 border-white" />
         </button>

@@ -51,6 +51,7 @@ export default function UserModal({ user, onClose }: UserModalProps) {
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            aria-label="Close"
           >
             <X className="size-5 text-slate-500" />
           </button>
@@ -72,7 +73,7 @@ export default function UserModal({ user, onClose }: UserModalProps) {
               )}
             </div>
             <div>
-              <h4 className="text-lg font-bold text-slate-900">{user.name}</h4>
+              <p className="text-lg font-bold text-slate-900">{user.name}</p>
               <p className="text-sm text-slate-500">User Account</p>
             </div>
           </div>

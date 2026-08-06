@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getTeamMemberBySlug } from "@/actions/team-action";
 import { MessageCircle, Calendar, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -48,9 +49,11 @@ export default async function TeamMemberPage({ params }: PageProps) {
             <div className="relative bg-gradient-to-br from-primarymain to-indigo-700 p-12 lg:p-16 flex items-center justify-center order-1 lg:order-2">
               <div className="relative">
                 {member.avatar ? (
-                  <img
+                  <Image
                     src={member.avatar}
                     alt={member.name}
+                    width={288}
+                    height={288}
                     className="size-64 sm:size-72 rounded-2xl object-cover ring-4 ring-white/20 shadow-2xl"
                   />
                 ) : (

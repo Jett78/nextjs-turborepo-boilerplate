@@ -1,5 +1,6 @@
 import { MessageCircle, Calendar } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import type { TeamMember } from "@/types/team";
 
 interface TeamCardProps {
@@ -15,9 +16,11 @@ export default function TeamCard({ member }: TeamCardProps) {
       <div className="flex flex-col items-center text-center">
         <div className="relative">
           {member.avatar ? (
-            <img
+            <Image
               src={member.avatar}
               alt={member.name}
+              width={96}
+              height={96}
               className="size-24 rounded-full object-cover ring-4 ring-white shadow-md"
             />
           ) : (

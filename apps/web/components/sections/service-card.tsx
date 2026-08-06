@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import { ArrowUpRight, Sparkles, Check } from "lucide-react";
 
@@ -30,10 +31,11 @@ export function ServiceCard({ service, index }: ServiceCardProps) {
               isFeatured ? "h-72 sm:h-80" : "h-56 sm:h-64"
             }`}
           >
-            <img
+            <Image
               src={service.imageKey}
               alt={service.name}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
