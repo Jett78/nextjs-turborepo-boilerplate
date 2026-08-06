@@ -21,7 +21,7 @@ export default async function EditTeamMemberPage({
   return (
     <div className="space-y-6">
       <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Edit Team Member</h1>
+        <h2 className="text-lg font-black tracking-tight text-primarymain">Edit Team Member</h2>
         <BreadCrumbs path="team" page="Edit" />
       </div>
       <TeamMemberForm teamMember={teamMember} />

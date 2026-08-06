@@ -11,7 +11,7 @@ export default async function EditNavigationPage({
   return (
     <div className="space-y-6">
       <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Edit Navigation Item</h1>
+        <h2 className="text-lg font-black tracking-tight text-primarymain">Edit Navigation Item</h2>
         <BreadCrumbs path="navigation" page="Edit" />
       </div>
       <NavigationEditClient id={id} />

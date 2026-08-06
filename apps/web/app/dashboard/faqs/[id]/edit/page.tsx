@@ -21,7 +21,7 @@ export default async function EditFaqPage({
   return (
     <div className="space-y-6">
       <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Edit FAQ</h1>
+        <h2 className="text-lg font-black tracking-tight text-primarymain">Edit FAQ</h2>
         <BreadCrumbs path="faqs" page="Edit" />
       </div>
       <FaqForm faq={faq} />

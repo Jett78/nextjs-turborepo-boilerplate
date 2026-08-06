@@ -15,7 +15,7 @@ export default function AddUserPage() {
           <ArrowLeft className="size-5 text-slate-600" />
         </Link>
         <div>
-          <h1 className="text-lg font-bold text-slate-900">Add New User</h1>
+          <h2 className="text-lg font-black tracking-tight text-primarymain">Add New User</h2>
           <p className="text-slate-500 mt-1 text-xs">
             Create a new user account with their role and credentials.
           </p>

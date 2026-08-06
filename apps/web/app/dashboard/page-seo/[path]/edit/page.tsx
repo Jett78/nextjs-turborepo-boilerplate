@@ -25,7 +25,7 @@ export default async function EditPageSeoPage({
     return (
       <div className="space-y-6">
         <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
-          <h1 className="text-2xl font-bold tracking-tight">Page SEO Not Found</h1>
+          <h2 className="text-lg font-black tracking-tight text-primarymain">Page SEO Not Found</h2>
           <BreadCrumbs path="page-seo" page="Edit" />
         </div>
       </div>
@@ -35,7 +35,7 @@ export default async function EditPageSeoPage({
   return (
     <div className="space-y-6">
       <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Edit Page SEO</h1>
+        <h2 className="text-lg font-black tracking-tight text-primarymain">Edit Page SEO</h2>
         <BreadCrumbs path="page-seo" page="Edit" />
       </div>
       <PageSeoForm pageSeo={pageSeo} />

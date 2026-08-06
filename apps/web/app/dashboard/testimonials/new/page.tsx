@@ -5,7 +5,7 @@ export default function NewTestimonialPage() {
   return (
     <div className="space-y-6">
       <div className="mb-8 flex flex-wrap justify-between gap-x-8 gap-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Create New Testimonial</h1>
+        <h2 className="text-lg font-black tracking-tight text-primarymain">Create New Testimonial</h2>
         <BreadCrumbs path="testimonials" page="Add" />
       </div>
       <TestimonialForm />
