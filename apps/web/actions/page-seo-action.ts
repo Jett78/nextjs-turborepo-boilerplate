@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { API_ROUTES } from "@/config/api-routes";
 import type { PageSeo, PageSeoResponse, PageSeoListResponse } from "@/types/page-seo";
 
-async function authFetch<T>(url: string, options?: RequestInit): Promise<T | null> {
+export async function getPageSeoList(): Promise<PageSeo[]> {
   try {
     const cookieStore = await cookies();
     const sessionToken =
@@ -13,38 +13,40 @@ async function authFetch<T>(url: string, options?: RequestInit): Promise<T | nul
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      ...(options?.headers as Record<string, string>),
     };
     if (sessionToken) {
       headers["Cookie"] = `better-auth.session_token=${sessionToken}`;
     }
 
-    const response = await fetch(url, { ...options, headers });
+    const response = await fetch(API_ROUTES.PAGE_SEO, { headers });
+    if (!response.ok) return [];
 
-    if (!response.ok) return null;
-
-    return response.json();
+    const data: PageSeoListResponse = await response.json();
+    if (data?.success && data.data) {
+      return data.data;
+    }
+    return [];
   } catch (error) {
-    console.error("Auth fetch failed:", error);
-    return null;
+    return [];
   }
-}
-
-export async function getPageSeoList(): Promise<PageSeo[]> {
-  const response = await authFetch<PageSeoListResponse>(API_ROUTES.PAGE_SEO);
-  if (response?.success && response.data) {
-    return response.data;
-  }
-  return [];
 }
 
 export async function getPageSeoByPath(path: string): Promise<PageSeo | null> {
-  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-  const response = await authFetch<PageSeoResponse>(`${API_ROUTES.PAGE_SEO}/${cleanPath}`);
-  if (response?.success && response.data) {
-    return response.data;
+  try {
+    const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+    const response = await fetch(`${API_ROUTES.PAGE_SEO}/${cleanPath}`, {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!response.ok) return null;
+
+    const data: PageSeoResponse = await response.json();
+    if (data?.success && data.data) {
+      return data.data;
+    }
+    return null;
+  } catch (error) {
+    return null;
   }
-  return null;
 }
 
 export async function getPageSeoForMetadata(path: string) {
