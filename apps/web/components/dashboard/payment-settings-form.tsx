@@ -9,7 +9,8 @@ import { useForm } from "@/hooks/useForm";
 import { API_ROUTES } from "@/config/api-routes";
 import { showSuccess, showError } from "@/lib/toast-helper";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
-import {  Key, Shield, Eye, EyeOff, Loader2 } from "lucide-react";
+import Loading from "@/app/loading";
+import {  Key, Shield, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 export function PaymentSettingsForm() {
@@ -84,12 +85,7 @@ export function PaymentSettingsForm() {
   };
 
   if (isLoadingSettings) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 text-purple-500 animate-spin" />
-        <span className="ml-3 text-slate-600">Loading payment settings...</span>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

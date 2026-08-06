@@ -5,7 +5,7 @@ import { useCrud } from "@/hooks/useCRUD";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { API_ROUTES } from "@/config/api-routes";
-import { showSuccess, showWarning, showError } from "@/lib/toast-helper";
+import { showSuccess, showError } from "@/lib/toast-helper";
 import {
   Shield,
   Search,
@@ -31,6 +31,7 @@ import PrimaryButton from "@/components/ui/primary-button";
 import { Input } from "@/components/ui/input";
 import DashboardHeading from "@/components/dashboard/dashboard-heading";
 import SubmittingLoader from "@/components/dashboard/submitting-loader";
+import Loading from "@/app/loading";
 
 interface Permission {
   id: string;
@@ -360,16 +361,7 @@ export default function RolePermissionsPage() {
     [currentRolePermissions]
   );
 
-  const handleRoleChange = async (role: string) => {
-    if (hasUnsavedChanges) {
-      await syncMutation.mutateAsync(
-        { role: selectedRole, permissionKeys: Array.from(pendingChanges) },
-        {
-          onSuccess: () => showWarning("Unsaved changes saved automatically"),
-          onError: () => showError("Failed to save changes"),
-        }
-      );
-    }
+  const handleRoleChange = (role: string) => {
     setPendingChanges(new Set());
     setSelectedRole(role);
   };
@@ -391,34 +383,6 @@ export default function RolePermissionsPage() {
     setPendingChanges(new Set());
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-8 animate-in fade-in duration-500">
-        <DashboardHeading
-          title="Role Permissions"
-          description="Control what each role can access in the admin panel."
-        />
-        <div className="flex items-center justify-center min-h-[40vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!roleData) {
-    return (
-      <div className="space-y-8 animate-in fade-in duration-500">
-        <DashboardHeading
-          title="Role Permissions"
-          description="Control what each role can access in the admin panel."
-        />
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-          <p className="text-slate-500">Failed to load permissions</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {syncMutation.isPending && <SubmittingLoader status="Saving permissions" />}
@@ -438,6 +402,10 @@ export default function RolePermissionsPage() {
         </div>
       </div>
 
+      {isLoading ? (
+        <Loading />
+      ) : (
+      <>
       {/* Role Tabs */}
       <div className="flex flex-wrap gap-2">
         {roles.map((role) => {
@@ -530,6 +498,8 @@ export default function RolePermissionsPage() {
         </div>
       )}
 
+      </>
+      )}
     </div>
   );
 }

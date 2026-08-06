@@ -4,11 +4,11 @@ import { useState } from "react";
 import {
   Globe,
   Loader2,
-  CheckCircle,
   AlertCircle,
   ExternalLink,
   ArrowRight,
   Zap,
+  CheckCircle,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import DashboardHeading from "@/components/dashboard/dashboard-heading";
@@ -18,6 +18,7 @@ import { showSuccess, showError } from "@/lib/toast-helper";
 import { API_ROUTES } from "@/config/api-routes";
 import { useCrud } from "@/hooks/useCRUD";
 import { apiClient } from "@/lib/api-client";
+import Loading from "@/app/loading";
 
 interface Domain {
   id: string;
@@ -122,17 +123,6 @@ export default function DomainsPage() {
     return configs[status] || configs.pending;
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-20">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 text-purple-500 animate-spin" />
-          <p className="text-sm text-slate-500">Loading domain settings...</p>
-        </div>
-      </div>
-    );
-  }
-
   const statusConfig = savedDomain ? getStatusConfig(savedDomain.status) : null;
   const StatusIcon = statusConfig?.icon;
 
@@ -146,6 +136,9 @@ export default function DomainsPage() {
         description="Connect your own domain to serve this application"
       />
 
+      {isLoading ? (
+        <Loading />
+      ) : (
       <div className="space-y-6">
         {/* Status Banner */}
         {savedDomain && statusConfig && (
@@ -241,6 +234,7 @@ export default function DomainsPage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }
